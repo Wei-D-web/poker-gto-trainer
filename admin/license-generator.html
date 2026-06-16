@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PokerGTO — 卡密生成器</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'SF Mono', monospace; background: #0A0A0A; color: #E5E7EB; padding: 40px; max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+  .subtitle { color: #6B7280; font-size: 13px; margin-bottom: 32px; }
+  .section { background: #111; border: 1px solid #222; border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+  .section h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; color: #9CA3AF; }
+  .row { display: flex; gap: 12px; align-items: flex-end; margin-bottom: 16px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11px; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; }
+  .field input, .field select { padding: 8px 12px; background: #1A1A1A; border: 1px solid #333; border-radius: 8px; color: #E5E7EB; font-size: 14px; font-family: 'SF Mono', monospace; }
+  .field input:focus, .field select:focus { outline: none; border-color: #3B82F6; }
+  button { padding: 10px 20px; background: #3B82F6; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  button:hover { background: #2563EB; }
+  button:disabled { background: #374151; color: #6B7280; cursor: not-allowed; }
+  .key-list { max-height: 400px; overflow-y: auto; }
+  .key-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #1A1A1A; border: 1px solid #222; border-radius: 6px; margin-bottom: 4px; font-size: 13px; }
+  .key-item .key { color: #34D399; font-weight: 600; letter-spacing: 0.02em; }
+  .key-item .copy-btn { padding: 4px 10px; background: #222; color: #9CA3AF; border: 1px solid #333; border-radius: 4px; font-size: 11px; cursor: pointer; }
+  .key-item .copy-btn:hover { background: #333; color: white; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .stat-box { background: #111; border: 1px solid #222; border-radius: 10px; padding: 16px; text-align: center; }
+  .stat-box .num { font-size: 28px; font-weight: 900; color: #3B82F6; }
+  .stat-box .label { font-size: 11px; color: #6B7280; margin-top: 4px; }
+  .toast { position: fixed; bottom: 20px; right: 20px; padding: 12px 20px; background: #065F46; color: #6EE7B7; border-radius: 8px; font-size: 13px; animation: slideIn 0.3s ease; }
+  @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .supabase-config { display: none; }
+  .supabase-config.show { display: block; }
+  .mode-tabs { display: flex; gap: 4px; margin-bottom: 20px; background: #111; border-radius: 10px; padding: 4px; }
+  .mode-tab { flex:1; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; text-align: center; cursor: pointer; border: none; background: transparent; color: #6B7280; transition: all 0.2s; }
+  .mode-tab.active { background: #3B82F6; color: white; }
+  textarea { width: 100%; padding: 12px; background: #1A1A1A; border: 1px solid #333; border-radius: 8px; color: #E5E7EB; font-size: 13px; font-family: 'SF Mono', monospace; resize: vertical; }
+  textarea:focus { outline: none; border-color: #3B82F6; }
+  .help { font-size: 11px; color: #6B7280; line-height: 1.8; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<h1>🔑 卡密生成器</h1>
+<p class="subtitle">PokerGTO Trainer — License Key Generator</p>
+
+<!-- Mode switcher -->
+<div class="mode-tabs">
+  <button class="mode-tab active" onclick="switchMode('local')">💻 本地生成</button>
+  <button class="mode-tab" onclick="switchMode('supabase')">☁️ Supabase 生成</button>
+</div>
+
+<!-- Stats -->
+<div class="stats">
+  <div class="stat-box">
+    <div class="num" id="stat-active">0</div>
+    <div class="label">可用卡密</div>
+  </div>
+  <div class="stat-box">
+    <div class="num" id="stat-used">0</div>
+    <div class="label">已使用</div>
+  </div>
+  <div class="stat-box">
+    <div class="num" id="stat-total">0</div>
+    <div class="label">总计</div>
+  </div>
+</div>
+
+<!-- Local mode -->
+<div id="local-mode">
+  <div class="section">
+    <h3>📦 批量生成卡密（本地）</h3>
+    <div class="row">
+      <div class="field">
+        <label>数量</label>
+        <input type="number" id="gen-count" value="10" min="1" max="1000" style="width: 100px;">
+      </div>
+      <div class="field">
+        <label>等级</label>
+        <select id="gen-tier" style="width: 130px;">
+          <option value="pro">Pro (月/年)</option>
+          <option value="lifetime">Lifetime (终身)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>前缀</label>
+        <input type="text" id="gen-prefix" value="PGTO" style="width: 100px;">
+      </div>
+      <button onclick="generateLocal()">生成卡密</button>
+    </div>
+  </div>
+</div>
+
+<!-- Supabase mode -->
+<div id="supabase-mode" style="display:none;">
+  <div class="section">
+    <h3>🔧 Supabase 配置</h3>
+    <div class="row">
+      <div class="field" style="flex:2;">
+        <label>Supabase URL</label>
+        <input type="text" id="sb-url" placeholder="https://xxx.supabase.co">
+      </div>
+      <div class="field" style="flex:2;">
+        <label>Service Role Key</label>
+        <input type="password" id="sb-key" placeholder="eyJ...">
+      </div>
+      <button onclick="connectSupabase()">连接</button>
+    </div>
+    <p class="help">⚠️ Service Role Key 仅在本地使用，不会上传到任何服务器。</p>
+  </div>
+
+  <div class="section" id="sb-generate" style="display:none;">
+    <h3>☁️ 通过 Supabase 函数生成（写入数据库）</h3>
+    <div class="row">
+      <div class="field">
+        <label>数量</label>
+        <input type="number" id="sb-count" value="10" min="1" max="500" style="width: 100px;">
+      </div>
+      <div class="field">
+        <label>等级</label>
+        <select id="sb-tier" style="width: 130px;">
+          <option value="pro">Pro</option>
+          <option value="lifetime">Lifetime</option>
+        </select>
+      </div>
+      <button onclick="generateSupabase()">生成并写入数据库</button>
+    </div>
+  </div>
+</div>
+
+<!-- Key output -->
+<div class="section" id="output-section" style="display:none;">
+  <h3>📋 生成的卡密 <span id="batch-info" style="font-weight:400; font-size:12px; color:#6B7280;"></span></h3>
+  <div style="display:flex; gap:8px; margin-bottom:12px;">
+    <button onclick="copyAll()" style="background:#222; font-size:11px;">📋 复制全部</button>
+    <button onclick="exportCSV()" style="background:#222; font-size:11px;">📥 导出 CSV</button>
+    <button onclick="clearKeys()" style="background:#222; font-size:11px; color:#EF4444;">🗑 清除</button>
+  </div>
+  <div class="key-list" id="key-list"></div>
+</div>
+
+<!-- Manual key check -->
+<div class="section">
+  <h3>🔍 检查卡密状态</h3>
+  <div class="row">
+    <div class="field" style="flex:1;">
+      <label>输入卡密</label>
+      <input type="text" id="check-key" placeholder="PGTO-XXXX-XXXX-XXXX" style="width: 280px;">
+    </div>
+    <button onclick="checkKey()">检查</button>
+  </div>
+  <div id="check-result" style="font-size: 13px;"></div>
+</div>
+
+<script>
+// ==============================
+// Mode switching
+// ==============================
+function switchMode(mode) {
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'))
+  event.target.classList.add('active')
+  document.getElementById('local-mode').style.display = mode === 'local' ? 'block' : 'none'
+  document.getElementById('supabase-mode').style.display = mode === 'supabase' ? 'block' : 'none'
+}
+
+// ==============================
+// Local generation
+// ==============================
+let currentKeys = []
+
+function generateKey(prefix) {
+  const seg = () => Math.random().toString(36).substring(2, 6).toUpperCase()
+  return `${prefix}-${seg()}-${seg()}-${seg()}`
+}
+
+function generateLocal() {
+  const count = parseInt(document.getElementById('gen-count').value) || 10
+  const tier = document.getElementById('gen-tier').value
+  const prefix = document.getElementById('gen-prefix').value || 'PGTO'
+
+  currentKeys = []
+  for (let i = 0; i < count; i++) {
+    currentKeys.push({ key: generateKey(prefix), tier, status: 'active' })
+  }
+
+  renderKeys('local_' + Date.now(), tier)
+  toast(`已生成 ${count} 个 ${tier === 'lifetime' ? 'Lifetime' : 'Pro'} 卡密`)
+}
+
+// ==============================
+// Supabase generation
+// ==============================
+let sbClient = null
+
+async function connectSupabase() {
+  const url = document.getElementById('sb-url').value.trim()
+  const key = document.getElementById('sb-key').value.trim()
+  if (!url || !key) return toast('请输入 Supabase URL 和 Service Role Key')
+
+  try {
+    const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2')
+    sbClient = createClient(url, key)
+
+    // Test connection
+    const { data, error } = await sbClient.rpc('generate_license_keys', {
+      p_count: 0, p_tier: 'pro', p_prefix: 'TEST'
+    })
+
+    if (error) throw error
+    document.getElementById('sb-generate').style.display = 'block'
+    toast('✅ Supabase 连接成功')
+    refreshStats()
+  } catch (e) {
+    toast('❌ 连接失败: ' + e.message)
+  }
+}
+
+async function generateSupabase() {
+  if (!sbClient) return toast('请先连接 Supabase')
+
+  const count = parseInt(document.getElementById('sb-count').value) || 10
+  const tier = document.getElementById('sb-tier').value
+
+  try {
+    const { data, error } = await sbClient.rpc('generate_license_keys', {
+      p_count: count,
+      p_tier: tier,
+      p_prefix: 'PGTO',
+      p_batch_id: null,
+    })
+
+    if (error) throw error
+
+    currentKeys = data.keys.map(k => ({ key: k, tier, status: 'active' }))
+    renderKeys(data.batch_id, tier)
+    refreshStats()
+    toast(`✅ 已生成 ${count} 个卡密并写入数据库`)
+  } catch (e) {
+    toast('❌ 生成失败: ' + e.message)
+  }
+}
+
+// ==============================
+// Check key status
+// ==============================
+async function checkKey() {
+  const key = document.getElementById('check-key').value.trim().toUpperCase()
+  if (!key) return
+
+  const resultEl = document.getElementById('check-result')
+
+  if (sbClient) {
+    // Check via Supabase
+    const { data, error } = await sbClient
+      .from('license_keys')
+      .select('*')
+      .eq('key', key)
+      .single()
+
+    if (error || !data) {
+      resultEl.innerHTML = '<span style="color:#EF4444;">❌ 卡密不存在</span>'
+    } else {
+      const color = data.status === 'active' ? '#34D399' : data.status === 'used' ? '#F59E0B' : '#EF4444'
+      resultEl.innerHTML = `<span style="color:${color};">
+        🔑 ${data.key} — ${data.status === 'active' ? '✅ 可用' : data.status === 'used' ? '⚠️ 已使用 (' + data.activated_email + ')' : '❌ 已作废'}
+        [${data.tier}] [${data.batch_id}]
+      </span>`
+    }
+  } else {
+    // Check local
+    const found = currentKeys.find(k => k.key === key)
+    resultEl.innerHTML = found
+      ? `<span style="color:#34D399;">✅ ${key} — 本地生成，可用</span>`
+      : `<span style="color:#F59E0B;">⚠️ 本地未找到该卡密（可能是在其他地方生成的）</span>`
+  }
+}
+
+// ==============================
+// Stats (Supabase only)
+// ==============================
+async function refreshStats() {
+  if (!sbClient) return
+
+  const { data: active } = await sbClient.from('license_keys').select('*', { count: 'exact', head: true }).eq('status', 'active')
+  const { data: used } = await sbClient.from('license_keys').select('*', { count: 'exact', head: true }).eq('status', 'used')
+  const { data: total } = await sbClient.from('license_keys').select('*', { count: 'exact', head: true })
+
+  document.getElementById('stat-active').textContent = active?.count || 0
+  document.getElementById('stat-used').textContent = used?.count || 0
+  document.getElementById('stat-total').textContent = total?.count || 0
+}
+
+// ==============================
+// UI helpers
+// ==============================
+function renderKeys(batchId, tier) {
+  document.getElementById('output-section').style.display = 'block'
+  document.getElementById('batch-info').textContent = `批次: ${batchId} | 等级: ${tier} | ${currentKeys.length} 个`
+
+  const list = document.getElementById('key-list')
+  list.innerHTML = currentKeys.map((k, i) => `
+    <div class="key-item">
+      <span style="color:#6B7280;">#${i + 1}</span>
+      <span class="key">${k.key}</span>
+      <span style="color:#6B7280; font-size:11px;">${k.tier === 'lifetime' ? '终身' : 'Pro'}</span>
+      <button class="copy-btn" onclick="copyOne('${k.key}')">复制</button>
+    </div>
+  `).join('')
+}
+
+function copyOne(key) {
+  navigator.clipboard.writeText(key)
+  toast('已复制: ' + key)
+}
+
+function copyAll() {
+  const text = currentKeys.map(k => k.key).join('\n')
+  navigator.clipboard.writeText(text)
+  toast(`已复制 ${currentKeys.length} 个卡密`)
+}
+
+function exportCSV() {
+  const csv = 'key,tier,status\n' + currentKeys.map(k => `${k.key},${k.tier},${k.status}`).join('\n')
+  const blob = new Blob([csv], { type: 'text/csv' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `poker-gto-keys-${Date.now()}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
+function clearKeys() {
+  currentKeys = []
+  document.getElementById('output-section').style.display = 'none'
+  document.getElementById('key-list').innerHTML = ''
+}
+
+function toast(msg) {
+  const el = document.createElement('div')
+  el.className = 'toast'
+  el.textContent = msg
+  document.body.appendChild(el)
+  setTimeout(() => el.remove(), 2500)
+}
+
+// Init
+if (currentKeys.length > 0) renderKeys('', 'pro')
+</script>
+</body>
+</html>

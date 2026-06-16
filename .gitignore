@@ -1,0 +1,8 @@
+dist/
+dist-web/
+node_modules/
+out/
+.env
+*.dmg
+*.dmg.blockmap
+.DS_Store

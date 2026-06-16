@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PokerGTO Trainer — 专业 GTO 扑克训练平台</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #05080C; color: #EDF1F7; line-height:1.6; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  /* Hero */
+  .hero { text-align: center; padding: 100px 0 60px; }
+  .hero .badge { display: inline-block; padding: 6px 16px; border-radius: 20px; background: rgba(59,130,246,0.1); color: #60A5FA; font-size: 13px; font-weight: 600; margin-bottom: 24px; border: 1px solid rgba(59,130,246,0.2); }
+  .hero h1 { font-size: 56px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 16px; background: linear-gradient(135deg, #60A5FA, #A78BFA, #34D399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { font-size: 18px; color: #94A3B8; max-width: 600px; margin: 0 auto 32px; }
+  .hero .cta-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn { padding: 14px 32px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
+  .btn-primary { background: linear-gradient(135deg, #2563EB, #7C3AED); color: white; box-shadow: 0 4px 24px rgba(37,99,235,0.3); border: none; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(37,99,235,0.4); }
+  .btn-outline { background: transparent; color: #94A3B8; border: 1px solid #1C2A3D; }
+  .btn-outline:hover { border-color: #3B82F6; color: #EDF1F7; }
+
+  /* Stats bar */
+  .stats-bar { display: flex; justify-content: center; gap: 48px; padding: 32px 0; border-top: 1px solid #152233; border-bottom: 1px solid #152233; margin-bottom: 80px; }
+  .stat { text-align: center; }
+  .stat .num { font-size: 32px; font-weight: 900; color: #EDF1F7; }
+  .stat .label { font-size: 13px; color: #64748B; margin-top: 4px; }
+
+  /* Section */
+  .section { padding: 60px 0; }
+  .section h2 { font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 12px; }
+  .section .subtitle { text-align: center; color: #94A3B8; margin-bottom: 48px; font-size: 16px; }
+
+  /* Module grid */
+  .module-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .module-card { background: #090D14; border: 1px solid #152233; border-radius: 16px; padding: 20px; transition: all 0.2s; }
+  .module-card:hover { border-color: #2A3B52; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+  .module-card .icon { font-size: 24px; margin-bottom: 8px; }
+  .module-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .module-card p { font-size: 12px; color: #64748B; }
+  .new-badge { display: inline-block; padding: 2px 8px; border-radius: 8px; background: rgba(16,185,129,0.1); color: #34D399; font-size: 10px; font-weight: 700; margin-left: 6px; }
+
+  /* Pricing */
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; margin: 0 auto; }
+  .pricing-card { background: #090D14; border: 1px solid #152233; border-radius: 20px; padding: 32px; text-align: center; position: relative; }
+  .pricing-card.popular { border-color: #3B82F6; box-shadow: 0 0 40px rgba(59,130,246,0.1); }
+  .pricing-card.popular::before { content: '最受欢迎'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3B82F6; color: white; padding: 4px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; }
+  .pricing-card h3 { font-size: 18px; margin-bottom: 8px; }
+  .pricing-card .price { font-size: 44px; font-weight: 900; margin: 16px 0; }
+  .pricing-card .price span { font-size: 16px; font-weight: 500; color: #64748B; }
+  .pricing-card ul { list-style: none; text-align: left; margin: 24px 0; }
+  .pricing-card li { font-size: 13px; padding: 6px 0; color: #94A3B8; }
+  .pricing-card li::before { content: '✓'; color: #34D399; margin-right: 8px; font-weight: 700; }
+
+  /* Footer */
+  .footer { text-align: center; padding: 40px 0; color: #475569; font-size: 13px; border-top: 1px solid #152233; margin-top: 60px; }
+
+  @media (max-width: 900px) {
+    .module-grid { grid-template-columns: repeat(2, 1fr); }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 36px; }
+    .stats-bar { gap: 24px; flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <div class="badge">🎯 GTO 扑克训练 · 专业版</div>
+    <h1>PokerGTO Trainer</h1>
+    <p>26 个专业模块 · 本地 CFR 求解器 · Cash vs MTT 对比 · 对手剥削顾问 · Range Battle · 实战 AI 对局<br>对标 GTO Wizard，功能覆盖 90%，价格仅 1/3</p>
+    <div class="cta-group">
+      <a href="#" class="btn btn-primary">免费试用 7 天</a>
+      <a href="#pricing" class="btn btn-outline">查看价格</a>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="stat"><div class="num">26</div><div class="label">专业模块</div></div>
+  <div class="stat"><div class="num">87+</div><div class="label">单元测试</div></div>
+  <div class="stat"><div class="num">中/EN</div><div class="label">双语支持</div></div>
+  <div class="stat"><div class="num">100%</div><div class="label">本地运行</div></div>
+</div>
+
+<!-- Features -->
+<div class="container">
+  <div class="section">
+    <h2>全部功能模块</h2>
+    <p class="subtitle">覆盖翻前到河牌，从学习到实战</p>
+    <div class="module-grid">
+
+      <div class="module-card"><div class="icon">🔥</div><h4>Daily Drills<span class="new-badge">New</span></h4><p>每日GTO挑战 + 连击追踪</p></div>
+      <div class="module-card"><div class="icon">🎮</div><h4>实战模拟</h4><p>对抗GTO AI，真实牌桌体验</p></div>
+      <div class="module-card"><div class="icon">🌐</div><h4>策略浏览器</h4><p>13×13范围矩阵 · CFR求解</p></div>
+      <div class="module-card"><div class="icon">🎯</div><h4>训练模式</h4><p>随机出题 · EV即时反馈</p></div>
+
+      <div class="module-card"><div class="icon">📊</div><h4>数据分析<span class="new-badge">New</span></h4><p>批量手牌聚合Dashboard</p></div>
+      <div class="module-card"><div class="icon">🎯</div><h4>胜率训练<span class="new-badge">New</span></h4><p>Equity估算 · 即时反馈</p></div>
+      <div class="module-card"><div class="icon">📚</div><h4>翻前图册<span class="new-badge">New</span></h4><p>全位置×全深度范围浏览</p></div>
+      <div class="module-card"><div class="icon">⚔️</div><h4>Range Battle<span class="new-badge">New</span></h4><p>范围对战 · 胜率分布图</p></div>
+
+      <div class="module-card"><div class="icon">🔍</div><h4>手牌分析器</h4><p>逐条决策GTO偏差分析</p></div>
+      <div class="module-card"><div class="icon">🔒</div><h4>Node Locking</h4><p>锁定手牌 · 观察策略调整</p></div>
+      <div class="module-card"><div class="icon">🔄</div><h4>转牌河牌</h4><p>危险牌/空白牌检测</p></div>
+      <div class="module-card"><div class="icon">👥</div><h4>多人底池</h4><p>3-6人启发式分析</p></div>
+
+      <div class="module-card"><div class="icon">🔧</div><h4>工具箱<span class="new-badge">New</span></h4><p>Pot Odds/Replayer/参考</p></div>
+      <div class="module-card"><div class="icon">⭐</div><h4>收藏夹<span class="new-badge">New</span></h4><p>保存标记复盘位置</p></div>
+      <div class="module-card"><div class="icon">💰</div><h4>ICM计算器</h4><p>锦标赛权益精确计算</p></div>
+      <div class="module-card"><div class="icon">📜</div><h4>手牌历史</h4><p>批量导入 · 导出PDF</p></div>
+
+      <div class="module-card"><div class="icon">📄</div><h4>PDF报告<span class="new-badge">New</span></h4><p>一键导出分析报告</p></div>
+      <div class="module-card"><div class="icon">📤</div><h4>多格式导出<span class="new-badge">New</span></h4><p>JSON/CSV/Range数据</p></div>
+      <div class="module-card"><div class="icon">📈</div><h4>进度追踪<span class="new-badge">New</span></h4><p>30天EV趋势图表</p></div>
+      <div class="module-card"><div class="icon">🔬</div><h4>Strategy Lab<span class="new-badge">New</span></h4><p>完整翻后策略分解</p></div>
+
+      <div class="module-card"><div class="icon">✏️</div><h4>范围编辑器</h4><p>构建自定义手牌范围</p></div>
+      <div class="module-card"><div class="icon">📊</div><h4>范围对比</h4><p>并排/差异对比视图</p></div>
+      <div class="module-card"><div class="icon">🔄</div><h4>Cash vs MTT<span class="new-badge">NEW</span></h4><p>现金局vs锦标赛策略差异</p></div>
+      <div class="module-card"><div class="icon">🎯</div><h4>对手剥削顾问<span class="new-badge">NEW</span></h4><p>7种对手类型针对性偏移</p></div>
+
+      <div class="module-card"><div class="icon">⚙️</div><h4>设置/双语</h4><p>中英文切换 · 快捷键</p></div>
+      <div class="module-card"><div class="icon">📖</div><h4>使用说明</h4><p>应用内完整指南</p></div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Pricing -->
+<div class="container" id="pricing">
+  <div class="section">
+    <h2>定价方案</h2>
+    <p class="subtitle">对标 GTO Wizard ($59-119/月)，我们提供 90% 功能，1/3 价格</p>
+    <div class="pricing-grid">
+
+      <div class="pricing-card">
+        <h3>🆓 免费版</h3>
+        <div class="price">免费<span></span></div>
+        <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">永久免费</div>
+        <ul>
+          <li>策略浏览器 · 翻前矩阵</li>
+          <li>训练模式 · 每日 5 题</li>
+          <li>范围编辑器</li>
+          <li>基础手牌分析器</li>
+          <li>ICM 计算器</li>
+          <li>Pot Odds 工具箱</li>
+        </ul>
+        <a href="#" class="btn btn-outline" style="width:100%;text-align:center;">免费开始</a>
+      </div>
+
+      <div class="pricing-card popular">
+        <h3>⭐ 专业版</h3>
+        <div class="price">$29.99<span>/月</span></div>
+        <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">美金 · 或 ¥219/月 (人民币)</div>
+        <div style="color:#94A3B8;font-size:13px;">年付 $219/年 (省 $140)</div>
+        <ul>
+          <li><b>全部 26 个模块</b></li>
+          <li>实战模拟 · Play vs AI</li>
+          <li>Daily Drills · 连击追踪</li>
+          <li><b>Cash vs MTT 策略对比</b><span class="new-badge">NEW</span></li>
+          <li><b>对手剥削顾问 (7种类型)</b><span class="new-badge">NEW</span></li>
+          <li>批量手牌导入 · 分析 · PDF</li>
+          <li>Node Locking · Range Battle</li>
+          <li>进度追踪 · 数据分析 Dashboard</li>
+          <li>翻前图册 · Strategy Lab</li>
+          <li>CFR 求解器 · 翻后预设</li>
+          <li>JSON/CSV 多格式导出</li>
+          <li>中英双语 · 优先支持</li>
+        </ul>
+        <a href="#" class="btn btn-primary" style="width:100%;text-align:center;">开始 7 天免费试用</a>
+      </div>
+
+      <div class="pricing-card">
+        <h3>💎 终身版</h3>
+        <div class="price">$299<span> 买断</span></div>
+        <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">美金 · 或 ¥2,199 (人民币)</div>
+        <div style="color:#94A3B8;font-size:13px;">一次付费，永久使用</div>
+        <ul>
+          <li><b>专业版全部功能</b></li>
+          <li>永久免费更新</li>
+          <li>桌面客户端 (Mac/Windows)</li>
+          <li>离线使用 · 无需网络</li>
+          <li>优先功能请求</li>
+          <li>专属社区访问</li>
+        </ul>
+        <a href="#" class="btn btn-outline" style="width:100%;text-align:center;border-color:#F59E0B;color:#F59E0B;">一次性购买</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- WeChat/Alipay Payment -->
+<div class="container" style="padding-bottom:60px;">
+  <div class="section">
+    <h2>🇨🇳 中国用户 · 微信/支付宝购买</h2>
+    <p class="subtitle">无需国际信用卡，支持微信支付和支付宝</p>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 900px; margin: 0 auto;">
+
+      <!-- Pro via WeChat/Alipay -->
+      <div style="background:#090D14; border:1px solid #152233; border-radius:20px; padding:32px; text-align:center;">
+        <h3 style="font-size:20px; margin-bottom:12px;">⭐ Pro 专业版</h3>
+        <div style="font-size:36px; font-weight:900; color:#3B82F6; margin-bottom:4px;">¥219</div>
+        <div style="color:#64748B; font-size:13px; margin-bottom:8px;">/ 月 · 人民币</div>
+        <div style="color:#94A3B8; font-size:13px; margin-bottom:20px;">年付 ¥1,599/年 (省 ¥1,029)</div>
+
+        <div style="background:#111; border-radius:12px; padding:20px; margin-bottom:16px;">
+          <p style="font-size:13px; color:#94A3B8; margin-bottom:12px;">📱 微信扫码支付后，加客服微信获取卡密</p>
+          <img src="public/payment/wechat-pay-qr.png" alt="微信支付" style="width:180px; height:180px; border-radius:12px; margin:0 auto 8px; display:block; object-fit:contain; background:white; padding:8px;" onerror="this.style.display='none';document.getElementById('wechat-placeholder').style.display='flex'" onload="document.getElementById('wechat-placeholder').style.display='none'">
+          <div id="wechat-placeholder" style="width:180px; height:180px; background:#1A1A1A; border:1px dashed #333; border-radius:12px; margin:0 auto 8px; display:none; align-items:center; justify-content:center; color:#64748B; font-size:12px;">
+            微信收款码<br>（将图片放到 public/payment/）
+          </div>
+          <p style="font-size:11px; color:#64748B;">客服微信: <b>pokergto666</b></p>
+        </div>
+
+        <div style="text-align:left; font-size:13px; color:#94A3B8; line-height:2;">
+          <b>购买流程：</b><br>
+          1️⃣ 扫码支付 ¥219<br>
+          2️⃣ 截图支付凭证<br>
+          3️⃣ 加客服微信发送凭证<br>
+          4️⃣ 收到卡密 → App 内激活<br>
+          5️⃣ 立刻解锁全部功能
+        </div>
+      </div>
+
+      <!-- Lifetime via WeChat/Alipay -->
+      <div style="background:#090D14; border:1px solid #F59E0B33; border-radius:20px; padding:32px; text-align:center; position:relative;">
+        <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#F59E0B; color:black; padding:4px 16px; border-radius:10px; font-size:12px; font-weight:700;">最划算</div>
+        <h3 style="font-size:20px; margin-bottom:12px;">💎 终身版</h3>
+        <div style="font-size:36px; font-weight:900; color:#F59E0B; margin-bottom:4px;">¥2,199</div>
+        <div style="color:#64748B; font-size:13px; margin-bottom:8px;">永久买断 · 终身更新</div>
+        <div style="color:#94A3B8; font-size:13px; margin-bottom:20px;">≈ Pro 8.3 个月回本</div>
+
+        <div style="background:#111; border-radius:12px; padding:20px; margin-bottom:16px;">
+          <p style="font-size:13px; color:#94A3B8; margin-bottom:12px;">📱 微信/支付宝扫码后加客服获取卡密</p>
+          <div style="display:flex; gap:12px; justify-content:center;">
+            <img src="public/payment/wechat-pay-qr.png" alt="微信支付" style="width:140px; height:140px; border-radius:12px; object-fit:contain; background:white; padding:6px;" onerror="this.style.display='none';document.getElementById('lt-wechat-ph').style.display='flex'" onload="document.getElementById('lt-wechat-ph').style.display='none'">
+            <img src="public/payment/alipay-qr.png" alt="支付宝" style="width:140px; height:140px; border-radius:12px; object-fit:contain; background:white; padding:6px;" onerror="this.style.display='none';document.getElementById('lt-alipay-ph').style.display='flex'" onload="document.getElementById('lt-alipay-ph').style.display='none'">
+            <div id="lt-wechat-ph" style="width:140px; height:140px; background:#1A1A1A; border:1px dashed #333; border-radius:12px; display:none; align-items:center; justify-content:center; color:#64748B; font-size:11px;">
+              微信收款码
+            </div>
+            <div id="lt-alipay-ph" style="width:140px; height:140px; background:#1A1A1A; border:1px dashed #333; border-radius:12px; display:none; align-items:center; justify-content:center; color:#64748B; font-size:11px;">
+              支付宝收款码
+            </div>
+          </div>
+          <p style="font-size:11px; color:#64748B; margin-top:8px;">客服: pokergto666</p>
+        </div>
+
+        <div style="text-align:left; font-size:13px; color:#94A3B8; line-height:2;">
+          <b>终身版特权：</b><br>
+          ✅ 所有 Pro 功能 · 永久有效<br>
+          ✅ 所有大版本更新免费<br>
+          ✅ 桌面端离线使用<br>
+          ✅ 专属 Discord 角色<br>
+          ✅ 优先功能请求通道
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Stripe International -->
+    <div style="text-align:center; margin-top:40px; padding:20px; background:#111; border:1px solid #222; border-radius:16px; max-width:600px; margin-left:auto; margin-right:auto;">
+      <p style="font-size:14px; color:#94A3B8; margin-bottom:4px;">
+        🌍 国际用户支持信用卡支付 (Visa/Mastercard)
+      </p>
+      <p style="font-size:12px; color:#64748B;">
+        在 App 内登录后进入「账户管理」选择 Stripe 支付
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- Tech -->
+<div class="container" style="text-align:center;padding-bottom:60px;">
+  <p style="color:#475569;font-size:13px;">
+    🛠 Electron · React 19 · TypeScript · Tailwind CSS · D3.js · SQLite (WASM) · CFR Solver<br>
+    100% 本地运行，无需联网 · macOS / Windows / Linux
+  </p>
+</div>
+
+<div class="footer">
+  PokerGTO Trainer v0.2.0 · © 2026 · poker-gto-trainer<br>
+  <span style="color:#475569;">支持微信/支付宝 · Stripe · 卡密激活</span><br>
+  <a href="public/privacy.html" style="color:#475569;font-size:12px;">隐私政策</a> ·
+  <a href="public/terms.html" style="color:#475569;font-size:12px;">服务条款</a>
+</div>
+
+</body>
+</html>
