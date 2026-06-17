@@ -43,9 +43,14 @@ export function analyzeMultiWay(
   const adjustedCbetFreq = Math.round(huBaseline * multiWayMultiplier * 100) / 100
 
   // Who has range advantage?
-  const lastToAct = Math.max(...positions)
+  // Postflop: BTN(3) always acts last. If BTN is not in the pot,
+  // the position closest to BTN (highest index among remaining) acts last.
+  const btnInPot = positions.includes(3)
+  const lastToAct = btnInPot ? 3 : Math.max(...positions)
+  const others = positions.filter(p => p !== lastToAct)
+  const secondLast = others.length > 0 ? Math.max(...others) : -1
   const rangeAdvantage = aggressorPosition === lastToAct ? 'last' :
-    aggressorPosition === Math.max(...positions.filter(p => p !== lastToAct)) ? 'middle' : 'first'
+    aggressorPosition === secondLast ? 'middle' : 'first'
 
   const warnings: string[] = [
     '⚠️ 多人底池GTO是开放研究问题，以下为基于求解器趋势的近似建议。',

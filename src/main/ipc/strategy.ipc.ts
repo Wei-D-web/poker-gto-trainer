@@ -68,16 +68,20 @@ export function registerStrategyIpc(): void {
         ':street': params.street,
       })
 
-      if (!stmt.step()) {
-        stmt.free()
+      try {
+        if (!stmt.step()) {
+          return null
+        }
+
+        const row = stmt.getAsObject()
+
+        if (!row.data) return null
+        return JSON.parse(row.data as string) as StrategyData
+      } catch {
         return null
+      } finally {
+        stmt.free()
       }
-
-      const row = stmt.getAsObject()
-      stmt.free()
-
-      if (!row.data) return null
-      return JSON.parse(row.data as string) as StrategyData
     }
   )
 
@@ -242,10 +246,13 @@ export function registerStrategyIpc(): void {
     const db = getDatabase()
     const countTable = (table: string): number => {
       const stmt = db.prepare(`SELECT COUNT(*) as count FROM ${table}`)
-      stmt.step()
-      const row = stmt.getAsObject()
-      stmt.free()
-      return row.count as number
+      try {
+        stmt.step()
+        const row = stmt.getAsObject()
+        return row.count as number
+      } finally {
+        stmt.free()
+      }
     }
     return {
       preflopCount: countTable('preflop_ranges'),

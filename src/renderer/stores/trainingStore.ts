@@ -192,7 +192,8 @@ export const useTrainingStore = create<TrainingStore>((set, get) => ({
       streets: config.streets as string[],
     })
 
-    const shuffled = [...generated].sort(() => Math.random() - 0.5).slice(0, config.questionCount)
+    // Deterministic shuffle using Fisher-Yates with seed based on current timestamp
+    const shuffled = fisherYatesShuffle([...generated]).slice(0, config.questionCount)
 
     set({
       sessionState: 'active',
@@ -226,7 +227,7 @@ export const useTrainingStore = create<TrainingStore>((set, get) => ({
         yourAction: selectedAction,
         correctAction: correctOption?.action || 'unknown',
         evLost: evDifference,
-        severity: evDifference > 0.08 ? 'major' : 'moderate',
+        severity: evDifference > 3 ? 'major' : evDifference > 1 ? 'moderate' : 'minor',
       }],
     }
 
@@ -306,6 +307,15 @@ const DYNAMIC_BOARDS = [
 const POSITIONS = [0,1,2,3,4,5] as Position[]
 const POS_LABELS = ['UTG','MP','CO','BTN','SB','BB']
 const DEPTHS = [20,30,50,75,100,150]
+
+function fisherYatesShuffle<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
 
 function generateDynamicQuestions(count: number, cfg: { positions: Position[]; stackDepths: number[]; streets: string[] }): TrainingQuestion[] {
   const questions: TrainingQuestion[] = []

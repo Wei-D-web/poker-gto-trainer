@@ -1,10 +1,15 @@
-import { getDatabase, saveDatabase } from './database'
+import { getDatabase } from './database'
 import { LRUCache } from 'lru-cache'
 import type { PreflopRange, ComboStrategy, StrategyData } from '../../shared/types/strategy'
 import type { ScenarioSummary } from '../../shared/types/scenario'
 import type { Position, GameType } from '../../shared/types/poker'
 import { POSITION_LABELS } from '../../shared/types/poker'
 import { generateAllCombos, type ComboInfo } from '../../shared/utils/combo-utils'
+
+function safeJsonParse<T>(json: string, fallback: T): T {
+  try { return JSON.parse(json) as T }
+  catch { return fallback }
+}
 
 // Cache for preflop ranges and strategies
 const preflopCache = new LRUCache<string, PreflopRange>({ max: 500 })
@@ -42,8 +47,8 @@ export function loadPreflopRange(
     position: row.position as number,
     stackDepth: row.stack_depth as number,
     ante: row.ante as number,
-    combos: JSON.parse(row.range_data as string),
-    metadata: JSON.parse(row.metadata as string),
+    combos: safeJsonParse(row.range_data as string, {}),
+    metadata: safeJsonParse(row.metadata as string, {}),
   }
 
   preflopCache.set(cacheKey, range)
@@ -133,7 +138,7 @@ export function listScenarios(filters?: {
   stmt.free()
 
   return rows.map(row => {
-    const metadata = JSON.parse((row.metadata as string) || '{}')
+    const metadata = safeJsonParse((row.metadata as string) || '{}', {})
     return {
       id: row.id as string,
       label: metadata.label || `${POSITION_LABELS[row.hero_position as Position]} ${row.effective_stack}bb`,

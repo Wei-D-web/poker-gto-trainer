@@ -5,6 +5,7 @@ import * as fs from 'fs'
 
 let db: SqlJsDatabase | null = null
 let dbPath: string = ''
+let initPromise: Promise<void> | null = null
 
 export function getDatabase(): SqlJsDatabase {
   if (!db) {
@@ -18,6 +19,11 @@ export function getDatabasePath(): string {
 }
 
 export async function initDatabase(): Promise<void> {
+  // Prevent concurrent initialization
+  if (initPromise) return initPromise
+  if (db) return
+
+  initPromise = (async () => {
   const userDataPath = app.getPath('userData')
   const dbDir = join(userDataPath, 'data')
 
@@ -51,6 +57,8 @@ export async function initDatabase(): Promise<void> {
   runMigrations(db)
 
   console.log(`Database initialized at ${dbPath}`)
+  })()
+  await initPromise
 }
 
 const CURRENT_DB_VERSION = 2
@@ -66,8 +74,10 @@ function runMigrations(database: SqlJsDatabase): void {
 
   if (version >= CURRENT_DB_VERSION) return
 
-  database.run(`
-    CREATE TABLE IF NOT EXISTS scenarios (
+  database.run('BEGIN')
+  try {
+    database.run(`
+      CREATE TABLE IF NOT EXISTS scenarios (
       id TEXT PRIMARY KEY,
       game_type TEXT NOT NULL,
       hero_position INTEGER NOT NULL,
@@ -213,10 +223,17 @@ function runMigrations(database: SqlJsDatabase): void {
   // Set version
   database.run(`PRAGMA user_version = ${CURRENT_DB_VERSION}`)
 
+  database.run('COMMIT')
+
   // Save to disk
   saveDatabase()
 
   console.log(`Database migrations complete (v${CURRENT_DB_VERSION})`)
+  } catch (e) {
+    database.run('ROLLBACK')
+    console.error('Migration failed, rolled back:', e)
+    throw e
+  }
 }
 
 /** Save the in-memory database to disk */

@@ -49,7 +49,7 @@ export function registerSessionReviewIpc(): void {
 
     const errors: string[] = []
     let totalCount = 0
-    let sessionId = ''
+    const sessionIds: string[] = []
 
     for (const filePath of result.filePaths) {
       try {
@@ -64,7 +64,8 @@ export function registerSessionReviewIpc(): void {
         // Create a session for these hands
         const firstHand = hands[0]
         const lastHand = hands[hands.length - 1]
-        sessionId = `session_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+        const sessionId = `session_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+        sessionIds.push(sessionId)
 
         const db = getDatabase()
 
@@ -137,7 +138,8 @@ export function registerSessionReviewIpc(): void {
 
     return {
       success: totalCount > 0,
-      sessionId,
+      sessionId: sessionIds[sessionIds.length - 1] || '',
+      sessionIds,
       handCount: totalCount,
       errors,
     } as SessionImportResult
@@ -154,7 +156,7 @@ export function registerSessionReviewIpc(): void {
         return { success: false, handCount: 0, errors: ['未找到有效牌谱'] }
       }
 
-      const sessionId = `session_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
+      const sessionId = `session_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`
       const db = getDatabase()
       let totalCount = 0
       let totalProfit = 0
@@ -179,6 +181,7 @@ export function registerSessionReviewIpc(): void {
           stmt.free()
           totalCount++
           if (hand.heroWon) totalProfit += hand.amountWon
+          else if (hand.heroWon === false) totalProfit -= Math.abs(hand.amountWon) || hand.effectiveStack * 0.1
         } catch (e) {
           // skip duplicates
         }
@@ -479,6 +482,7 @@ export function registerSessionReviewIpc(): void {
     for (const s of sessions) {
       totalHands += s.total_hands || 0
       totalAlignment += s.gto_alignment || 0
+      totalEVLost += s.gto_alignment ? (100 - s.gto_alignment) * 0.1 : 0
       alignmentTrend.push({
         date: s.date || new Date((s.created_at || 0) * 1000).toISOString().slice(0, 10),
         score: s.gto_alignment || 0,
@@ -544,7 +548,10 @@ function calculateWeeklyImprovement(sessions: any[]): number {
   const byWeek: Map<string, number[]> = new Map()
   for (const s of sessions) {
     const date = new Date((s.created_at || 0) * 1000)
-    const weekKey = `${date.getFullYear()}-W${Math.ceil(date.getDate() / 7)}`
+    const startOfYear = new Date(date.getFullYear(), 0, 1)
+    const diff = date.getTime() - startOfYear.getTime()
+    const weekNum = Math.ceil((diff / 86400000 + startOfYear.getDay() + 1) / 7)
+    const weekKey = `${date.getFullYear()}-W${String(weekNum).padStart(2, '0')}`
     const existing = byWeek.get(weekKey) || []
     existing.push(s.gto_alignment || 0)
     byWeek.set(weekKey, existing)

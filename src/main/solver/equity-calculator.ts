@@ -4,8 +4,6 @@
  */
 
 import type { ComboKey } from '../../shared/types/poker'
-import { ALL_COMBOS } from '../../shared/utils/combo-utils'
-
 // Pre-computed matchup table (simplified: approximate equity based on hand strength tiers)
 // In production, this would be a 169×169 lookup from PokerStove or similar
 const HAND_STRENGTH_SCORES: Record<ComboKey, number> = {
@@ -32,6 +30,9 @@ const HAND_STRENGTH_SCORES: Record<ComboKey, number> = {
   'Q5o': 4, 'J3o': 4, '93o': 4, '83o': 4, '73o': 4, '63o': 4, '43o': 4,
   'Q4o': 4, 'J2o': 4, 'T2o': 4, '92o': 3, '82o': 3, '72o': 3, '62o': 3,
   '52o': 3, '42o': 3, '32o': 3, 'Q3o': 3, 'Q2o': 3,
+  // Missing combos (added)
+  'KJo': 52, 'K8o': 26, 'K7o': 24, 'K6o': 22, 'K5o': 20, 'K4o': 19, 'K3o': 17, 'K2o': 16,
+  '62s': 14, '42s': 10, '32s': 9,
 }
 
 const MAX_SCORE = 100
@@ -46,9 +47,11 @@ export function preflopEquity(hero: ComboKey, villain: ComboKey): number {
 
   if (hero === villain) return 0.5 // same hand = chop
 
-  // Logistic-style equity model (calibrated for common preflop matchups)
+  // Logistic-style equity model clamped to realistic preflop bounds
   const diff = heroScore - villainScore
-  return 1.0 / (1.0 + Math.exp(-diff / 10.0))
+  const raw = 1.0 / (1.0 + Math.exp(-diff / 10.0))
+  // Clamp to realistic preflop equity range [0.05, 0.88]
+  return 0.05 + raw * 0.83
 }
 
 /**

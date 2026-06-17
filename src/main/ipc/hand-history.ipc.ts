@@ -2,7 +2,6 @@ import { ipcMain, dialog, BrowserWindow } from 'electron'
 import * as fs from 'fs'
 import { getDatabase, saveDatabase } from '../data/database'
 import { autoDetectAndParse, parseMultipleHands } from '../data/hand-history-parser'
-import { batchAnalyzeHands } from '../data/batch-analyzer'
 import type { ParsedHand, HandHistorySummary, BatchAnalysisResult, HandHistoryStats } from '../../shared/types/hand-history'
 
 export function registerHandHistoryIpc(): void {

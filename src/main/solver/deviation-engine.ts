@@ -48,9 +48,8 @@ export function compareHandToGTO(params: {
   streetDeviations: StreetDeviation[]
   totalEVLost: number
 } {
-  const { actions, heroPosition, gameType, effectiveStack } = params
+  const { actions, heroPosition, villainPosition, gameType, effectiveStack } = params
   const decisions: DecisionDeviation[] = []
-  const gtoRange = solvePreflopRange(heroPosition, effectiveStack, gameType)
 
   // Build GTO action baselines per street
   const baseline = POSITION_BASELINE[heroPosition] ?? POSITION_BASELINE[3] // default BTN
@@ -65,8 +64,7 @@ export function compareHandToGTO(params: {
       action,
       prevActions,
       heroActionIdx,
-      params,
-      gtoRange,
+      { heroPosition, villainPosition, effectiveStack, gameType, board: params.board },
       baseline,
     )
     decisions.push(analysis)
@@ -245,14 +243,13 @@ function analyzeSingleDecision(
   action: HandAction,
   prevActions: HandAction[],
   heroActionIdx: number,
-  params: { heroPosition: Position; effectiveStack: number; gameType: string; board: string[] },
-  gtoRange: Record<string, number>,
+  params: { heroPosition: Position; villainPosition: Position; effectiveStack: number; gameType: string; board: string[] },
   baseline: any,
 ): DecisionDeviation {
-  const { heroPosition, effectiveStack, gameType } = params
+  const { heroPosition, villainPosition, effectiveStack, gameType } = params
 
   // Determine GTO-expected action based on baseline heuristics
-  const gtoAction = determineGTOAction(action, prevActions, heroActionIdx, baseline, gtoRange)
+  const gtoAction = determineGTOAction(action, prevActions, heroActionIdx, baseline, heroPosition, villainPosition)
 
   const isGTO = action.action === gtoAction || isActionEquivalent(action.action, gtoAction)
 
@@ -287,17 +284,20 @@ function determineGTOAction(
   prevActions: HandAction[],
   heroActionIdx: number,
   baseline: any,
-  gtoRange: Record<string, number>,
+  heroPosition: Position = 3,
+  villainPosition: Position = 5,
 ): string {
   const { street, action: currentAction } = action
 
   // Preflop decisions
   if (street === 'preflop') {
     if (heroActionIdx === 0) {
-      // First action: open or fold
-      // Check if there's prior aggression
-      const hasRaise = prevActions.some(a => ['bet', 'raise', 'all_in'].some(t => a.action.includes(t)))
-      if (hasRaise) {
+      // First hero action: open or fold
+      // Check if there's prior aggression from OTHER players (not hero)
+      const hasOpponentRaise = prevActions.some(a =>
+        a.actor !== 'hero' && ['bet', 'raise', 'all_in'].some(t => a.action.includes(t))
+      )
+      if (hasOpponentRaise) {
         // Facing a raise — use 3bet/fold/call decision
         const isStrongAction = currentAction.includes('raise') || currentAction.includes('bet') || currentAction === 'all_in'
         if (isStrongAction) return currentAction // reasonable
@@ -313,21 +313,27 @@ function determineGTOAction(
   }
 
   // Postflop decisions — use simplified GTO heuristics
-  const isOOP = false // simplified, assume IP for now
+  // BTN(3) is always IP. Otherwise higher position index acts last.
+  const isOOP = heroPosition !== 3 && (villainPosition === 3 || heroPosition < villainPosition)
 
   if (street === 'flop') {
     // Facing a bet?
     const villainBet = prevActions.filter(a => a.actor === 'villain')
       .some(a => a.action.includes('bet') || a.action.includes('raise'))
     if (villainBet) {
-      // Facing aggression
-      if (currentAction.includes('fold')) return 'call' // should call more
+      // Facing aggression: OOP should call less, fold more
+      if (currentAction.includes('fold')) {
+        // OOP facing bet: folding marginal hands is more acceptable
+        const hash = simpleHash(currentAction + '_' + heroActionIdx + '_flop_facing')
+        return isOOP ? (hash % 3 === 0 ? 'call' : 'fold') : 'call'
+      }
       return currentAction
     }
-    // Initiative: cbet or check — use deterministic hash based on action + index
+    // Initiative: cbet or check
     const hash = simpleHash(currentAction + '_' + heroActionIdx + '_flop')
     if (currentAction.includes('check') || currentAction === 'check') {
-      return hash % 2 === 0 ? 'bet_33' : 'check'
+      // OOP should check more, IP should cbet more
+      return isOOP ? 'check' : (hash % 2 === 0 ? 'bet_33' : 'check')
     }
     return currentAction
   }
@@ -356,18 +362,14 @@ function simpleHash(s: string): number {
 function isActionEquivalent(a: string, b: string): boolean {
   if (a === b) return true
 
-  // Equivalent categories
-  const foldActions = ['fold']
-  const checkActions = ['check']
-  const callActions = ['call']
-  const betActions = ['bet_33', 'bet_50', 'bet_75', 'bet_100', 'bet_150']
-  const raiseActions = ['raise_2x', 'raise_3x', '3bet_10bb']
-
-  if (foldActions.includes(a) && foldActions.includes(b)) return true
-  if (checkActions.includes(a) && checkActions.includes(b)) return true
-  if (callActions.includes(a) && callActions.includes(b)) return true
-  if (betActions.includes(a) && betActions.includes(b)) return true
-  if (raiseActions.includes(a) && raiseActions.includes(b)) return true
+  // Equivalent categories — use prefix matching for extensibility
+  if (a === 'fold' && b === 'fold') return true
+  if (a === 'check' && b === 'check') return true
+  if (a === 'call' && b === 'call') return true
+  if (a.includes('bet') && b.includes('bet')) return true
+  if (a.includes('raise') && b.includes('raise')) return true
+  if (a.includes('3bet') && b.includes('3bet')) return true
+  if (a === 'open_2.5bb' && b === 'open_2.5bb') return true
 
   return false
 }
@@ -448,11 +450,14 @@ function calculateStreetDeviations(
 }
 
 function handToComboKey(hand: string[]): ComboKey {
-  if (hand.length < 2) return 'AKo' as ComboKey
+  if (hand.length < 2 || !hand[0] || !hand[1]) return 'AKo' as ComboKey
 
   const rankChars = '23456789TJQKA'
   const r1 = rankChars.indexOf(hand[0][0])
   const r2 = rankChars.indexOf(hand[1][0])
+  // Guard against invalid rank characters
+  if (r1 === -1 || r2 === -1) return 'AKo' as ComboKey
+
   const suited = hand[0][1] === hand[1][1]
 
   const highR = Math.max(r1, r2)

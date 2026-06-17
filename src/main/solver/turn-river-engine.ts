@@ -164,8 +164,12 @@ export function analyzeRiver(
   const backdoorFlush = !frontDoorFlushPossible
 
   const completedDraws: string[] = []
-  if (frontDoorFlushPossible) completedDraws.push('前门同花')
-  if (backdoorFlush && turnSuits.filter(s => s === riverSuit).length === 2) completedDraws.push('后门同花')
+  // Front-door flush: 2+ of the river suit were already on the turn board
+  // (3+ of that suit total on board after river → flush now possible)
+  if (turnSuits.filter(s => s === riverSuit).length >= 2) completedDraws.push('前门同花')
+  // Backdoor flush: exactly 1 of the river suit was on the turn board
+  // (only 2 of that suit total after river → backdoor flush completed)
+  else if (turnSuits.filter(s => s === riverSuit).length === 1) completedDraws.push('后门同花')
   // Simplified straight detection
   const allRanks = fullBoard.map(c => c[0])
   if (new Set(allRanks).size <= 4) completedDraws.push('可能顺子')

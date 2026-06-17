@@ -62,6 +62,20 @@ export interface SessionStats {
   netProfit: number; biggestWin: number; biggestLoss: number
 }
 
+const RANK_ORDER = '23456789TJQKA'
+
+/** Convert hole cards like ['Ah','Ad'] to ComboKey like 'AA' or ['Ah','Kd'] to 'AKo' */
+function cardsToComboKey(cards: CardString[]): ComboKey {
+  const [c1, c2] = cards
+  const rank1 = c1[0], rank2 = c2[0]
+  const high = RANK_ORDER.indexOf(rank1) >= RANK_ORDER.indexOf(rank2) ? rank1 : rank2
+  const low = high === rank1 ? rank2 : rank1
+  // Pocket pair: no suit suffix
+  if (high === low) return `${high}${low}` as ComboKey
+  const suited = c1[1] === c2[1]
+  return `${high}${low}${suited ? 's' : 'o'}` as ComboKey
+}
+
 function shuffle(arr: string[]): string[] {
   const a = [...arr]
   for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]] }
@@ -74,36 +88,22 @@ export function createGame(heroPos: Position, villainPos: Position, stackDepth: 
   const villainCards = [deck.pop()!, deck.pop()!]
 
   // In heads-up format: BTN = SB (posts 0.5bb), BB posts 1bb
-  // In multi-way contexts, we still post blinds even if the blind players aren't in the hand
-  // For simplicity: the lower position between the two players posts the SB-equivalent
+  // HU rule: dealer/BTN is SB, other is BB.
+  // If neither is BTN (non-standard), lower position = earlier = BB.
   const heroIsBtn = heroPos === 3
   const villainIsBtn = villainPos === 3
 
-  // Determine who acts as SB and BB in this HU pot
-  // HU rule: dealer/BTN is SB, other is BB. If neither is BTN, use lower position as "earlier"
-  let sb = 0, bb = 0
-  if (heroIsBtn) {
-    sb = 0.5  // hero is BTN = SB in HU
-    bb = 0    // villain posts BB
-  } else if (villainIsBtn) {
-    sb = 0    // hero posts nothing
-    bb = 1    // villain is BTN = SB, hero is BB
-  } else {
-    // Neither is BTN — use relative position: lower index = earlier = posts more
-    if (heroPos < villainPos) {
-      bb = 1   // hero in earlier position posts BB
-      sb = 0
-    } else {
-      sb = 0.5
-    }
-  }
+  const SB_AMOUNT = 0.5
+  const BB_AMOUNT = 1.0
 
-  // Hero's blind contribution
-  const heroBlindContribution = heroIsBtn ? sb : (heroPos < villainPos && !villainIsBtn ? bb : 0)
-  // Villain's blind contribution
-  const villainBlindContribution = villainIsBtn ? sb : (!heroIsBtn && villainPos < heroPos ? bb : 0)
-  // If neither is BTN and villain is later position, hero pays more
-  const totalBlinds = sb + bb
+  // Determine who is SB vs BB
+  // If BTN is present, BTN = SB. Otherwise lower position index = SB (SB=4 < BB=5).
+  const heroIsSB = heroIsBtn || (!villainIsBtn && heroPos < villainPos)
+  const heroIsBB = !heroIsSB
+
+  const heroBlindContribution = heroIsSB ? SB_AMOUNT : BB_AMOUNT
+  const villainBlindContribution = heroIsSB ? BB_AMOUNT : SB_AMOUNT
+  const totalBlinds = SB_AMOUNT + BB_AMOUNT  // always 1.5bb in HU
 
   return {
     handId: `sim_${Date.now() % 100000}`,
@@ -133,7 +133,7 @@ export function applyAction(state: GameState, action: GameAction): GameState {
 
   ns.actions.push({ player: action.player, type: action.type, amount: action.amount || 0, street: action.street })
 
-  const potBeforeAction = ns.pot + ns.hero.currentBet + ns.villain.currentBet
+  const potBeforeAction = ns.pot  // pot already includes all bets; don't double-count current street bets
   const toCall = o.currentBet - p.currentBet
 
   switch (action.type) {
@@ -197,9 +197,11 @@ export function applyAction(state: GameState, action: GameAction): GameState {
       }
     }
     ns.street = ns.street === 'preflop' ? 'flop' : ns.street === 'flop' ? 'turn' : 'river'
+    ns.phase = ns.street  // keep phase in sync with street
     ns.hero.currentBet = 0; ns.villain.currentBet = 0
     ns.hero.actedThisStreet = false; ns.villain.actedThisStreet = false
-    ns.currentActor = 'hero' // Hero acts first postflop
+    // Hero acts first postflop unless hero is folded/all-in
+    ns.currentActor = ns.hero.folded || ns.hero.isAllIn ? 'villain' : 'hero'
   } else if (betsEqual && bothActed && ns.street === 'river') {
     ns.phase = 'showdown'
     ns.result = resolveHand(ns)
@@ -220,10 +222,6 @@ export function applyAction(state: GameState, action: GameAction): GameState {
   } else {
     // Switch actor
     ns.currentActor = action.player === 'hero' ? 'villain' : 'hero'
-    // Reset acted flags on new street first action
-    if (!betsEqual) {
-      // Someone still needs to act
-    }
   }
 
   if (ns.phase === 'showdown' && !ns.result) {
@@ -238,10 +236,10 @@ export function applyAction(state: GameState, action: GameAction): GameState {
 export function getAIDecision(state: GameState): GameAction {
   const v = state.villain
   const h = state.hero
-  const pot = state.pot + h.currentBet + v.currentBet
+  const pot = state.pot  // pot already includes all bets
   const toCall = h.currentBet - v.currentBet
-  const comboKey = (v.holeCards.join('') || 'AKo') as ComboKey
-  const strength = handStrengthScore(comboKey) || 50
+  const comboKey = cardsToComboKey(v.holeCards)
+  const strength = handStrengthScore(comboKey)
   const r = Math.random()
 
   if (state.street === 'preflop') {
@@ -258,8 +256,8 @@ export function getAIDecision(state: GameState): GameAction {
       return { player: 'villain', type: 'fold', amount: 0, street: 'preflop' }
     }
     // Facing 3bet+
-    if (strength >= 70) return { player: 'villain', type: 'call', amount: toCall, street: 'preflop' }
     if (strength >= 85) return { player: 'villain', type: 'raise', amount: Math.round(pot * 1.0 * 100) / 100, street: 'preflop' }
+    if (strength >= 70) return { player: 'villain', type: 'call', amount: toCall, street: 'preflop' }
     return { player: 'villain', type: 'fold', amount: 0, street: 'preflop' }
   }
 

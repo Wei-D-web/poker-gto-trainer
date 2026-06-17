@@ -23,7 +23,7 @@ export const useLanguageStore = create<LanguageStore>((set) => ({
 export function useT() {
   const lang = useLanguageStore((s) => s.lang)
   return function t(key: string): string {
-    if (lang === 'en') return key
+    if (lang === 'en') return key.replace(/_/g, ' ') // Use key as English text with readable format
     // Navigate nested keys like "nav.explore" → zh.nav.explore
     const parts = key.split('.')
     let val: any = zh

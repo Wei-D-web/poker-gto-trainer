@@ -106,7 +106,7 @@ function rank5Cards(cards: CardObj[]): RankedHand {
     desc = `Full House ${RANK_NAMES[trips]}s over ${RANK_NAMES[pair]}s`
   } else if (isFlush) {
     rank = 'flush'
-    score = 5000000 + ranks[0] * 3375 + ranks[1] * 225 + ranks[2] * 15 + ranks[3]
+    score = 5000000 + ranks[0] * 50625 + ranks[1] * 3375 + ranks[2] * 225 + ranks[3] * 15 + ranks[4]
     desc = 'Flush'
   } else if (isStraight) {
     rank = 'straight'

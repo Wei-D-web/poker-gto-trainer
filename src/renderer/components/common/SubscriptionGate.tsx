@@ -76,7 +76,7 @@ export function TierBadge() {
     developer: { label: '🔑 开发者', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
   }
 
-  const c = config[tier]
+  const c = config[tier as keyof typeof config] || config.free
   return (
     <span className={cn('text-[9px] px-2 py-0.5 rounded-full font-semibold border', c.bg, c.color)}>
       {c.label}
@@ -162,7 +162,7 @@ export function UpgradePrompt({ feature }: { feature?: string }) {
           {/* Pro Yearly */}
           <button
             onClick={() => handleUpgrade(STRIPE_PRICES.proYearly, 'pro')}
-            disabled={loading === 'pro-yearly'}
+            disabled={loading === 'pro'}
             className="w-full text-left bg-[#090D14] border border-emerald-500/20 hover:border-emerald-500/40 rounded-xl p-4 transition-all group"
           >
             <div className="flex items-center justify-between">
@@ -176,7 +176,7 @@ export function UpgradePrompt({ feature }: { feature?: string }) {
               <div className="flex items-center gap-2">
                 <span className="text-lg font-black text-emerald-400">$219</span>
                 <span className="text-xs text-neutral-500">/年</span>
-                {loading === 'pro-yearly' ? (
+                {loading === 'pro' ? (
                   <RefreshCw size={14} className="animate-spin text-neutral-400" />
                 ) : (
                   <ArrowRight size={14} className="text-neutral-600 group-hover:text-emerald-400 transition-colors" />

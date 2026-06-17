@@ -161,10 +161,10 @@ describe('evaluateHandOnFlop', () => {
       expect(result.handType).toBe('gutshot')
     })
 
-    it('detects OESD: 87 on 965 board (needs 7 or 4)', () => {
-      // 87 on 965: 5-6-7-8-9, missing 4 at low end → OESD
+    it('detects made straight: 87 on 965 board', () => {
+      // 87 on 965: 5-6-7-8-9 = 5 consecutive ranks with hero cards = made straight
       const result = evaluateHandOnFlop('87s', ['9h', '6d', '5c'])
-      expect(result.handType).toBe('oesd')
+      expect(result.handType).toBe('straight')
     })
 
     it('detects OESD: JT on 982 board (needs Q or 7)', () => {
@@ -191,13 +191,11 @@ describe('evaluateHandOnFlop', () => {
       expect(result.handType).toBe('two_overcards')
     })
 
-    it('OESD with wheel: A2 on 543 board', () => {
-      // A2 on 543: need 6 or use A as low for wheel (A-2-3-4-5)
+    it('detects wheel straight: A2 on 543 board', () => {
+      // A2 on 543: A-2-3-4-5 = wheel made straight (A=14=1 for wheel)
       const result = evaluateHandOnFlop('A2o', ['5h', '4d', '3c'])
-      // A2345: 4 present ranks in window [1-5], missing at high end?
-      // Actually A=14=1 for wheel, window [1-5]: 1(A),2(present),3(present),4(present),5(present) = 5/5 = made straight!
-      // Wait, A2 on 543 = A-2-3-4-5 made straight, should be classified as oesd (made straight)
-      expect(result.handType).toBe('oesd') // made straight classified as oesd in current code
+      // window [1-5]: 1(A),2(present),3(present),4(present),5(present) = 5/5 = made straight
+      expect(result.handType).toBe('straight')
     })
   })
 

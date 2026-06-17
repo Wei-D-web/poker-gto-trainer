@@ -69,7 +69,7 @@ export function applyNodeLocks(
   // Build original strategy entries
   for (const combo of allCombos) {
     const base = baseStrategy[combo.key]
-    const actions = base?.actions || [{ action: 'fold', frequency: 1, ev: 0 }]
+    const actions = base?.actions?.length ? base.actions : [{ action: 'fold', frequency: 1, ev: 0 }]
     originalStrategy[combo.key] = {
       comboKey: combo.key,
       actions: actions.map(a => ({ ...a })),
@@ -78,13 +78,15 @@ export function applyNodeLocks(
   }
 
   // Determine overall lock direction (compute once, outside the loop)
-  const locksAreAggressive = locks.filter(l => l.action !== 'fold' && l.action !== 'check').length > locks.length / 2
-  const locksArePassive = locks.filter(l => l.action === 'fold' || l.action === 'check').length > locks.length / 2
+  // Call is passive in poker — it doesn't pressure the opponent
+  const hasLocks = locks.length > 0
+  const aggressiveCount = locks.filter(l => l.action !== 'fold' && l.action !== 'check' && l.action !== 'call').length
+  const passiveCount = locks.filter(l => l.action === 'fold' || l.action === 'check' || l.action === 'call').length
+  // Use > for direction (50/50 tie = no clear direction, defaults neutral)
+  const locksAreAggressive = hasLocks && aggressiveCount > passiveCount
+  const locksArePassive = hasLocks && passiveCount > aggressiveCount
 
   // Build adjusted strategy
-  const totalLockedFreq = locks.reduce((s, l) => s + l.frequency, 0)
-  const lockRatio = totalLockedFreq / Math.max(1, locks.length)
-
   for (const combo of allCombos) {
     const base = baseStrategy[combo.key]
     const lock = lockSet.get(combo.key)
@@ -94,12 +96,12 @@ export function applyNodeLocks(
       const lockActionName = lockActionToName(lock.action)
       adjustedStrategy[combo.key] = {
         comboKey: combo.key,
-        actions: [{ action: lockActionName, frequency: lock.frequency, ev: 0 }],
+        actions: [{ action: lockActionName, frequency: Math.max(0.01, lock.frequency), ev: 0 }],
         isLocked: true,
       }
     } else {
       // Unlocked combo: adjust based on lock effects
-      const origActions = base?.actions || [{ action: 'fold', frequency: 1, ev: 0 }]
+      const origActions = base?.actions?.length ? base.actions : [{ action: 'fold', frequency: 1, ev: 0 }]
       const origPrimary = origActions.reduce((best, a) => a.frequency > best.frequency ? a : best, origActions[0])
 
       let adjustedActions = origActions.map(a => ({ ...a }))

@@ -72,10 +72,8 @@ describe('comboLabel', () => {
     expect(comboLabel('AKs')).toBe('AKs')
   })
 
-  it('returns label for AKo (AKo maps to KAo in lookup)', () => {
-    const label = comboLabel('AKo')
-    // comboLabel returns r2+r1+o for offsuit combos
-    expect(label).toMatch(/^(AK|KA)o$/)
+  it('returns AKo for AKo', () => {
+    expect(comboLabel('AKo')).toBe('AKo')
   })
 
   it('returns the key for unknown combo', () => {

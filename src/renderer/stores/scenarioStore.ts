@@ -55,18 +55,25 @@ export const useScenarioStore = create<ScenarioStore>((set, get) => ({
   setHeroPosition: (pos) => {
     // Auto-set villain position if same
     const state = get()
+    const newVillain = state.villainPosition === pos ? ((pos + 1) % 6) as Position : state.villainPosition
+    // BTN(3) is always IP. Otherwise higher position acts last.
+    const isOOP = pos === 3 ? false
+      : (newVillain === 3 ? true : pos < newVillain)
     set({
       heroPosition: pos,
-      villainPosition: state.villainPosition === pos ? ((pos + 1) % 6) as Position : state.villainPosition,
-      isHeroOOP: pos > state.villainPosition || (pos === 4 && state.villainPosition === 5),
+      villainPosition: newVillain,
+      isHeroOOP: isOOP,
       currentScenarioId: null,
     })
   },
   setVillainPosition: (pos) => {
     const state = get()
+    // BTN(3) is always IP. Otherwise higher position acts last.
+    const isOOP = state.heroPosition === 3 ? false
+      : (pos === 3 ? true : state.heroPosition < pos)
     set({
       villainPosition: pos,
-      isHeroOOP: state.heroPosition > pos || (state.heroPosition === 4 && pos === 5),
+      isHeroOOP: isOOP,
       currentScenarioId: null,
     })
   },
@@ -74,10 +81,15 @@ export const useScenarioStore = create<ScenarioStore>((set, get) => ({
   setSizingSchema: (id) => set({ sizingSchemaId: id }),
   flipPositions: () => {
     const { heroPosition, villainPosition } = get()
+    const newHeroPos = villainPosition
+    const newVillainPos = heroPosition
+    // BTN(3) is always IP. Otherwise higher position acts last.
+    const isOOP = newHeroPos === 3 ? false
+      : (newVillainPos === 3 ? true : newHeroPos < newVillainPos)
     set({
-      heroPosition: villainPosition,
-      villainPosition: heroPosition,
-      isHeroOOP: villainPosition > heroPosition,
+      heroPosition: newHeroPos,
+      villainPosition: newVillainPos,
+      isHeroOOP: isOOP,
       currentScenarioId: null,
     })
   },

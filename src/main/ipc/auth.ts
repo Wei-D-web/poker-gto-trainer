@@ -45,7 +45,9 @@ function readSession(): StoredSession | null {
 function writeSession(data: StoredSession): void {
   try {
     const filePath = getSessionPath()
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf-8')
+    const tmpPath = filePath + '.tmp'
+    fs.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf-8')
+    fs.renameSync(tmpPath, filePath) // atomic replace — prevents corruption on crash
   } catch (e) {
     console.error('Failed to write session:', e)
   }
@@ -123,13 +125,16 @@ export function registerAuthIpc(): void {
 
   /**
    * Store session data (called after successful login/signup).
+   * NOTE: tier is NEVER accepted from the renderer — it must be set via license activation.
    */
-  ipcMain.handle('auth:setSession', async (_event, sessionData: Partial<StoredSession>): Promise<void> => {
+  ipcMain.handle('auth:setSession', async (_event, sessionData: Partial<Omit<StoredSession, 'tier'>>): Promise<void> => {
     try {
-      const existing = readSession() || {} as StoredSession
+      const existing = readSession() || { user: null, session: null, tier: 'free', updatedAt: '' } as StoredSession
+      // Strip tier from incoming data — tier must be set via license:store only
+      const { tier: _ignoredTier, ...safeData } = sessionData as any
       writeSession({
         ...existing,
-        ...sessionData,
+        ...safeData,
         updatedAt: new Date().toISOString(),
       } as StoredSession)
     } catch (e) {

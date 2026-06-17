@@ -4,14 +4,14 @@ import { autoDetectAndParse } from '../data/hand-history-parser'
 import { analyzeParsedHand } from '../data/batch-analyzer'
 
 export function registerReportIpc(): void {
-  ipcMain.handle('report:exportPDF', async (_event, params: { ids: string[] }) => {
+  ipcMain.handle('report:exportPDF', async (_event, params: { ids: string[] } = { ids: [] }) => {
     const window = BrowserWindow.getFocusedWindow()
     if (!window) return { success: false, error: 'No window' }
 
     const db = getDatabase()
     const hands: any[] = []
 
-    for (const id of params.ids || []) {
+    for (const id of params.ids) {
       const stmt = db.prepare('SELECT * FROM hand_histories WHERE id = :id')
       stmt.bind({ ':id': id })
       if (stmt.step()) hands.push(stmt.getAsObject())

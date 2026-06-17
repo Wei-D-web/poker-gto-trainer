@@ -53,7 +53,15 @@ export const useOpponentStore = create<OpponentStore>((set, get) => ({
   toggleExploitMode: () => set(s => ({ exploitMode: !s.exploitMode })),
   setExploitMode: (enabled) => set({ exploitMode: enabled }),
   togglePanel: () => set(s => ({ panelExpanded: !s.panelExpanded })),
-  setCustomStat: (stat, value) => set({ [`custom${stat.charAt(0).toUpperCase() + stat.slice(1)}` as keyof OpponentStore]: value } as any),
+  setCustomStat: (stat, value) => {
+    const statKeyMap: Record<string, 'customVpip' | 'customPfr' | 'customFoldToCbet'> = {
+      vpip: 'customVpip',
+      pfr: 'customPfr',
+      foldToCbet: 'customFoldToCbet',
+    }
+    const key = statKeyMap[stat]
+    if (key) set({ [key]: value })
+  },
   resetCustomStats: () => set({ customVpip: null, customPfr: null, customFoldToCbet: null }),
 
   get profile(): OpponentProfile {

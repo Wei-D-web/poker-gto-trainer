@@ -9,7 +9,7 @@
 
 
 import type { ComboKey } from '../../shared/types/poker'
-import { generateAllCombos, type ComboInfo } from '../../shared/utils/combo-utils'
+import { generateAllCombos, ALL_COMBOS, type ComboInfo } from '../../shared/utils/combo-utils'
 
 // ============================================================
 // Hand strength tiers (preflop)
@@ -23,7 +23,7 @@ const HAND_TIER: Record<string, number> = {
   'AJo': 5, 'ATs': 5, 'KQo': 5, 'KJs': 5, '88': 5, 'QJs': 5,
   'ATo': 6, 'A9s': 6, 'KJo': 6, 'KTs': 6, 'QJo': 6, 'QTs': 6, '77': 6, 'JTs': 6,
   'A8s': 7, 'A7s': 7, 'KTo': 7, 'K9s': 7, 'QTo': 7, 'Q9s': 7, 'JTo': 7, 'J9s': 7, '66': 7, 'T9s': 7,
-  'A5s': 8, 'A4s': 8, 'A3s': 8, 'A2s': 8, 'K8s': 8, 'K7s': 8, 'Q8s': 8, 'J8s': 8, 'T8s': 8, '55': 8, '98s': 8,
+  'A6s': 8, 'A5s': 8, 'A4s': 8, 'A3s': 8, 'A2s': 8, 'K8s': 8, 'K7s': 8, 'Q8s': 8, 'J8s': 8, 'T8s': 8, '55': 8, '98s': 8,
   'A9o': 9, 'A8o': 9, 'K9o': 9, 'K8o': 9, 'Q9o': 9, 'Q8o': 9, 'J9o': 9, 'J8o': 9, 'T9o': 9, 'T8o': 9, '44': 9, '87s': 9, '76s': 9,
   'A7o': 10, 'A6o': 10, 'A5o': 10, 'A4o': 10, 'K7o': 10, 'K6o': 10, 'Q7o': 10, 'J7o': 10, 'T7o': 10, '33': 10, '97s': 10, '86s': 10, '75s': 10, '65s': 10,
   'A3o': 11, 'A2o': 11, 'K5o': 11, 'K4o': 11, 'Q6o': 11, 'Q5o': 11, 'J6o': 11, 'T6o': 11, '22': 11, '96s': 11, '85s': 11, '74s': 11, '64s': 11, '54s': 11,
@@ -34,6 +34,16 @@ const HAND_TIER: Record<string, number> = {
   '75o': 16, '65o': 16, '64o': 16, '54o': 16,
   'T2s': 17, '93s': 17, '82s': 17,
   '32o': 18,
+  // Missing suited hands (added — playable from LP)
+  'K6s': 11, 'K5s': 12, 'K4s': 13, 'K3s': 14, 'K2s': 14,
+  'Q7s': 12, 'Q6s': 13, 'Q5s': 14, 'Q4s': 15, 'Q3s': 16, 'Q2s': 16,
+  'J7s': 12, 'J6s': 13, 'J5s': 14, 'J4s': 16, 'J3s': 16, 'J2s': 17,
+  'T7s': 12, 'T6s': 13, 'T5s': 14, 'T4s': 14, 'T3s': 16,
+  '92s': 17, '72s': 18,
+  // Missing offsuit hands (added)
+  '98o': 12, '97o': 14, '96o': 15,
+  '87o': 13, '86o': 15,
+  '76o': 14,
 }
 
 function getTier(combo: string): number {
@@ -49,9 +59,14 @@ export function solvePreflopRange(
   stackDepth: number,
   gameType: 'cash' | 'tournament' = 'cash',
   ante: number = 0,
-  iterations: number = 300
+  iterations: number = 300 // NOTE: iterations currently unused — heuristic range, not iterative CFR
 ): Record<ComboKey, number> {
-  const allCombos = generateAllCombos()
+  // Validate position: 0-4 (UTG-SB), BB(5) cannot open
+  if (position < 0 || position > 4) {
+    console.warn(`solvePreflopRange: invalid position ${position}, clamping to 0-4`)
+    position = Math.max(0, Math.min(4, position))
+  }
+
   const result: Record<ComboKey, number> = {}
 
   // GTO opening frequencies per tier, adjusted by position and stack depth
@@ -107,11 +122,13 @@ export function solvePreflopRange(
   const foldEquity = baseFoldEquity * foldEquityMultiplier
 
   // Postflop equity realization (IP advantage)
-  // MTT: equity realization 略低(ICM 让玩家在 postflop 更保守)
-  const baseEquityReal = position >= 3 ? 1.05 : position >= 1 ? 1.0 : 0.95
+  // Position-specific: BTN(3) has max IP advantage, SB(4) is always OOP
+  // Values derived from solver data: UTG=0.92, MP=0.95, CO=1.0, BTN=1.05, SB=0.88, BB=1.0
+  const equityRealLookup = [0.92, 0.95, 1.0, 1.05, 0.88, 1.0]
+  const baseEquityReal = equityRealLookup[position] ?? 1.0
   const equityRealization = gameType === 'tournament' ? baseEquityReal * 0.92 : baseEquityReal
 
-  for (const combo of allCombos) {
+  for (const combo of ALL_COMBOS) {
     const tier = getTier(combo.key)
 
     // Compute EV of opening vs folding
@@ -165,10 +182,10 @@ export function solvePreflopRange(
 
     // === Cash 特殊调整 ===
     if (gameType === 'cash') {
-      // Cash deep stack: suited connectors / small pairs 更有价值
-      const isSuitedConnector = combo.key.includes('s') && Math.abs(getTier(combo.key)) <= 9
+      // Cash deep stack: suited hands / small pairs 更有价值(隐含赔率)
+      const isSuitedHand = combo.key.includes('s')
       const isSmallPair = combo.key[0] === combo.key[1] && tier >= 9 && tier <= 11
-      if ((isSuitedConnector || isSmallPair) && stackDepth > 120 && frequency > 0.02) {
+      if ((isSuitedHand || isSmallPair) && stackDepth > 120 && frequency > 0.02) {
         frequency = Math.min(1, frequency * 1.15) // 深码时这些牌 +15%
       }
     }
@@ -202,7 +219,7 @@ export function solvePreflopRange(
 
     // Ensure clean rounding
     const roundedFreq = Math.round(frequency * 100) / 100
-    if (roundedFreq > 0.01) {
+    if (roundedFreq >= 0.01) {
       result[combo.key] = roundedFreq
     }
   }

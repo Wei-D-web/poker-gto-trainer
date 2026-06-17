@@ -966,6 +966,12 @@ export function evaluateHoleCards(heroHand: CardString[], board: CardString[]): 
             gutshot = true
           }
         }
+        // Made straight (no pair) — all 5 connected ranks present with hero card
+        if (presentCount === 5 && heroInWindow >= 1) {
+          oesd = false // it's not a draw, it's a made hand
+          gutshot = false
+          // Set via handType classification below; bypass draw detection
+        }
       }
 
       // Detect if draws COMPLETED (hero actually made the hand)

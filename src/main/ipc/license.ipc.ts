@@ -8,40 +8,65 @@
 import { ipcMain } from 'electron'
 import { getDatabase, saveDatabase } from '../data/database'
 
+const VALID_TIERS = ['free', 'pro', 'lifetime', 'developer'] as const
+
 export function registerLicenseIpc(): void {
   // Store license key locally (offline mode)
   ipcMain.handle('license:store', async (_event, params: { key: string; tier: string }) => {
-    const db = getDatabase()
+    try {
+      if (!params?.key || !params?.tier) {
+        return { success: false, error: 'Missing key or tier parameter' }
+      }
+      // Validate tier is an allowed value — prevent arbitrary tier injection
+      if (!VALID_TIERS.includes(params.tier as any)) {
+        return { success: false, error: `Invalid tier: ${params.tier}` }
+      }
+      // Validate key format before storing
+      const cleanKey = params.key.toUpperCase().trim()
+      if (!/^[A-Z0-9]{4,8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(cleanKey)) {
+        return { success: false, error: 'Invalid license key format' }
+      }
 
-    // Create license_keys table if not exists
-    db.run(`
-      CREATE TABLE IF NOT EXISTS local_licenses (
-        key TEXT PRIMARY KEY,
-        tier TEXT NOT NULL DEFAULT 'pro',
-        activated_at INTEGER DEFAULT (unixepoch()),
-        last_validated INTEGER DEFAULT (unixepoch())
+      const db = getDatabase()
+
+      // Create license_keys table if not exists
+      db.run(`
+        CREATE TABLE IF NOT EXISTS local_licenses (
+          key TEXT PRIMARY KEY,
+          tier TEXT NOT NULL DEFAULT 'pro',
+          activated_at INTEGER DEFAULT (unixepoch()),
+          last_validated INTEGER DEFAULT (unixepoch())
+        )
+      `)
+
+      const stmt = db.prepare(
+        `INSERT OR REPLACE INTO local_licenses (key, tier, activated_at, last_validated)
+         VALUES (:key, :tier, unixepoch(), unixepoch())`
       )
-    `)
+      try {
+        stmt.bind({ ':key': cleanKey, ':tier': params.tier })
+        stmt.step()
+      } finally {
+        stmt.free()
+      }
 
-    const stmt = db.prepare(
-      `INSERT OR REPLACE INTO local_licenses (key, tier, activated_at, last_validated)
-       VALUES (:key, :tier, unixepoch(), unixepoch())`
-    )
-    stmt.bind({ ':key': params.key, ':tier': params.tier })
-    stmt.step()
-    stmt.free()
+      // Update user_preferences with tier
+      const prefStmt = db.prepare(
+        `INSERT OR REPLACE INTO user_preferences (key, value, updated_at)
+         VALUES ('active_tier', :tier, unixepoch())`
+      )
+      try {
+        prefStmt.bind({ ':tier': params.tier })
+        prefStmt.step()
+      } finally {
+        prefStmt.free()
+      }
 
-    // Update user_preferences with tier
-    const prefStmt = db.prepare(
-      `INSERT OR REPLACE INTO user_preferences (key, value, updated_at)
-       VALUES ('active_tier', :tier, unixepoch())`
-    )
-    prefStmt.bind({ ':tier': params.tier })
-    prefStmt.step()
-    prefStmt.free()
-
-    saveDatabase()
-    return { success: true }
+      saveDatabase()
+      return { success: true }
+    } catch (e) {
+      return { success: false, error: String(e) }
+    }
   })
 
   // Get stored license info

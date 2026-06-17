@@ -83,7 +83,7 @@ export function simulateRangeBattle(config: RangeBattleConfig): RangeBattleResul
     let comboEquity = 0
     let comboWeight = 0
     for (const [vCombo, vFreq] of villainEntries) {
-      const w = (hFreq as number) * (vFreq as number)
+      const w = hFreq * vFreq
       comboEquity += preflopEquity(hCombo, vCombo) * w
       comboWeight += w
     }
@@ -102,8 +102,8 @@ export function simulateRangeBattle(config: RangeBattleConfig): RangeBattleResul
       }
     }
 
-    totalHeroEquity += eq * (hFreq as number)
-    totalWeight += (hFreq as number)
+    totalHeroEquity += eq * hFreq
+    totalWeight += hFreq
   }
 
   // Compute villain per-combo equity vs hero range
@@ -112,7 +112,7 @@ export function simulateRangeBattle(config: RangeBattleConfig): RangeBattleResul
     let comboEquity = 0
     let comboWeight = 0
     for (const [hCombo, hFreq] of heroEntries) {
-      const w = (hFreq as number) * (vFreq as number)
+      const w = hFreq * vFreq
       comboEquity += (1 - preflopEquity(hCombo, vCombo)) * w
       comboWeight += w
     }
@@ -130,8 +130,8 @@ export function simulateRangeBattle(config: RangeBattleConfig): RangeBattleResul
       }
     }
 
-    totalVillainEquity += eq * (vFreq as number)
-    villainWeightSum += (vFreq as number)
+    totalVillainEquity += eq * vFreq
+    villainWeightSum += vFreq
   }
 
   const heroEq = totalWeight > 0 ? totalHeroEquity / totalWeight : 0.5
@@ -187,7 +187,7 @@ export function buildStandardRange(position: number, stackDepth: number): Record
   // Add some suited connectors at medium frequency
   const suitedConnectors = ['JTs', 'T9s', '98s', '87s', '76s', '65s', '54s']
   for (const sc of suitedConnectors) {
-    if (!range[sc]) range[sc] = 0.3 * depthMultiplier
+    if (range[sc] === undefined) range[sc] = 0.3 * depthMultiplier
   }
 
   return range

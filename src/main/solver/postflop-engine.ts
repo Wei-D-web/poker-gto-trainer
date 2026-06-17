@@ -48,7 +48,7 @@ export interface PostflopResult {
 type HandType =
   | 'set' | 'two_pair' | 'overpair' | 'top_pair_top_kicker'
   | 'top_pair' | 'middle_pair' | 'bottom_pair' | 'pocket_pair_below'
-  | 'flush_draw' | 'oesd' | 'gutshot' | 'two_overcards'
+  | 'flush_draw' | 'oesd' | 'gutshot' | 'straight' | 'two_overcards'
   | 'one_overcard' | 'backdoor_draws' | 'air'
 
 export function evaluateHandOnFlop(
@@ -82,7 +82,9 @@ export function evaluateHandOnFlop(
   if (isSuited && !isPair) {
     const suitFreq: Record<string, number> = {}
     for (const s of boardSuits) { suitFreq[s] = (suitFreq[s] || 0) + 1 }
-    flushDraw = Object.values(suitFreq).some(c => c >= 2) // 2 of a suit on board = possible flush draw
+    // Note: per-combo analysis doesn't know the specific suit.
+    // If any suit has 2+ on board, flag potential flush draw for suited combos.
+    flushDraw = Object.values(suitFreq).some(c => c >= 2)
   }
 
   // Connectedness for straight draws
@@ -90,10 +92,10 @@ export function evaluateHandOnFlop(
   // Include wheel ace (14 can act as 1)
   const extendedRanks = new Set(allRanks)
   if (extendedRanks.has(14)) extendedRanks.add(1)
-  const allRankList = [...extendedRanks].sort((a, b) => a - b)
-
   let hasOESD = false
   let hasGutshot = false
+
+  let hasMadeStraight = false
 
   // Check each 5-consecutive-rank window: [1-5], [2-6], ..., [10-14]
   for (let start = 1; start <= 10; start++) {
@@ -103,8 +105,8 @@ export function evaluateHandOnFlop(
     const heroInWindow = windowRanks.filter(r => r === rank1 || r === rank2 || (r === 1 && rank1 === 14) || (r === 1 && rank2 === 14)).length
 
     if (presentCount === 5 && heroInWindow >= 1) {
-      // Made straight — already handled by two_pair/set/etc classification, but mark it
-      hasOESD = true
+      // Made straight — mark separately, not as a draw
+      hasMadeStraight = true
     } else if (presentCount === 4 && heroInWindow >= 1) {
       // 4 to a straight — determine OESD vs gutshot
       const missing = windowRanks.find(r => !extendedRanks.has(r))!
@@ -124,7 +126,6 @@ export function evaluateHandOnFlop(
   const uniqueBoardRanks = [...new Set(boardRanks)].sort((a, b) => b - a)
   const topBoardRank = uniqueBoardRanks[0]
   const secondBoardRank = uniqueBoardRanks.length >= 2 ? uniqueBoardRanks[1] : 0
-  const isBoardPaired = uniqueBoardRanks.length < boardRanks.length
 
   // Combo draw: both flush draw + OESD = premium semi-bluff
   const hasComboDraw = flushDraw && hasOESD
@@ -134,7 +135,11 @@ export function evaluateHandOnFlop(
   let isValue = false
   let isBluff = false
 
-  if (hasSet) {
+  if (hasMadeStraight) {
+    handType = 'straight'
+    equity = 0.82
+    isValue = true
+  } else if (hasSet) {
     handType = 'set'
     equity = 0.85
     isValue = true
@@ -169,6 +174,11 @@ export function evaluateHandOnFlop(
   } else if (isPair && rank1 < Math.min(...boardRanks)) {
     handType = 'pocket_pair_below'
     equity = 0.15
+    isBluff = false
+  } else if (isPair && rank1 > Math.min(...boardRanks) && rank1 < Math.max(...boardRanks)) {
+    // Pocket pair between board ranks (e.g., 99 on K72 — underpair to K, overpair to 7&2)
+    handType = 'pocket_pair_below'
+    equity = 0.18
     isBluff = false
   } else if (hasComboDraw) {
     handType = 'flush_draw'  // combo draw: flush + OESD
@@ -299,7 +309,7 @@ export function generatePostflopStrategy(
   return {
     board,
     texture: analysis.texture,
-    description: prefix + descriptions[analysis.texture] || `${analysis.texture}面${gameTypeSuffix}`,
+    description: prefix + (descriptions[analysis.texture] || `${analysis.texture}面${gameTypeSuffix}`),
     heroPosition,
     villainPosition,
     isHeroIP,
