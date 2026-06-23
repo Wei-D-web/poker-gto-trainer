@@ -9,8 +9,9 @@
  *   sig  (4 base32 chars) = HMAC-SHA256(body, SECRET) first 20 bits
  */
 
-// ⚠️ Must match scripts/generate-license-keys.mjs LICENSE_SECRET
-const LICENSE_SECRET = 'pokergto-trainer-secret-key-2026'
+// ⚠️ Must match POKERGTO_LICENSE_SECRET used in scripts/generate-license-keys.mjs
+// Set via VITE_LICENSE_SECRET in .env — never hardcode in production builds.
+const LICENSE_SECRET = import.meta.env.VITE_LICENSE_SECRET || 'pokergto-trainer-secret-key-2026'
 
 // Crockford base32 alphabet (no I/L/O/U to avoid confusion)
 const BASE32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'

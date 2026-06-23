@@ -45,5 +45,5 @@ nsis:
   createStartMenuShortcut: true
 publish:
   provider: github
-  owner: pokergto
-  repo: trainer
+  owner: Wei-D-web
+  repo: poker-gto-trainer

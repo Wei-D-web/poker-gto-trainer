@@ -1,0 +1,14 @@
+# PokerGTO License Keys — Generated 2026-06-23
+# Secret hash: d0aa7dbf (first 8 chars of signing key — for integrity check)
+# 
+# Pro keys (12-month expiry, expires 2027-06):
+PGTO-0019-731M-3RWY  pro  2027-06
+PGTO-0019-DH4W-TZT5  pro  2027-06
+PGTO-0019-P23V-SXV8  pro  2027-06
+PGTO-0019-KWEM-VDAD  pro  2027-06
+PGTO-0019-2260-ZNHP  pro  2027-06
+#
+# Lifetime keys (never expires):
+PGTO-01W4-VH6Y-W3MT  lifetime  permanent
+PGTO-01W4-XT6M-CGKG  lifetime  permanent
+PGTO-01W4-XZ18-DXN6  lifetime  permanent
