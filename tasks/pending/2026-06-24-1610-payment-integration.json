@@ -1,0 +1,31 @@
+{
+  "task": "支付链路评估与集成（等预设策略上线看效果后决定方向）",
+  "details": [
+    "目前已有：",
+    "  - Stripe 集成：api/create-checkout-session.ts, api/stripe-webhook.ts, api/create-customer-portal.ts",
+    "  - Supabase 用户 tier 系统（free/pro/lifetime）",
+    "  - 国内支付占位（public/payment/alipay-qr.png, wechat-pay-qr.png）",
+    "  - Landing page 定价卡片（18元/月 Pro, 198元/终身）",
+    "",
+    "待办（等预设策略上线后，根据流量数据决定）：",
+    "1. 如果海外用户多 → 完善 Stripe 流程（测试 webhook、订阅状态同步）",
+    "2. 如果国内用户多 → 接入支付宝/微信支付 SDK",
+    "3. License key 系统已有（scripts/generate-license-keys.mjs, dist 已有安装包）",
+    "4. 许可证自动绑定到 Supabase 用户 tier（付费后自动升级到 pro/lifetime）",
+    "5. 支付页面 UI 完善（成功率提示、支付方式选择）",
+    "",
+    "关键文件：",
+    "  - api/create-checkout-session.ts",
+    "  - api/stripe-webhook.ts",
+    "  - api/create-customer-portal.ts",
+    "  - src/renderer/components/settings/LicenseActivation.tsx",
+    "  - src/renderer/components/common/SubscriptionGate.tsx",
+    "  - deploy/index.html (pricing section)",
+    "  - supabase-schema.sql (profiles.tier)"
+  ],
+  "priority": "normal",
+  "from": "webchat",
+  "created": "2026-06-24T16:10:00+08:00",
+  "depends_on": "预设策略上云完成之后",
+  "note": "当前阶段先保持 Stripe 作为主力支付方案，待预设策略上线看到付费转化数据后再决定是否需要加国内支付。如果国内用户占主导，支付宝/微信支付优先级高于 Stripe。"
+}

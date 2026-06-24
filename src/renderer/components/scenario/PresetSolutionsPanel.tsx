@@ -1,19 +1,19 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useScenarioStore } from '../../stores/scenarioStore'
 import { PostflopAnalysis } from './PostflopAnalysis'
 import { cn } from '../../lib/utils'
-import { Zap, ChevronRight, Layers } from 'lucide-react'
+import { Zap, ChevronRight, Layers, CloudOff } from 'lucide-react'
+import {
+  fetchPresetCategories,
+  fetchCompleteStrategy,
+  isWebMode,
+  type PresetCategory,
+} from '../../services/supabase-strategies'
 
 interface PresetFlop {
   board: string[]
   texture: string
   description: string
-}
-
-interface PresetCategory {
-  label: string
-  accent: string
-  flops: PresetFlop[]
 }
 
 const PRESET_CATEGORIES: PresetCategory[] = [
@@ -81,20 +81,65 @@ export function PresetSolutionsPanel() {
   const [selectedFlop, setSelectedFlop] = useState<string[] | null>(null)
   const [postflopResult, setPostflopResult] = useState<any>(null)
   const [analyzing, setAnalyzing] = useState(false)
+  const web = isWebMode()
+
+  // Web mode: load categories from Supabase (with fallback to hardcoded)
+  const [webCategories, setWebCategories] = useState<PresetCategory[] | null>(null)
+  const [webCategoriesLoading, setWebCategoriesLoading] = useState(false)
+  const [webCategoriesError, setWebCategoriesError] = useState(false)
+
+  useEffect(() => {
+    if (!web) return
+    let cancelled = false
+    setWebCategoriesLoading(true)
+    setWebCategoriesError(false)
+
+    fetchPresetCategories()
+      .then((cats) => {
+        if (!cancelled) {
+          setWebCategories(cats.length > 0 ? cats : null)
+          setWebCategoriesError(cats.length === 0)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setWebCategoriesError(true)
+      })
+      .finally(() => {
+        if (!cancelled) setWebCategoriesLoading(false)
+      })
+
+    return () => { cancelled = true }
+  }, [web])
+
+  const categories = web ? (webCategories || PRESET_CATEGORIES) : PRESET_CATEGORIES
 
   const analyzeFlop = async (board: string[]) => {
     setSelectedFlop(board)
     setAnalyzing(true)
+
     try {
-      const result = await window.electronAPI.strategy.analyzePostflop({
-        board,
-        heroPosition,
-        villainPosition,
-        stackDepth,
-      })
-      setPostflopResult(result)
+      if (web) {
+        // Web: fetch from Supabase
+        const strategy = await fetchCompleteStrategy(
+          board.join(' '),
+          heroPosition,
+          villainPosition,
+          stackDepth,
+        )
+        setPostflopResult(strategy)
+      } else {
+        // Desktop: call Electron IPC
+        const result = await window.electronAPI.strategy.analyzePostflop({
+          board,
+          heroPosition,
+          villainPosition,
+          stackDepth,
+        })
+        setPostflopResult(result)
+      }
     } catch (e) {
       console.error('Postflop analysis failed:', e)
+      setPostflopResult(null)
     } finally {
       setAnalyzing(false)
     }
@@ -104,7 +149,21 @@ export function PresetSolutionsPanel() {
     <div>
       {/* Preset flops grid */}
       <div className="space-y-1">
-        {PRESET_CATEGORIES.map((cat) => (
+        {/* Web mode: loading / error indicator */}
+        {web && webCategoriesLoading && categories === PRESET_CATEGORIES && (
+          <div className="flex items-center gap-2 px-2 py-2 text-[10px] text-neutral-500">
+            <div className="w-3 h-3 rounded-full border border-neutral-600 border-t-blue-500 animate-spin" />
+            Loading preset strategies...
+          </div>
+        )}
+        {web && webCategoriesError && categories === PRESET_CATEGORIES && (
+          <div className="flex items-center gap-2 px-2 py-2 text-[10px] text-amber-500">
+            <CloudOff size={11} />
+            Offline — using cached data
+          </div>
+        )}
+
+        {categories.map((cat) => (
           <div key={cat.label}>
             <button
               onClick={() => setExpandedCategory(expandedCategory === cat.label ? null : cat.label)}

@@ -1,0 +1,23 @@
+{
+  "task": "将预设策略从 Electron 本地 SQLite 迁移到 Supabase，让网页版也能读取策略数据",
+  "details": [
+    "1. 梳理 preset-solutions.ts 的数据结构 (50种翻牌纹理 + 翻牌前策略)",
+    "2. 在 Supabase 建表存储预设策略（board_texture、position、combo_data 等）",
+    "3. 写一个 migration script，把 sql.js 本地数据导出并插入到 Supabase",
+    "4. 修改网页端 API 调用层，优先读 Supabase 缓存，备用回退",
+    "5. 确保网页版（WebApp.tsx 等）在 GitHub Pages 环境下能正常获取策略数据展示",
+    "6. 后端数据接口封装在 Supabase Edge Function 或直接 Row Level Security 暴露",
+    "7. preset-solutions.ts 的输出包含 per-combo {action, frequency} 数据，需要对应表结构"
+  ],
+  "keyFiles": [
+    "src/main/data/preset-solutions.ts",
+    "src/main/data/database.ts",
+    "src/main/solver/postflop-engine.ts",
+    "src/shared/utils/poker-math.ts",
+    "src/shared/types/strategy.ts"
+  ],
+  "priority": "high",
+  "from": "webchat",
+  "created": "2026-06-24T07:50:00.000Z",
+  "note": "这是上线卖钱的前提——网页版必须有数据可看。目前 database.ts 依赖 Electron app.getPath，网页版跑不了。"
+}

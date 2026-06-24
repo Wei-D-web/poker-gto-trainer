@@ -7,7 +7,9 @@
   "license": "MIT",
   "scripts": {
     "dev": "electron-vite dev",
+    "dev:web": "vite --config vite.config.web.mts",
     "build": "electron-vite build",
+    "build:web": "vite build --config vite.config.web.mts",
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit",
     "typecheck:main": "tsc --noEmit -p tsconfig.node.json",

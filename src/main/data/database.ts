@@ -1,11 +1,56 @@
 import initSqlJs, { type Database as SqlJsDatabase } from 'sql.js'
-import { app } from 'electron'
 import { join } from 'path'
 import * as fs from 'fs'
 
 let db: SqlJsDatabase | null = null
 let dbPath: string = ''
 let initPromise: Promise<void> | null = null
+
+// ============================================================
+// Detect runtime environment
+// ============================================================
+let _isElectron: boolean | null = null
+
+export function isElectron(): boolean {
+  if (_isElectron !== null) return _isElectron
+  try {
+    // Check if electron is available — in web/Node.js without Electron,
+    // requiring 'electron' will throw.
+    require.resolve('electron')
+    const { app } = require('electron')
+    _isElectron = typeof app?.getPath === 'function'
+  } catch {
+    _isElectron = false
+  }
+  return _isElectron
+}
+
+// ============================================================
+// Injectable options — call before initDatabase() when NOT in Electron
+// ============================================================
+export interface DatabaseOptions {
+  /** Absolute path to the directory where poker-gto.db is stored. */
+  dbDir?: string
+  /** Absolute path to the sql-wasm.wasm file. */
+  wasmPath?: string
+  /** If true, use in-memory database only (no disk persistence). */
+  inMemory?: boolean
+}
+
+let customOptions: DatabaseOptions = {}
+
+/**
+ * Configure database paths before initialization.
+ * Only needed in non-Electron environments (web, Node.js scripts).
+ * In Electron, paths are auto-detected from app.getPath('userData').
+ */
+export function configureDatabase(options: DatabaseOptions): void {
+  customOptions = options
+}
+
+// ============================================================
+// Public API
+// ============================================================
 
 export function getDatabase(): SqlJsDatabase {
   if (!db) {
@@ -24,39 +69,61 @@ export async function initDatabase(): Promise<void> {
   if (db) return
 
   initPromise = (async () => {
-  const userDataPath = app.getPath('userData')
-  const dbDir = join(userDataPath, 'data')
+    let dataDir: string
+    let wasmPath: string | undefined
 
-  if (!fs.existsSync(dbDir)) {
-    fs.mkdirSync(dbDir, { recursive: true })
-  }
+    if (isElectron()) {
+      // ── Electron: auto-detect paths ──
+      const { app } = require('electron')
+      const userDataPath = app.getPath('userData')
+      dataDir = join(userDataPath, 'data')
 
-  dbPath = join(dbDir, 'poker-gto.db')
+      if (app.isPackaged) {
+        wasmPath = join(process.resourcesPath, 'sql-wasm.wasm')
+      } else {
+        wasmPath = join(__dirname, '../../node_modules/sql.js/dist/sql-wasm.wasm')
+      }
+    } else if (customOptions.dbDir) {
+      // ── Explicit config (web, Node.js scripts) ──
+      dataDir = customOptions.dbDir
+      wasmPath = customOptions.wasmPath
+    } else {
+      throw new Error(
+        'Not running in Electron and no custom database path configured. ' +
+        'Call configureDatabase({ dbDir, wasmPath }) before initDatabase().'
+      )
+    }
 
-  // Locate WASM file — in packaged app it's in Resources/, in dev it's in node_modules
-  let wasmPath: string | undefined
-  if (app.isPackaged) {
-    wasmPath = join(process.resourcesPath, 'sql-wasm.wasm')
-  } else {
-    wasmPath = join(__dirname, '../../node_modules/sql.js/dist/sql-wasm.wasm')
-  }
-  const SQL = await initSqlJs({ locateFile: () => wasmPath! })
+    // Ensure directory exists
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true })
+    }
 
-  // Load existing database or create new one
-  if (fs.existsSync(dbPath)) {
-    const buffer = fs.readFileSync(dbPath)
-    db = new SQL.Database(buffer)
-  } else {
-    db = new SQL.Database()
-  }
+    dbPath = join(dataDir, 'poker-gto.db')
 
-  db.run('PRAGMA journal_mode = WAL')
-  db.run('PRAGMA foreign_keys = ON')
-  db.run('PRAGMA cache_size = -64000')
+    // Locate WASM file
+    if (!wasmPath) {
+      // Fallback for Node.js: try node_modules
+      wasmPath = join(__dirname, '../../node_modules/sql.js/dist/sql-wasm.wasm')
+    }
 
-  runMigrations(db)
+    const SQL = await initSqlJs({ locateFile: () => wasmPath! })
 
-  console.log(`Database initialized at ${dbPath}`)
+    // Load existing database or create new one
+    if (!customOptions.inMemory && fs.existsSync(dbPath)) {
+      const buffer = fs.readFileSync(dbPath)
+      db = new SQL.Database(buffer)
+    } else {
+      db = new SQL.Database()
+    }
+
+    db.run('PRAGMA journal_mode = WAL')
+    db.run('PRAGMA foreign_keys = ON')
+    db.run('PRAGMA cache_size = -64000')
+
+    runMigrations(db)
+
+    console.log(`Database initialized at ${customOptions.inMemory ? '(in-memory)' : dbPath}`)
   })()
   await initPromise
 }
@@ -236,9 +303,9 @@ function runMigrations(database: SqlJsDatabase): void {
   }
 }
 
-/** Save the in-memory database to disk */
+/** Save the in-memory database to disk (no-op in inMemory mode). */
 export function saveDatabase(): void {
-  if (!db) return
+  if (!db || customOptions.inMemory) return
   const data = db.export()
   const buffer = Buffer.from(data)
   fs.writeFileSync(dbPath, buffer)
