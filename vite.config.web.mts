@@ -13,13 +13,11 @@ const __dirname = dirname(__filename)
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  root: '.',
+  root: resolve(__dirname, 'web'),
+  base: '/poker-gto-trainer/',
   build: {
     outDir: resolve(__dirname, 'dist/web'),
     emptyOutDir: true,
-    rollupOptions: {
-      input: resolve(__dirname, 'web/index.html'),
-    },
   },
   resolve: {
     alias: {
@@ -29,6 +27,6 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    open: '/web/',
+    open: '/',
   },
 })

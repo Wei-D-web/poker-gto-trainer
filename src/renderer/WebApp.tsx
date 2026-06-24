@@ -9,6 +9,9 @@ import { LoginPage } from './components/auth/LoginPage'
 export function WebApp() {
   const { user, loading } = useAuth()
 
+  // Dev build: skip auth, go straight to app
+  const isDev = import.meta.env.VITE_POKERGTO_DEV_BUILD === 'true'
+
   if (loading) {
     return (
       <div className="h-screen w-screen bg-[#05080C] flex items-center justify-center">
@@ -20,7 +23,7 @@ export function WebApp() {
     )
   }
 
-  if (!user) {
+  if (!isDev && !user) {
     return <LoginPage />
   }
 

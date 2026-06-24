@@ -5,7 +5,6 @@ import { cn } from '../../lib/utils'
 import { Zap, ChevronRight, Layers, CloudOff } from 'lucide-react'
 import {
   fetchPresetCategories,
-  fetchCompleteStrategy,
   isWebMode,
   type PresetCategory,
 } from '../../services/supabase-strategies'
@@ -118,25 +117,15 @@ export function PresetSolutionsPanel() {
     setAnalyzing(true)
 
     try {
-      if (web) {
-        // Web: fetch from Supabase
-        const strategy = await fetchCompleteStrategy(
-          board.join(' '),
-          heroPosition,
-          villainPosition,
-          stackDepth,
-        )
-        setPostflopResult(strategy)
-      } else {
-        // Desktop: call Electron IPC
-        const result = await window.electronAPI.strategy.analyzePostflop({
-          board,
-          heroPosition,
-          villainPosition,
-          stackDepth,
-        })
-        setPostflopResult(result)
-      }
+      // Desktop → IPC → local engine
+      // Web → bridge → Supabase (see web-api-bridge.ts)
+      const result = await window.electronAPI.strategy.analyzePostflop({
+        board,
+        heroPosition,
+        villainPosition,
+        stackDepth,
+      })
+      setPostflopResult(result)
     } catch (e) {
       console.error('Postflop analysis failed:', e)
       setPostflopResult(null)

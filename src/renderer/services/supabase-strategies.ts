@@ -337,7 +337,15 @@ export async function fetchPresetCategories(): Promise<PresetCategory[]> {
 
 /**
  * Check if the app is running in web mode (not Electron).
+ * electronAPI might be set by our bridge in web mode, so check
+ * for Electron-specific globals instead.
  */
 export function isWebMode(): boolean {
-  return (window as any).electronAPI === undefined
+  // Electron renderer exposes process.versions.electron (e.g. "28.0.0")
+  // Browser has no process.versions at all
+  try {
+    return !(window as any).process?.versions?.electron
+  } catch {
+    return true
+  }
 }
