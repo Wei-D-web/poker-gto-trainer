@@ -6,7 +6,7 @@ import { X, Sparkles, Grid3X3 } from 'lucide-react'
 interface BoardSelectorProps {
   board: CardString[]
   onChange: (board: CardString[]) => void
-  onAnalyze: () => void
+  onAnalyze?: () => void
   isLoading?: boolean
 }
 
@@ -215,7 +215,7 @@ export function BoardSelector({ board, onChange, onAnalyze, isLoading }: BoardSe
       </div>
 
       {/* Analyze button */}
-      {board.length >= 3 && (
+      {onAnalyze && board.length >= 3 && (
         <button
           onClick={onAnalyze}
           disabled={isLoading}

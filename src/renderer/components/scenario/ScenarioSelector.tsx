@@ -137,7 +137,7 @@ export function ScenarioSelector() {
         <div className="flex items-center justify-between text-[10px] mt-1.5">
           <span className="text-neutral-500">Position</span>
           <span className={cn('font-semibold', heroPosition > villainPosition ? 'text-green-400' : 'text-amber-400')}>
-            {heroPosition > villainPosition || (heroPosition === 4 && villainPosition === 5) ? 'In Position' : 'Out of Position'}
+            {heroPosition > villainPosition || heroPosition === 3 || (heroPosition === 4 && villainPosition === 5) ? 'In Position' : 'Out of Position'}
           </span>
         </div>
       </div>

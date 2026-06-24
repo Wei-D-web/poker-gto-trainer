@@ -45,7 +45,7 @@ export function parsePokerStarsHand(rawText: string): ParsedHand | null {
     const seatLines = lines.filter(l => l.startsWith('Seat '))
     const seats: Record<string, { name: string; stack: number; seat: number }> = {}
     for (const sl of seatLines) {
-      const m = sl.match(/Seat (\d+): (\S+) \(\$?([\d.]+) in chips\)/)
+      const m = sl.match(/Seat (\d+): (.+?) \(\$?([\d.]+) in chips\)/)
       if (m) seats[m[2]] = { name: m[2], stack: parseFloat(m[3]), seat: parseInt(m[1]) }
     }
 
@@ -159,11 +159,6 @@ export function parsePokerStarsHand(rawText: string): ParsedHand | null {
       actions.push({ street: currentStreet, actor, action: actionStr, amount })
     }
 
-    // Add preflop open action if hero raised first
-    if (!actions.some(a => a.street === 'preflop' && a.actor === 'hero')) {
-      actions.unshift({ street: 'preflop', actor: 'hero', action: 'open_2.5bb' })
-    }
-
     // Determine showdown and result
     const collectedLine = lines.find(l => l.includes(heroName) && l.includes('collected'))
     const showdown = lines.some(l => l.includes(`${heroName}: shows`))
@@ -223,7 +218,7 @@ export function parseGGPokerHand(rawText: string): ParsedHand | null {
     const seatLines = lines.filter(l => l.match(/^Seat \d+:/))
     const seats: Record<string, { name: string; stack: number; seat: number }> = {}
     for (const sl of seatLines) {
-      const m = sl.match(/Seat (\d+): (\S+) \(\$?([\d.]+) in chips\)/)
+      const m = sl.match(/Seat (\d+): (.+?) \(\$?([\d.]+) in chips\)/)
       if (m) seats[m[2]] = { name: m[2], stack: parseFloat(m[3]), seat: parseInt(m[1]) }
     }
 
@@ -280,22 +275,30 @@ export function parseGGPokerHand(rawText: string): ParsedHand | null {
       const actor: 'hero' | 'villain' = playerName === heroName ? 'hero' : 'villain'
 
       let actionStr: string
-      if (actionText === 'folds') actionStr = 'fold'
-      else if (actionText === 'checks' || actionText.startsWith('checks')) actionStr = 'check'
-      else if (actionText.startsWith('calls')) actionStr = 'call'
-      else if (actionText.startsWith('bets')) {
+      let amount: number | undefined
+
+      if (actionText === 'folds') { actionStr = 'fold' }
+      else if (actionText === 'checks' || actionText.startsWith('checks')) { actionStr = 'check' }
+      else if (actionText.startsWith('calls')) {
+        actionStr = 'call'
+        amount = am[3] ? parseFloat(am[3]) : undefined
+      } else if (actionText.startsWith('bets')) {
         const betAmt = parseFloat(am[4])
+        amount = betAmt
         // Estimate pot as ~6.5bb for a standard SRP at 100bb depth
         const potEst = effectiveStack * 0.065
         const pct = Math.round((betAmt / Math.max(1, potEst)) * 100)
         actionStr = pct <= 40 ? 'bet_33' : pct <= 60 ? 'bet_50' : pct <= 85 ? 'bet_75' : pct <= 125 ? 'bet_100' : 'bet_150'
       } else if (actionText.startsWith('raises')) {
+        // am[6] is raise-to amount, am[5] is raise-by amount
+        amount = am[6] ? parseFloat(am[6]) : parseFloat(am[5])
         actionStr = currentStreet === 'preflop' ? '3bet_10bb' : 'raise_2x'
       } else if (actionText.startsWith('all-in')) {
         actionStr = 'all_in'
+        amount = am[7] ? parseFloat(am[7]) : undefined
       } else continue
 
-      actions.push({ street: currentStreet, actor, action: actionStr })
+      actions.push({ street: currentStreet, actor, action: actionStr, amount })
     }
 
     const collectedLine = lines.find(l => l.includes(heroName) && l.includes('collected'))
@@ -322,8 +325,11 @@ export function autoDetectAndParse(rawText: string): ParsedHand | null {
   if (rawText.includes('PokerStars Hand #')) {
     return parsePokerStarsHand(rawText)
   }
-  if (rawText.includes('GGPoker')) {
+  if (rawText.includes('Poker Hand #RC')) {
     return parseGGPokerHand(rawText)
+  }
+  if (rawText.includes('Game No') || rawText.includes('游戏编号')) {
+    return parseWPKHand(rawText)
   }
   // Default: try PokerStars format
   return parsePokerStarsHand(rawText)
@@ -437,11 +443,6 @@ export function parseWPKHand(rawText: string): ParsedHand | null {
       actions.push({ street: currentStreet, actor, action: actionStr })
     }
 
-    // Add preflop open if no preflop actions
-    if (!actions.some(a => a.street === 'preflop' && a.actor === 'hero')) {
-      actions.unshift({ street: 'preflop', actor: 'hero', action: 'open_2.5bb' })
-    }
-
     // Determine result
     const winLine = lines.find(l => l.includes(heroName) && (l.includes('赢得') || l.includes('win') || l.includes('collected')))
     const heroWon = !!winLine
@@ -480,7 +481,7 @@ export function parseWPKHand(rawText: string): ParsedHand | null {
 
 export function parseMultipleHands(rawText: string): ParsedHand[] {
   const hands: ParsedHand[] = []
-  const parts = rawText.split(/(?=PokerStars Hand #|GGPoker|Game No|游戏编号)/)
+  const parts = rawText.split(/(?=PokerStars Hand #|Poker Hand #|Game No|游戏编号)/)
   for (const part of parts) {
     if (part.trim().length < 50) continue
     const hand = autoDetectAndParse(part)

@@ -76,14 +76,16 @@ export function generateBreadcrumbSteps(
 
   for (let i = 0; i < actions.length; i++) {
     const isLastAction = i === actions.length - 1
-    const currentStreet: Street =
-      i === 0 ? 'preflop' :
-      i <= 2 ? 'flop' :
-      i <= 4 ? 'turn' : 'river'
+    // Use actual currentStreet for the active step; distribute earlier steps across streets
+    const stepStreet: Street = isLastAction
+      ? (street as Street)
+      : i === 0 ? 'preflop'
+      : i <= 2 ? 'flop'
+      : i <= 4 ? 'turn' : 'river'
 
     steps.push({
       label: actions[i],
-      street: currentStreet,
+      street: stepStreet,
       isActive: isLastAction,
       onClick: () => onNavigate(i + 1),
     })

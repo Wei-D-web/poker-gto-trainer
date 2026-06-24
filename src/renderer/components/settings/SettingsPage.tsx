@@ -132,7 +132,7 @@ export function SettingsPage() {
                 onClick={async () => {
                   setInitStatus('Generating preflop data...')
                   try {
-                    const result = await window.electronAPI.strategy.initSampleData()
+                    const result = await window.electronAPI?.strategy?.initSampleData() || { message: 'Electron API not available' }
                     setInitStatus(result.message)
                     await loadStats()
                   } catch (e) { setInitStatus('Failed: ' + String(e)) }
@@ -145,7 +145,7 @@ export function SettingsPage() {
                 onClick={async () => {
                   setInitStatus('Generating postflop data...')
                   try {
-                    const result = await window.electronAPI.strategy.initPostflopData()
+                    const result = await window.electronAPI?.strategy?.initPostflopData() || { message: 'Electron API not available' }
                     setInitStatus(result.message)
                     await loadStats()
                   } catch (e) { setInitStatus('Failed: ' + String(e)) }

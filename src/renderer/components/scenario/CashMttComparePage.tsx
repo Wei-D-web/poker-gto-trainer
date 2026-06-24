@@ -98,8 +98,11 @@ export function CashMttComparePage() {
   // === Diff combos ===
   const diffCombos = useMemo(() => {
     if (!cashCombos || !mttCombos) return null
-    return cashCombos.map((comboA: any, i: number) => {
-      const comboB = mttCombos[i]
+    // Index by comboKey for reliable matching (not array position)
+    const mttMap = new Map(mttCombos.map((c: any) => [c.comboKey, c]))
+    return cashCombos.map((comboA: any) => {
+      const comboB = mttMap.get(comboA.comboKey)
+      if (!comboB) return null
       // Diff on cbet frequency
       const getFreq = (c: any) => {
         const betAction = c.actions?.find((a: any) => a.action.startsWith('bet'))
@@ -113,7 +116,7 @@ export function CashMttComparePage() {
         weight: Math.abs(diff),
         ev: diff,
       }
-    })
+    }).filter(Boolean)
   }, [cashCombos, mttCombos])
 
   // === Selected combo detail ===

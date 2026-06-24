@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from 'react'
+import { useEffect, useRef, useMemo, useId } from 'react'
 import * as d3 from 'd3'
 import type { ComboStrategy } from '@shared/types/strategy'
 
@@ -11,6 +11,7 @@ interface Props {
 
 export function EquityDistribution({ combos, villainCombos, width = 500, height = 200 }: Props) {
   const svgRef = useRef<SVGSVGElement>(null)
+  const gradientId = `equity-gradient-${useId()}`
 
   // Compute equity distribution
   const distribution = useMemo(() => {
@@ -84,7 +85,7 @@ export function EquityDistribution({ combos, villainCombos, width = 500, height 
     // Gradient
     const gradient = svg.append('defs')
       .append('linearGradient')
-      .attr('id', 'equity-gradient')
+      .attr('id', gradientId)
       .attr('x1', '0%').attr('y1', '0%')
       .attr('x2', '100%').attr('y2', '0%')
 
@@ -98,7 +99,7 @@ export function EquityDistribution({ combos, villainCombos, width = 500, height 
     const data = distribution.percentileData
     g.append('path')
       .datum(data)
-      .attr('fill', 'url(#equity-gradient)')
+      .attr('fill', `url(#${gradientId})`)
       .attr('d', area)
 
     // Draw line

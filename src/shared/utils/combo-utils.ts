@@ -68,7 +68,7 @@ export function comboLabel(key: ComboKey): string {
   if (info.suited) {
     return `${r1}${r2}s`
   } else {
-    return `${r2}${r1}o`
+    return `${r1}${r2}o`
   }
 }
 

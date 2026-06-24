@@ -55,7 +55,7 @@ export function HandHistoryDashboard() {
     if (result.success) {
       addToast({ type: 'success', message: `Imported ${result.count} hand(s)` })
       loadData()
-    } else if (result.errors.length > 0) {
+    } else if (result.errors?.length > 0) {
       addToast({ type: 'warning', message: result.errors[0] })
     }
   }

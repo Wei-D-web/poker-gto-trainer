@@ -136,7 +136,7 @@ export function TurnRiverPage() {
             <div className="text-[10px] font-semibold text-neutral-500 uppercase tracking-wider mb-1.5">Presets</div>
             <div className="flex gap-1.5 flex-wrap">
               {FLOP_PRESETS.map((f,i) => (
-                <button key={i} onClick={()=>setFlop(f)}
+                <button key={i} onClick={()=>{setFlop(f); setTurnCard(null); setRiverCard(null)}}
                   className="px-2.5 py-1.5 text-[10px] bg-[#0F141C] hover:bg-[#151B28] text-neutral-400 hover:text-neutral-200 rounded-lg transition-colors border border-transparent hover:border-[#1C2A3D]">
                   {f.map(format).join(' ')}
                 </button>

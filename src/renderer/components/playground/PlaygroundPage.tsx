@@ -39,6 +39,8 @@ export function PlaygroundPage() {
   const timerRef = useRef<ReturnType<typeof setTimeout>>()
 
   const startHand = useCallback(() => {
+    // Clear any stale AI timer from previous hand
+    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = undefined }
     setLastResult(null)
     const g = createGame(heroPos, villainPos, 100)
     setGame(g)
@@ -66,9 +68,9 @@ export function PlaygroundPage() {
       if (key === 'f') doAction('fold')
       else if (key === 'c') doAction('check')
       else if (key === 'a') doAction('all_in')
-      else if (key === '1') doAction(game.villain.currentBet > game.hero.currentBet ? 'raise' : 'bet', '33')
-      else if (key === '2') doAction(game.villain.currentBet > game.hero.currentBet ? 'raise' : 'bet', '50')
-      else if (key === '3') doAction(game.villain.currentBet > game.hero.currentBet ? 'raise' : 'bet', '67')
+      else if (key === '1') doAction(game.villain.currentBet > game.hero.currentBet ? 'raise' : 'bet', 0.33)
+      else if (key === '2') doAction(game.villain.currentBet > game.hero.currentBet ? 'raise' : 'bet', 0.50)
+      else if (key === '3') doAction(game.villain.currentBet > game.hero.currentBet ? 'raise' : 'bet', 0.67)
       else if (game.villain.currentBet === game.hero.currentBet) return
       else if (key === 'enter' || key === ' ') doAction('call')
     }
@@ -94,22 +96,21 @@ export function PlaygroundPage() {
     }
   }
 
-  const doAction = useCallback((type: GameAction['type'], sizing?: string) => {
+  const doAction = useCallback((type: GameAction['type'], sizingPct?: number) => {
     if (!game || game.currentActor !== 'hero' || game.phase === 'showdown' || aiThinking) return
 
-    const pot = game.pot + game.hero.currentBet + game.villain.currentBet
+    const pot = game.pot  // pot already includes all bets
     const toCall = game.villain.currentBet - game.hero.currentBet
 
     let amount = 0
     if (type === 'bet' || type === 'raise') {
-      const pct = sizing ? parseFloat(sizing) / 100 : 0.5
+      const pct = sizingPct ?? 0.5
       amount = Math.round(pot * pct * 100) / 100
-      if (type === 'raise' && toCall > 0) amount = Math.round(pot * pct * 100) / 100
     }
     if (type === 'call') amount = toCall
     if (type === 'all_in') amount = game.hero.stack
 
-    const action: GameAction = { player: 'hero', type, amount, sizing, street: game.street }
+    const action: GameAction = { player: 'hero', type, amount, sizing: sizingPct != null ? String(Math.round(sizingPct * 100)) + '%' : undefined, street: game.street }
     const afterHero = applyAction(game, action)
     setGame(afterHero)
 
@@ -197,7 +198,7 @@ export function PlaygroundPage() {
   }
 
   const isHeroTurn = game.currentActor === 'hero' && game.phase !== 'showdown' && !aiThinking
-  const pot = game.pot + game.hero.currentBet + game.villain.currentBet
+  const pot = game.pot  // pot already includes all bets
   const toCall = game.villain.currentBet - game.hero.currentBet
 
   return (
@@ -336,7 +337,7 @@ export function PlaygroundPage() {
             {/* Bet sizing row */}
             <div className="flex gap-1.5">
               {SIZINGS.map(s => (
-                <button key={s.label} onClick={() => doAction(toCall > 0 ? 'raise' : 'bet', s.label)}
+                <button key={s.label} onClick={() => doAction(toCall > 0 ? 'raise' : 'bet', s.pct)}
                   className="px-3 py-1.5 text-[11px] font-semibold bg-amber-500/8 hover:bg-amber-500/15 text-amber-400 border border-amber-500/15 rounded-lg transition-all hover:border-amber-500/30">
                   {toCall > 0 ? 'Raise' : 'Bet'} {s.label}
                 </button>

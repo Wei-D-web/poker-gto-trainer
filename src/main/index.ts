@@ -1,7 +1,7 @@
 import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import { join } from 'path'
 import { registerAllIpcHandlers } from './ipc/register'
-import { initDatabase, getDatabase } from './data/database'
+import { initDatabase, getDatabase, closeDatabase } from './data/database'
 import { generateSamplePreflopData } from './data/generate-sample-data'
 import { generatePresetSolutions } from './data/preset-solutions'
 
@@ -73,6 +73,11 @@ app.whenReady().then(async () => {
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit()
+})
+
+// Persist database on quit to prevent data loss
+app.on('before-quit', () => {
+  closeDatabase()
 })
 
 export { mainWindow }

@@ -5,7 +5,7 @@
  * Left: visual replay of the hand
  * Right: per-decision GTO analysis
  */
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { cn } from '../../lib/utils'
 import { ChevronLeft, ChevronRight, Play, SkipForward, AlertTriangle, Check, X } from 'lucide-react'
 import type { SessionHand } from '../../stores/sessionReviewStore'
@@ -24,6 +24,9 @@ const STREET_LABELS: Record<string, string> = {
 
 export function HandReplayer({ hand, allHands, onSelectHand }: Props) {
   const [replayIndex, setReplayIndex] = useState(0)
+
+  // Reset replay position when hand changes
+  useEffect(() => { setReplayIndex(0) }, [hand?.id])
 
   if (!hand) {
     // Show hand picker
@@ -89,9 +92,9 @@ export function HandReplayer({ hand, allHands, onSelectHand }: Props) {
           <div className="flex items-center justify-between mb-3">
             <div>
               <span className="text-sm font-medium text-neutral-200">
-                {hand.heroHand[0]}{hand.heroHand[0][1] ? SUIT_SYMBOLS[hand.heroHand[0][1]?.toLowerCase()] || '' : ''}
+                {hand.heroHand[0]?.[0]}{SUIT_SYMBOLS[hand.heroHand[0]?.[1]?.toLowerCase()] || ''}
                 {' '}
-                {hand.heroHand[1]}{hand.heroHand[1][1] ? SUIT_SYMBOLS[hand.heroHand[1][1]?.toLowerCase()] || '' : ''}
+                {hand.heroHand[1]?.[0]}{SUIT_SYMBOLS[hand.heroHand[1]?.[1]?.toLowerCase()] || ''}
               </span>
               <span className="text-xs text-neutral-500 ml-2">
                 {STREET_LABELS[currentStreet]} · Pot: {Math.round(hand.potSize * 100) / 100} bb
@@ -266,7 +269,7 @@ function HandRow({ hand, onClick }: { hand: SessionHand; onClick: () => void }) 
             hand.heroHand[0][1] === hand.heroHand[1][1] ? 's' : 'o'}
         </span>
         <span className="text-xs text-neutral-500">
-          {hand.board.slice(0, 3).join(' ') || 'Preflop'}
+          {hand.board?.slice(0, 3).join(' ') || 'Preflop'}
         </span>
       </div>
       <div className="flex items-center gap-2">

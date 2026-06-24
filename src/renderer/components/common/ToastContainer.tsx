@@ -25,13 +25,14 @@ export function ToastContainer() {
   return (
     <div className="fixed bottom-5 right-5 z-[9999] flex flex-col-reverse gap-2 pointer-events-none">
       {toasts.map((toast) => {
-        const Icon = ICON_MAP[toast.type]
+        const Icon = ICON_MAP[toast.type] || Info
+        const colorClasses = COLOR_MAP[toast.type] || COLOR_MAP.info
         return (
           <div
             key={toast.id}
             className={cn(
               'pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl border shadow-lg backdrop-blur-md animate-slide-in-right',
-              COLOR_MAP[toast.type],
+              colorClasses,
             )}
           >
             <Icon size={15} className="shrink-0" />

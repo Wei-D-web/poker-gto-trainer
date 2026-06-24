@@ -116,7 +116,7 @@ export function LoginPage() {
                     <label className="text-[10px] font-semibold text-neutral-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                       <Mail size={11} /> Email
                     </label>
-                    <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
+                    <input id="login-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required
                       placeholder="you@example.com"
                       className="w-full bg-[#0F141C] border border-[#1C2A3D] rounded-lg px-3 py-2.5 text-sm text-neutral-200 focus:outline-none focus:border-blue-500/50 placeholder:text-neutral-600" />
                   </div>

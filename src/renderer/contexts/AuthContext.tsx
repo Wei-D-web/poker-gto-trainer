@@ -45,7 +45,7 @@ const AuthContext = createContext<AuthState>({
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const isWeb = !!(window as any).electronAPI === undefined
+  const isWeb = (window as any).electronAPI === undefined
 
   // Desktop: dev build auto-unlocks as developer, customer build starts as free.
   const isDevBuild = import.meta.env.VITE_POKERGTO_DEV_BUILD === 'true'

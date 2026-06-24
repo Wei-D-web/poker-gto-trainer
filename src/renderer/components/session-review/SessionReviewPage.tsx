@@ -5,6 +5,7 @@
  */
 import { useEffect, useState, useCallback } from 'react'
 import { useSessionReviewStore } from '../../stores/sessionReviewStore'
+import { ErrorBoundary } from '../common/ErrorBoundary'
 import { SessionBrowser } from './SessionBrowser'
 import { DeviationHeatmap } from './DeviationHeatmap'
 import { WeaknessPanel } from './WeaknessPanel'
@@ -254,6 +255,7 @@ export function SessionReviewPage() {
 
       {/* Content */}
       <div className="flex-1 overflow-hidden">
+        <ErrorBoundary>
         {store.activeTab === 'sessions' && (
           <SessionBrowser
             sessions={store.sessions}
@@ -286,6 +288,7 @@ export function SessionReviewPage() {
             onSelectHand={handleSelectHand}
           />
         )}
+        </ErrorBoundary>
       </div>
 
       {/* Import dialog */}

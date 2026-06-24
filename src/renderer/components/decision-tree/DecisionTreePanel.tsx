@@ -127,12 +127,15 @@ export function DecisionTreePanel({ tree: externalTree, onNavigateToNode }: Deci
 
     const g = svg.append('g').attr('transform', 'translate(50, 40)')
 
+    // Inner group for zoom transforms — preserves padding on zoom
+    const zoomG = g.append('g')
+
     // Draw edges with curved paths
-    g.selectAll('path')
+    zoomG.selectAll('path')
       .data(treeData.links())
       .enter()
       .append('path')
-      .attr('d', d3.linkHorizontal<d3.HierarchyPointLink<TreeNode>, d3.HierarchyPointNode<TreeNode>>()
+      .attr('d', d3.linkVertical<d3.HierarchyPointLink<TreeNode>, d3.HierarchyPointNode<TreeNode>>()
         .x(d => d.x)
         .y(d => d.y))
       .attr('fill', 'none')
@@ -141,7 +144,7 @@ export function DecisionTreePanel({ tree: externalTree, onNavigateToNode }: Deci
       .attr('stroke-dasharray', d => (d.target.data as TreeNode).isActive ? '' : '3,4')
 
     // Draw nodes
-    const nodes = g.selectAll('g.node-group')
+    const nodes = zoomG.selectAll('g.node-group')
       .data(treeData.descendants())
       .enter()
       .append('g')
@@ -202,10 +205,11 @@ export function DecisionTreePanel({ tree: externalTree, onNavigateToNode }: Deci
         return label.length > 24 ? label.slice(0, 22) + '…' : label
       })
 
-    // Zoom
+    // Zoom — remove old listeners before re-attaching to prevent leaks
+    svg.on('.zoom', null)
     const zoom = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.3, 2.5])
-      .on('zoom', (event) => { g.attr('transform', event.transform) })
+      .on('zoom', (event) => { zoomG.attr('transform', event.transform) })
 
     svg.call(zoom)
 

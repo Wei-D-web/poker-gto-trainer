@@ -53,7 +53,7 @@ export function OnboardingTour() {
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[9998] flex items-center justify-center animate-fade-in">
-      <div className={cn('max-w-sm w-full mx-4 rounded-2xl p-6 shadow-2xl border animate-scale-in', s.bg)}>
+      <div className={cn('max-w-sm w-full mx-4 rounded-2xl p-6 shadow-2xl border animate-scale-in relative', s.bg)}>
         <button onClick={finish} className="absolute top-4 right-4 text-neutral-500 hover:text-neutral-300">
           <X size={16} />
         </button>

@@ -212,7 +212,10 @@ function HandReplayer() {
   }
 
   if (selectedHand) {
-    const actions = typeof selectedHand.actions === 'string' ? JSON.parse(selectedHand.actions || '[]') : (selectedHand.actions || [])
+    let actions: any[] = []
+    try {
+      actions = typeof selectedHand.actions === 'string' ? JSON.parse(selectedHand.actions || '[]') : (selectedHand.actions || [])
+    } catch { actions = [] }
     const currentActions = actions.slice(0, step + 1)
     const boardCards = selectedHand.board || []
 

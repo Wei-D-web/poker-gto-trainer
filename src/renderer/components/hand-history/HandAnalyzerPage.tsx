@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useScenarioStore } from '../../stores/scenarioStore'
 import { POSITION_LABELS, RANK_CHARS, SUIT_SYMBOLS, ALL_RANKS, type Position, type Suit } from '@shared/types/poker'
 import type { HandInput, HandAction, HandAnalysisResult, DecisionAnalysis, GTOActionOption } from '../../../../src/main/solver/hand-analyzer'
+import { analyzeHand } from '../../../../src/main/solver/hand-analyzer'
 import { cn } from '../../lib/utils'
 import { Search, X, ChevronRight, Check, AlertTriangle, TrendingDown, Zap, Target } from 'lucide-react'
 
@@ -63,7 +64,7 @@ export function HandAnalyzerPage() {
         heroHand: heroCards, board, heroPosition: heroPos, villainPosition: villainPos,
         stackDepth, gameType, potSize: stackDepth * 0.12, actions,
       }
-      const analysisResult = (await import('../../../../src/main/solver/hand-analyzer')).analyzeHand(input)
+      const analysisResult = analyzeHand(input)
       setResult(analysisResult)
     } catch (e) { console.error('Analysis failed:', e) }
     finally { setAnalyzing(false) }

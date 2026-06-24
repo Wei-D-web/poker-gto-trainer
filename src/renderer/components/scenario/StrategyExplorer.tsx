@@ -125,6 +125,7 @@ export function StrategyExplorer() {
         ante: gameType === 'tournament' ? 0.1 : 0,
       })
       setPostflopResult(result)
+      setActiveBoard(customBoard) // Sync activeBoard so street/sizing display updates
       setExploitAdjustedResult(null) // Reset exploit on new analysis
       setShowExploitBar(true)
     } catch (err) {
