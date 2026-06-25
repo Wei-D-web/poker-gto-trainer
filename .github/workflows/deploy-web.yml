@@ -41,6 +41,8 @@ jobs:
           mv dist/web/index.html dist/pages/app/index.html
           # Copy landing page to root
           cp landing-page.html dist/pages/index.html
+          # Copy payment QR images (WeChat/Alipay)
+          cp -r payment dist/pages/payment 2>/dev/null || echo "payment/ dir not found, skipping"
           # Add .nojekyll
           touch dist/pages/.nojekyll
       - name: Upload Pages artifact

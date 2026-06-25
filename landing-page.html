@@ -234,6 +234,194 @@
     .pricing-features li::before { content: '✓'; color: var(--success); font-weight: 700; }
     .pricing-card .btn-primary, .pricing-card .btn-secondary { width: 100%; text-align: center; }
 
+    /* ── Payment (WeChat / Alipay) ── */
+    .payment-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .payment-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-2xl);
+      padding: 32px;
+      text-align: center;
+    }
+    .payment-card.pro-payment { border-color: rgba(59,130,246,0.3); }
+    .payment-card.lifetime-payment {
+      border-color: rgba(245,158,11,0.25);
+      position: relative;
+    }
+    .payment-card.lifetime-payment::before {
+      content: '最划算';
+      position: absolute; top: -12px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--warning); color: #000;
+      padding: 4px 14px; border-radius: 100px;
+      font-size: 11px; font-weight: 700;
+    }
+    .payment-card h3 {
+      font-size: 20px; font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .payment-card .payment-price {
+      font-size: 36px; font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .payment-card .payment-price span {
+      font-size: 16px; font-weight: 500;
+      color: var(--fg-tertiary);
+    }
+    .payment-card .payment-sub {
+      color: var(--fg-tertiary);
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+    .payment-qr-box {
+      background: #111;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .payment-qr-box img {
+      width: 180px; height: 180px;
+      border-radius: var(--radius-md);
+      background: white;
+      padding: 8px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 8px;
+    }
+    .payment-qr-box .qr-placeholder {
+      width: 180px; height: 180px;
+      background: #1A1A1A;
+      border: 1px dashed #333;
+      border-radius: var(--radius-md);
+      margin: 0 auto 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: #64748B; font-size: 12px;
+    }
+    .payment-qr-box .qr-dual {
+      display: flex;
+      gap: 12px; justify-content: center;
+    }
+    .payment-qr-box .qr-dual img {
+      width: 140px; height: 140px;
+    }
+    .payment-wechat-id {
+      font-size: 11px; color: #64748B;
+      margin-top: 8px;
+    }
+    .payment-wechat-id b { color: var(--fg-secondary); }
+    .payment-steps {
+      text-align: left;
+      font-size: 13px; color: var(--fg-secondary);
+      line-height: 2;
+      margin-bottom: 20px;
+    }
+    .payment-steps b { color: var(--fg-primary); }
+    .payment-activate {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: var(--radius-lg);
+      text-align: center;
+    }
+    .payment-activate.pro-activate {
+      background: rgba(16,185,129,0.08);
+      border: 1px solid rgba(16,185,129,0.2);
+    }
+    .payment-activate.lifetime-activate {
+      background: rgba(245,158,11,0.08);
+      border: 1px solid rgba(245,158,11,0.2);
+    }
+    .payment-activate .activate-title {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .payment-activate.pro-activate .activate-title { color: var(--success); }
+    .payment-activate.lifetime-activate .activate-title { color: var(--warning); }
+    .payment-activate .activate-hint {
+      font-size: 11px; color: var(--fg-tertiary);
+      margin-bottom: 10px;
+    }
+    .payment-activate .btn-activate {
+      display: block;
+      padding: 10px 0;
+      border-radius: var(--radius-md);
+      font-size: 13px; font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      transition: filter .2s;
+    }
+    .payment-activate .btn-activate:hover { filter: brightness(1.1); }
+    .payment-activate.pro-activate .btn-activate {
+      background: var(--success); color: #000;
+    }
+    .payment-activate.lifetime-activate .btn-activate {
+      background: var(--warning); color: #000;
+    }
+
+    /* ── Community ── */
+    .community-card {
+      max-width: 600px;
+      margin: 60px auto 0;
+      padding: 40px 24px;
+      background: linear-gradient(135deg, rgba(59,130,246,0.04), rgba(139,92,246,0.06));
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-2xl);
+      text-align: center;
+    }
+    .community-card .community-badge {
+      display: inline-block;
+      color: #8b5cf6;
+      font-size: 13px; font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .community-card h3 {
+      font-size: 22px; font-weight: 800;
+      margin-bottom: 8px;
+    }
+    .community-card .community-desc {
+      font-size: 14px; color: var(--fg-secondary);
+      margin-bottom: 24px;
+      max-width: 400px;
+      margin-left: auto; margin-right: auto;
+    }
+    .community-qr {
+      display: inline-block;
+      background: white;
+      padding: 8px;
+      border-radius: var(--radius-lg);
+      box-shadow: 0 4px 24px rgba(139,92,246,0.12);
+    }
+    .community-qr img {
+      width: 160px; height: 160px;
+      display: block;
+      border-radius: var(--radius-sm);
+    }
+    .community-wechat {
+      font-size: 12px; color: var(--fg-tertiary);
+      margin-top: 12px;
+    }
+    .community-wechat b { color: var(--fg-secondary); }
+
+    /* ── Stripe note ── */
+    .stripe-note {
+      max-width: 600px;
+      margin: 24px auto 0;
+      padding: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      text-align: center;
+    }
+    .stripe-note p { font-size: 13px; color: var(--fg-secondary); margin-bottom: 4px; }
+    .stripe-note p:last-child { font-size: 12px; color: var(--fg-tertiary); }
+
     /* ── CTA ── */
     .cta-section {
       text-align: center;
@@ -267,6 +455,7 @@
     <div class="nav-links">
       <a href="#features">功能</a>
       <a href="#pricing">定价</a>
+      <a href="#payment">购买</a>
       <a href="app/">打开 App</a>
     </div>
   </nav>
@@ -374,6 +563,106 @@
         </ul>
         <a href="app/?plan=lifetime" class="btn-secondary">购买 Lifetime →</a>
       </div>
+    </div>
+  </section>
+
+  <!-- WeChat / Alipay Payment -->
+  <section id="payment">
+    <div class="section-title">
+      <h2>🇨🇳 中国用户 · 微信/支付宝购买</h2>
+      <p>无需国际信用卡，支持微信支付和支付宝</p>
+    </div>
+    <div class="payment-grid">
+
+      <!-- Pro WeChat/Alipay -->
+      <div class="payment-card pro-payment">
+        <h3 style="color: var(--accent);">⭐ Pro 专业版</h3>
+        <div class="payment-price">¥219 <span>/ 月</span></div>
+        <div class="payment-sub">年付 ¥1,599/年 (省 ¥1,029)</div>
+
+        <div class="payment-qr-box">
+          <p style="font-size:13px;color:var(--fg-secondary);margin-bottom:12px;">📱 微信扫码支付后，加客服微信获取卡密</p>
+          <img src="payment/wechat-pay-qr.png" alt="微信支付收款码" onerror="this.style.display='none';document.getElementById('pro-qr-placeholder').style.display='flex'" onload="document.getElementById('pro-qr-placeholder').style.display='none'">
+          <div id="pro-qr-placeholder" class="qr-placeholder" style="display:none;">
+            微信收款码<br>(需上传 payment/wechat-pay-qr.png)
+          </div>
+          <p class="payment-wechat-id">客服微信: <b>Mamba4life__0824</b></p>
+        </div>
+
+        <div class="payment-steps">
+          <b>购买流程：</b><br>
+          1️⃣ 扫码支付 ¥219<br>
+          2️⃣ 截图支付凭证<br>
+          3️⃣ 加客服微信发送凭证<br>
+          4️⃣ 收到卡密 → App 内激活<br>
+          5️⃣ 立刻解锁全部功能
+        </div>
+
+        <div class="payment-activate pro-activate">
+          <div class="activate-title">✅ 支付完成？直接跳回 App 激活</div>
+          <div class="activate-hint">收到卡密后，点击下方按钮自动跳转到激活页面</div>
+          <a href="app/?plan=pro" class="btn-activate">回到 App 激活 🚀</a>
+        </div>
+      </div>
+
+      <!-- Lifetime WeChat/Alipay -->
+      <div class="payment-card lifetime-payment">
+        <h3 style="color: var(--warning);">💎 终身版</h3>
+        <div class="payment-price">¥2,199 <span> 买断</span></div>
+        <div class="payment-sub">一次付费，永久使用 · ≈ Pro 8.3 个月回本</div>
+
+        <div class="payment-qr-box">
+          <p style="font-size:13px;color:var(--fg-secondary);margin-bottom:12px;">📱 微信/支付宝扫码后加客服获取卡密</p>
+          <div class="qr-dual">
+            <img src="payment/wechat-pay-qr.png" alt="微信支付" onerror="this.style.display='none';document.getElementById('lt-wechat-ph').style.display='flex'" onload="document.getElementById('lt-wechat-ph').style.display='none'">
+            <img src="payment/alipay-qr.png" alt="支付宝" onerror="this.style.display='none';document.getElementById('lt-alipay-ph').style.display='flex'" onload="document.getElementById('lt-alipay-ph').style.display='none'">
+            <div id="lt-wechat-ph" class="qr-placeholder" style="width:140px;height:140px;display:none;">微信收款码</div>
+            <div id="lt-alipay-ph" class="qr-placeholder" style="width:140px;height:140px;display:none;">支付宝收款码</div>
+          </div>
+          <p class="payment-wechat-id">客服微信: <b>Mamba4life__0824</b></p>
+        </div>
+
+        <div class="payment-steps">
+          <b>终身版特权：</b><br>
+          ✅ 所有 Pro 功能 · 永久有效<br>
+          ✅ 所有大版本更新免费<br>
+          ✅ 桌面端离线使用<br>
+          ✅ 专属 Discord 角色<br>
+          ✅ 优先功能请求通道
+        </div>
+
+        <div class="payment-activate lifetime-activate">
+          <div class="activate-title">✅ 支付完成？直接跳回 App 激活</div>
+          <div class="activate-hint">收到卡密后，点击下方按钮自动跳转到激活页面</div>
+          <a href="app/?plan=lifetime" class="btn-activate">回到 App 激活 🚀</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Community -->
+    <div class="community-card">
+      <div class="community-badge">🧠 加入社群</div>
+      <h3>PokerGTO 学习交流群</h3>
+      <p class="community-desc">
+        免费手牌分析 · GTO 策略讨论 · 软件内测资格 · 卡密优惠
+      </p>
+      <div class="community-qr">
+        <img src="payment/wechat-group-qr.png" alt="微信群二维码" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div style="width:160px;height:160px;background:#1A1A1A;border:1px dashed #333;border-radius:8px;display:none;align-items:center;justify-content:center;color:#64748B;font-size:12px;text-align:center;line-height:1.6;flex-direction:column;gap:8px;">
+          <span style="font-size:28px;">📱</span>
+          <span>群二维码<br>即将更新</span>
+        </div>
+      </div>
+      <p class="community-wechat">
+        扫码加入 · 或加客服微信 <b>Mamba4life__0824</b> 手动拉群
+      </p>
+    </div>
+
+    <!-- Stripe International -->
+    <div class="stripe-note">
+      <p>🌍 国际用户支持信用卡支付 (Visa/Mastercard)</p>
+      <p>在 App 内登录后进入「账户管理」选择 Stripe 支付</p>
     </div>
   </section>
 
