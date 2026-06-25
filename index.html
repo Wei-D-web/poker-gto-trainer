@@ -1,15 +1,393 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="PokerGTO Trainer — 专业 GTO 扑克训练平台" />
-    <title>PokerGTO Trainer</title>
-    <link rel="icon" type="image/png" href="/icon.png" />
-    <script type="module" crossorigin src="/poker-gto-trainer/assets/index-BIVacMrG.js"></script>
-    <link rel="stylesheet" crossorigin href="/poker-gto-trainer/assets/index-1eaarkeB.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="PokerGTO Trainer — 专业 GTO 扑克训练平台，翻前范围、翻后策略、AI 剥削训练" />
+  <meta name="theme-color" content="#05080c" />
+  <title>PokerGTO Trainer — 像 GTO Wizard 一样专业</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-app: #05080c;
+      --bg-surface: #090d14;
+      --bg-card: #0f141f;
+      --bg-card-hover: #151b28;
+      --bg-input: #111723;
+      --fg-primary: #edf1f7;
+      --fg-secondary: #94a3b8;
+      --fg-tertiary: #556278;
+      --border-default: #1c2a3d;
+      --border-subtle: #152233;
+      --border-strong: #2a3b52;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-muted: #3b82f61a;
+      --accent-glow: #3b82f633;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #8b5cf6;
+      --radius-sm: 5px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --radius-2xl: 20px;
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.6);
+      --shadow-lg: 0 8px 32px rgba(0,0,0,0.7);
+      --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.3);
+      --ease-out: cubic-bezier(.16, 1, .3, 1);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg-app);
+      color: var(--fg-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── Navigation ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 16px 24px;
+      background: rgba(5,8,12,0.85);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    nav .logo {
+      font-size: 20px; font-weight: 700;
+      background: linear-gradient(135deg, var(--fg-primary), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    nav .logo span { color: var(--fg-tertiary); font-weight: 400; }
+    nav .nav-links { display: flex; gap: 24px; align-items: center; }
+    nav .nav-links a {
+      color: var(--fg-secondary); text-decoration: none;
+      font-size: 14px; font-weight: 500; transition: color .2s;
+    }
+    nav .nav-links a:hover { color: var(--fg-primary); }
+    .btn-primary {
+      display: inline-block;
+      background: var(--accent); color: #fff;
+      padding: 10px 24px; border-radius: var(--radius-md);
+      font-size: 14px; font-weight: 600;
+      text-decoration: none;
+      transition: background .2s, transform .15s, box-shadow .2s;
+      cursor: pointer; border: none;
+    }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 0 24px var(--accent-glow); }
+    .btn-secondary {
+      display: inline-block;
+      background: transparent; color: var(--fg-primary);
+      padding: 10px 24px; border-radius: var(--radius-md);
+      font-size: 14px; font-weight: 600;
+      text-decoration: none; border: 1px solid var(--border-default);
+      transition: border-color .2s, background .2s;
+    }
+    .btn-secondary:hover { border-color: var(--border-strong); background: var(--bg-card-hover); }
+    .btn-large {
+      padding: 14px 32px; font-size: 16px;
+      border-radius: var(--radius-lg);
+    }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 24px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -40%; left: -20%;
+      width: 140%; height: 140%;
+      background: radial-gradient(ellipse at 50% 50%, rgba(59,130,246,0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: var(--accent-muted);
+      border: 1px solid rgba(59,130,246,0.25);
+      color: var(--accent);
+      padding: 6px 14px; border-radius: 100px;
+      font-size: 12px; font-weight: 600; letter-spacing: .03em;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      letter-spacing: -0.03em;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, var(--accent), var(--purple));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero p {
+      font-size: clamp(16px, 2vw, 20px);
+      color: var(--fg-secondary);
+      max-width: 560px;
+      margin-bottom: 36px;
+    }
+    .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+
+    /* ── Sections ── */
+    section {
+      padding: 80px 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .section-title {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+    .section-title h2 {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .section-title p {
+      color: var(--fg-secondary);
+      font-size: 16px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    /* ── Features ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+    }
+    .feature-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-card);
+    }
+    .feature-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      margin-bottom: 16px;
+    }
+    .feature-card h3 { font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+    .feature-card p { font-size: 14px; color: var(--fg-secondary); line-height: 1.7; }
+
+    /* ── Pricing ── */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .pricing-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-2xl);
+      padding: 32px;
+      position: relative;
+      transition: border-color .2s, transform .2s;
+    }
+    .pricing-card.popular {
+      border-color: var(--accent);
+      background: linear-gradient(135deg, rgba(59,130,246,0.06), transparent);
+    }
+    .pricing-card.popular::before {
+      content: '最受欢迎';
+      position: absolute; top: -12px; left: 50%;
+      transform: translateX(-50%);
+      background: var(--accent); color: #fff;
+      padding: 4px 14px; border-radius: 100px;
+      font-size: 11px; font-weight: 700; letter-spacing: .03em;
+    }
+    .pricing-card:hover { border-color: var(--border-strong); transform: translateY(-3px); }
+    .pricing-card.popular:hover { border-color: var(--accent); }
+    .pricing-name { font-size: 14px; color: var(--fg-tertiary); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+    .pricing-price { font-size: 36px; font-weight: 800; margin-bottom: 4px; }
+    .pricing-price span { font-size: 16px; font-weight: 500; color: var(--fg-tertiary); }
+    .pricing-desc { font-size: 14px; color: var(--fg-secondary); margin-bottom: 24px; }
+    .pricing-features { list-style: none; margin-bottom: 24px; }
+    .pricing-features li {
+      font-size: 14px; padding: 6px 0;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .pricing-features li::before { content: '✓'; color: var(--success); font-weight: 700; }
+    .pricing-card .btn-primary, .pricing-card .btn-secondary { width: 100%; text-align: center; }
+
+    /* ── CTA ── */
+    .cta-section {
+      text-align: center;
+      padding: 100px 24px;
+    }
+    .cta-section h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 700; margin-bottom: 16px; }
+    .cta-section p { color: var(--fg-secondary); margin-bottom: 32px; max-width: 480px; margin-left: auto; margin-right: auto; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 40px 24px;
+      border-top: 1px solid var(--border-subtle);
+      color: var(--fg-tertiary);
+      font-size: 13px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 640px) {
+      nav .nav-links { gap: 12px; }
+      nav .nav-links a { font-size: 12px; }
+      .pricing-card { padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav>
+    <div class="logo">PokerGTO <span>Trainer</span></div>
+    <div class="nav-links">
+      <a href="#features">功能</a>
+      <a href="#pricing">定价</a>
+      <a href="app/">打开 App</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-badge">🔥 GTO 扑克训练工具</div>
+    <h1>
+      像 <span class="gradient">GTO Wizard</span> 一样<br/>
+      打你的每一手牌
+    </h1>
+    <p>
+      翻前范围训练 · 翻后策略矩阵 · AI 对手剥削<br/>
+      本地免费，云端 Pro，你的专属扑克教练
+    </p>
+    <div class="hero-actions">
+      <a href="app/" class="btn-primary btn-large">🚀 打开 App</a>
+      <a href="#features" class="btn-secondary btn-large">了解更多</a>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features">
+    <div class="section-title">
+      <h2>为什么选择 PokerGTO Trainer</h2>
+      <p>专业 GTO 训练工具，从翻前范围到翻后策略全覆盖</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon" style="background: var(--accent-muted);">🎯</div>
+        <h3>翻前范围训练</h3>
+        <p>RFI、3-Bet、4-Bet、Call vs 3-Bet… 每个位置、每种场景，系统化记忆翻前范围。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: rgba(139,92,246,0.12);">🧠</div>
+        <h3>翻后策略矩阵</h3>
+        <p>50 种翻牌纹理，C-Bet / Check-Raise / Donk-Bet 等等，矩阵可视化的策略训练。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: rgba(16,185,129,0.12);">🤖</div>
+        <h3>AI 对手剥削</h3>
+        <p>基于你标记的对手倾向，AI 自动推荐剥削策略，边打边学。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: var(--accent-muted);">📊</div>
+        <h3>进度追踪</h3>
+        <p>逐手牌、逐个场景的准确率统计，知道哪里强哪里弱。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: rgba(245,158,11,0.12);">⚡</div>
+        <h3>本地运行</h3>
+        <p>纯前端应用，无需服务器。下载桌面版即可离线使用，隐私安全。</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background: rgba(6,182,212,0.12);">☁️</div>
+        <h3>云端同步</h3>
+        <p>Pro 用户跨设备同步进度，社区分享手牌和策略，持续进化。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing">
+    <div class="section-title">
+      <h2>简单透明的定价</h2>
+      <p>免费就能用，Pro 解锁全部潜能</p>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-name">Free</div>
+        <div class="pricing-price">¥0 <span>/ 永久</span></div>
+        <div class="pricing-desc">本地基础训练，零成本上手</div>
+        <ul class="pricing-features">
+          <li>翻前范围训练（基础场景）</li>
+          <li>翻后策略矩阵（10 种纹理）</li>
+          <li>本地进度保存</li>
+          <li>桌面版离线使用</li>
+        </ul>
+        <a href="app/" class="btn-secondary">开始免费使用 →</a>
+      </div>
+      <div class="pricing-card popular">
+        <div class="pricing-name">Pro</div>
+        <div class="pricing-price">¥18 <span>/ 月</span></div>
+        <div class="pricing-desc">完整训练体验 + 云端能力</div>
+        <ul class="pricing-features">
+          <li>全部翻前场景</li>
+          <li>50 种翻牌纹理全覆盖</li>
+          <li>AI 对手剥削推荐</li>
+          <li>云端进度同步</li>
+          <li>社区手牌分享</li>
+          <li>优先新功能体验</li>
+        </ul>
+        <a href="#" class="btn-primary">订阅 Pro</a>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-name">Lifetime</div>
+        <div class="pricing-price">¥198 <span>/ 一次</span></div>
+        <div class="pricing-desc">永久拥有全部功能</div>
+        <ul class="pricing-features">
+          <li>Pro 全部权益</li>
+          <li>✨ 终身无续费</li>
+          <li>✨ 未来所有功能</li>
+          <li>✨ 专属标识</li>
+        </ul>
+        <a href="#" class="btn-secondary">购买 Lifetime</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <h2>准备好了？</h2>
+    <p>无需注册，打开即练。Pro 用户更是跨设备无缝体验。</p>
+    <a href="app/" class="btn-primary btn-large">🚀 立刻开始训练</a>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>PokerGTO Trainer — 每一手牌都值得被认真对待</p>
+    <p style="margin-top: 8px;">© 2025 PokerGTO Trainer</p>
+  </footer>
+
+</body>
 </html>
