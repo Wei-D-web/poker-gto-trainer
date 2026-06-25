@@ -49,7 +49,37 @@ export async function redirectToCheckout(
   tier: 'pro' | 'lifetime',
   _customerEmail?: string,
 ): Promise<{ error?: string }> {
-  // Map price ID to Payment Link URL
+  // 1) Try Supabase Edge Function first (creates proper Stripe Checkout Session)
+  const baseUrl = getBaseUrl()
+  if (baseUrl) {
+    try {
+      const functionUrl = `${baseUrl}/functions/v1/create-checkout-session`
+      const res = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(await getAuthHeader()),
+        },
+        body: JSON.stringify({
+          priceId,
+          tier,
+          customerEmail: _customerEmail,
+          successUrl: `${window.location.origin}/app/?stripe=success`,
+          cancelUrl: `${window.location.origin}/app/?stripe=canceled`,
+        }),
+      })
+      const data = await res.json()
+      if (res.ok && data.url) {
+        window.location.href = data.url
+        return {}
+      }
+      console.warn('Edge Function checkout failed, falling back to Payment Link:', data.error)
+    } catch (err: any) {
+      console.warn('Edge Function unreachable, falling back to Payment Link:', err.message)
+    }
+  }
+
+  // 2) Fallback: direct Payment Link URL (works from China, no API call)
   const priceToLink: Record<string, string> = {
     [import.meta.env.VITE_STRIPE_PRICE_PRO_MONTHLY || '']: import.meta.env.VITE_STRIPE_LINK_PRO_MONTHLY || '',
     [import.meta.env.VITE_STRIPE_PRICE_PRO_YEARLY || '']: import.meta.env.VITE_STRIPE_LINK_PRO_YEARLY || '',
@@ -58,10 +88,9 @@ export async function redirectToCheckout(
 
   const link = priceToLink[priceId]
   if (!link) {
-    return { error: `No payment link configured for this plan` }
+    return { error: `No payment method configured for this plan` }
   }
 
-  // Direct redirect to Stripe Payment Link (no API call, works from China)
   window.location.href = link
   return {}
 }
