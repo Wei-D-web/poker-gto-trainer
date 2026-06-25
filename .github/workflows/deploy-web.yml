@@ -27,6 +27,11 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITESUPABASEURL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITESUPABASEANONKEY }}
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITESTRIPEPUBLISHABLEKEY }}
+          VITE_STRIPE_PRICE_PRO_MONTHLY: ${{ secrets.VITESTRIPEPRICEPROMONTHLY }}
+          VITE_STRIPE_PRICE_LIFETIME: ${{ secrets.VITESTRIPEPRICELIFETIME }}
+          VITE_STRIPE_LINK_PRO_MONTHLY: ${{ secrets.VITESTRIPELINKPROMONTHLY }}
+          VITE_STRIPE_LINK_LIFETIME: ${{ secrets.VITESTRIPELINKLIFETIME }}
       - name: Prepare pages structure
         run: |
           mkdir -p dist/pages/app
