@@ -9,6 +9,30 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // Landing page 定价按钮跳转 → 保存计划选择 → 等 App 加载后跳转到 Account
+      (function(){
+        var p = new URLSearchParams(window.location.search).get('plan');
+        if (p === 'pro' || p === 'lifetime') {
+          sessionStorage.setItem('pricingPlan', p);
+          var u = new URL(window.location.href);
+          u.searchParams.delete('plan');
+          window.history.replaceState({}, '', u.toString());
+        }
+        var plan = sessionStorage.getItem('pricingPlan');
+        if (!plan) return;
+        var attempts = 0;
+        var timer = setInterval(function(){
+          attempts++;
+          if (document.querySelector('main')) {
+            clearInterval(timer);
+            sessionStorage.removeItem('pricingPlan');
+            window.dispatchEvent(new CustomEvent('navigate', { detail: { route: 'account' } }));
+          }
+          if (attempts > 60) { clearInterval(timer); sessionStorage.removeItem('pricingPlan'); }
+        }, 500);
+      })();
+    </script>
     <script type="module" src="../src/renderer/web-main.tsx"></script>
   </body>
 </html>
