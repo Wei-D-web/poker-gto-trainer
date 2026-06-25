@@ -137,11 +137,10 @@ export async function redirectToCustomerPortal(customerId?: string): Promise<{ e
  * Get Supabase auth header from localStorage (web) or electron-store (desktop).
  */
 async function getAuthHeader(): Promise<Record<string, string>> {
-  // Always include Supabase anon key (required for Edge Functions)
   const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
   const headers: Record<string, string> = {}
   if (anonKey) {
-    headers['Authorization'] = `Bearer ${anonKey}`
+    // Send anon key as apikey only (not as Bearer token — it's not a valid JWT)
     headers['apikey'] = anonKey
   }
 
