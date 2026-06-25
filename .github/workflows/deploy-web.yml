@@ -22,15 +22,26 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Build web
+      - name: Build web (SPA)
         run: npx vite build --config vite.config.web.mts
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITESUPABASEURL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITESUPABASEANONKEY }}
+      - name: Prepare pages structure
+        run: |
+          mkdir -p dist/pages/app
+          # Move SPA assets to root /assets/
+          mv dist/web/assets dist/pages/assets/
+          # Move SPA index.html to /app/
+          mv dist/web/index.html dist/pages/app/index.html
+          # Copy landing page to root
+          cp landing-page.html dist/pages/index.html
+          # Add .nojekyll
+          touch dist/pages/.nojekyll
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/web
+          path: dist/pages
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
