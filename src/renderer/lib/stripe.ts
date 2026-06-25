@@ -137,30 +137,30 @@ export async function redirectToCustomerPortal(customerId?: string): Promise<{ e
  * Get Supabase auth header from localStorage (web) or electron-store (desktop).
  */
 async function getAuthHeader(): Promise<Record<string, string>> {
+  // Always include Supabase anon key (required for Edge Functions gateway)
   const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
   const headers: Record<string, string> = {}
   if (anonKey) {
-    // Send anon key as apikey only (not as Bearer token — it's not a valid JWT)
+    headers['Authorization'] = `Bearer ${anonKey}`
     headers['apikey'] = anonKey
   }
 
+  // Override Authorization with real user JWT if logged in
   try {
-    // Try window.electronAPI first (desktop) — get user's access token
-    if ((window as any).electronAPI?.auth?.getSession) {
-      const session = await (window as any).electronAPI.auth.getSession()
-      if (session?.session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.session.access_token}`
+    const sbToken = localStorage.getItem('sb-token')
+    if (sbToken) {
+      const parsed = JSON.parse(sbToken)
+      if (parsed?.access_token) {
+        headers['Authorization'] = `Bearer ${parsed.access_token}`
       }
     }
   } catch {}
 
-  // Fallback: check localStorage (web) for user token
   try {
-    const stored = localStorage.getItem('sb-token')
-    if (stored) {
-      const parsed = JSON.parse(stored)
-      if (parsed?.access_token) {
-        headers['Authorization'] = `Bearer ${parsed.access_token}`
+    if ((window as any).electronAPI?.auth?.getSession) {
+      const session = await (window as any).electronAPI.auth.getSession()
+      if (session?.session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.session.access_token}`
       }
     }
   } catch {}
