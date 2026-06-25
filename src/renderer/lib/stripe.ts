@@ -49,12 +49,29 @@ export async function redirectToCheckout(
   tier: 'pro' | 'lifetime',
   _customerEmail?: string,
 ): Promise<{ error?: string }> {
-  // 1) Try Supabase Edge Function first (creates proper Stripe Checkout Session)
+  // 1) Client-side Stripe.js redirectToCheckout — no server needed
+  try {
+    const stripe = await getStripe()
+    if (stripe) {
+      const { error } = await stripe.redirectToCheckout({
+        lineItems: [{ price: priceId, quantity: 1 }],
+        mode: tier === 'lifetime' ? 'payment' : 'subscription',
+        successUrl: `${window.location.origin}/app/?stripe=success`,
+        cancelUrl: `${window.location.origin}/app/?stripe=canceled`,
+        customerEmail: _customerEmail,
+      })
+      if (!error) return {}
+      console.warn('Stripe.js redirectToCheckout failed:', error.message)
+    }
+  } catch (err: any) {
+    console.warn('Stripe.js redirectToCheckout error:', err.message)
+  }
+
+  // 2) Fallback: Supabase Edge Function
   const baseUrl = getBaseUrl()
   if (baseUrl) {
     try {
-      const functionUrl = `${baseUrl}/functions/v1/create-checkout-session`
-      const res = await fetch(functionUrl, {
+      const res = await fetch(`${baseUrl}/functions/v1/create-checkout-session`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -73,26 +90,25 @@ export async function redirectToCheckout(
         window.location.href = data.url
         return {}
       }
-      console.warn('Edge Function checkout failed, falling back to Payment Link:', data.error)
+      console.warn('Edge Function checkout failed:', data.error)
     } catch (err: any) {
-      console.warn('Edge Function unreachable, falling back to Payment Link:', err.message)
+      console.warn('Edge Function unreachable:', err.message)
     }
   }
 
-  // 2) Fallback: direct Payment Link URL (works from China, no API call)
+  // 3) Last resort: Payment Link URL
   const priceToLink: Record<string, string> = {
     [import.meta.env.VITE_STRIPE_PRICE_PRO_MONTHLY || '']: import.meta.env.VITE_STRIPE_LINK_PRO_MONTHLY || '',
     [import.meta.env.VITE_STRIPE_PRICE_PRO_YEARLY || '']: import.meta.env.VITE_STRIPE_LINK_PRO_YEARLY || '',
     [import.meta.env.VITE_STRIPE_PRICE_LIFETIME || '']: import.meta.env.VITE_STRIPE_LINK_LIFETIME || '',
   }
-
   const link = priceToLink[priceId]
-  if (!link) {
-    return { error: `No payment method configured for this plan` }
+  if (link) {
+    window.location.href = link
+    return {}
   }
 
-  window.location.href = link
-  return {}
+  return { error: 'No payment method available' }
 }
 
 /**
