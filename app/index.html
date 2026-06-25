@@ -6,10 +6,43 @@
     <meta name="description" content="PokerGTO Trainer — 专业 GTO 扑克训练平台" />
     <title>PokerGTO Trainer</title>
     <link rel="icon" type="image/png" href="../icon.png" />
+    <script>
+    // 从 landing page 定价按钮跳转过来时保存计划选择
+    (function(){
+      var p = new URLSearchParams(window.location.search).get('plan');
+      if (p === 'pro' || p === 'lifetime') {
+        sessionStorage.setItem('pricingPlan', p);
+        // 清除 URL 参数，刷新不会重复触发
+        var u = new URL(window.location.href);
+        u.searchParams.delete('plan');
+        window.history.replaceState({}, '', u.toString());
+      }
+    })();
+    </script>
     <script type="module" crossorigin src="../assets/index-BIVacMrG.js"></script>
     <link rel="stylesheet" crossorigin href="../assets/index-1eaarkeB.css">
   </head>
   <body>
     <div id="root"></div>
+    <script>
+    // 等用户登录完成（App 渲染出 <main>）后，自动跳转到 Account 页面
+    (function(){
+      if (!sessionStorage.getItem('pricingPlan')) return;
+      var timer = setInterval(function(){
+        // App 渲染后有 <main> 标签，LoginPage 没有
+        if (document.querySelector('main')) {
+          clearInterval(timer);
+          sessionStorage.removeItem('pricingPlan');
+          // dispatch navigate 事件到 account 路由
+          window.dispatchEvent(new CustomEvent('navigate', {detail: {route: 'account'}}));
+        }
+      }, 500);
+      // 最多等 30 秒
+      setTimeout(function(){
+        clearInterval(timer);
+        sessionStorage.removeItem('pricingPlan');
+      }, 30000);
+    })();
+    </script>
   </body>
 </html>
