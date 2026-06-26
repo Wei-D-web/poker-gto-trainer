@@ -28,7 +28,7 @@ export function Sidebar() {
   const activeRoute = useUIStore((s) => s.activeRoute)
   const collapsed = useUIStore((s) => s.sidebarCollapsed)
   const setActiveRoute = useUIStore((s) => s.setActiveRoute)
-  const { tier } = useAuth()
+  const { tier, user } = useAuth()
   const isFree = tier === 'free'
 
   if (collapsed) return null
@@ -131,7 +131,13 @@ export function Sidebar() {
       </div>
 
       {/* Footer */}
-      <div className="px-4 py-3 border-t border-[#152233]">
+      <div className="px-4 py-3 border-t border-[#152233] space-y-2">
+        {user && (
+          <div className="flex items-center gap-2 text-[11px] text-neutral-400">
+            <span className="text-xs">👤</span>
+            <span className="truncate font-medium text-neutral-300">{user.email}</span>
+          </div>
+        )}
         <div className="flex items-center gap-2 text-[11px] text-neutral-500">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-subtle shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
           <span className="font-medium">Offline Ready</span>

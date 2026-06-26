@@ -44,6 +44,31 @@ const AuthContext = createContext<AuthState>({
   isWeb: false,
 })
 
+/**
+ * Read demo auth from the login modal's localStorage key.
+ * Returns a synthetic Supabase User or null.
+ */
+function getDemoUser(): User | null {
+  try {
+    const raw = localStorage.getItem('pokerGTO_auth')
+    if (!raw) return null
+    const auth = JSON.parse(raw)
+    if (!auth.loggedIn || !auth.identity) return null
+    if (Date.now() - auth.timestamp > 7 * 24 * 60 * 60 * 1000) {
+      localStorage.removeItem('pokerGTO_auth')
+      return null
+    }
+    return {
+      id: 'demo-' + (auth.identity || 'user'),
+      email: auth.identity,
+      app_metadata: {},
+      user_metadata: { login_method: auth.method || 'email' },
+      aud: 'demo',
+      created_at: new Date(auth.timestamp).toISOString(),
+    } as User
+  } catch { return null }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const isWeb = (window as any).electronAPI === undefined
 
@@ -58,21 +83,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!supabase || !isWeb) {
       // Desktop: try to load cached session from electron-store
       if (!isWeb) loadDesktopSession()
-      else setLoading(false)
+      else {
+        // Web demo: read login modal's localStorage auth
+        const demoUser = getDemoUser()
+        if (demoUser) {
+          setUser(demoUser)
+          setTier('free')
+        }
+        setLoading(false)
+      }
       return
     }
 
     // Web: standard Supabase session management
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
-      setUser(session?.user ?? null)
+      setUser(session?.user ?? getDemoUser())
       if (session?.user) loadTier(session.user.id)
       setLoading(false)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setSession(session)
-      setUser(session?.user ?? null)
+      setUser(session?.user ?? getDemoUser())
       if (session?.user) loadTier(session.user.id)
       else setTier('free')
     })
@@ -255,6 +288,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (supabase) {
       await supabase.auth.signOut()
     }
+    // Clear demo auth from login modal
+    localStorage.removeItem('pokerGTO_auth')
     setUser(null)
     setSession(null)
     setTier('free')
