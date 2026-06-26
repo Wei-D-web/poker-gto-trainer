@@ -721,6 +721,11 @@
       function isAuthenticated() {
         try {
           var auth = JSON.parse(localStorage.getItem(STORAGE_KEY));
+          // Clean up stale skip sessions — only real logins persist
+          if (auth && auth.method === 'skip') {
+            localStorage.removeItem(STORAGE_KEY);
+            return false;
+          }
           return !!(auth && auth.loggedIn && auth.timestamp);
         } catch (e) { return false; }
       }
@@ -739,11 +744,8 @@
         }, 600);
       }
 
-      // Force show login via URL param (for testing)
-      var forceShow = (new URLSearchParams(window.location.search)).get('showLogin') === '1';
-
-      // Already logged in → skip (unless forceShow)
-      if (isAuthenticated() && !forceShow) { hideOverlay(); }
+      // Already logged in → skip
+      if (isAuthenticated()) { hideOverlay(); }
 
       // ═════════════════════════════════════
       //  MOUSE PARALLAX
@@ -996,12 +998,12 @@
       }
 
       // ═════════════════════════════════════
-      //  SKIP
+      //  SKIP (session-only, next visit → modal shows again)
       // ═════════════════════════════════════
       var skipBtn = document.getElementById('btn-skip');
       if (skipBtn) {
         skipBtn.addEventListener('click', function() {
-          saveAuth('guest', 'skip');
+          sessionStorage.setItem(STORAGE_KEY + '_skip', '1');
           hideOverlay();
         });
       }
