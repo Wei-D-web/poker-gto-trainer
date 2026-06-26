@@ -707,9 +707,24 @@
       'use strict';
 
       var STORAGE_KEY = 'pokerGTO_auth';
+      var AUTH_VERSION = 2; // bump to force-clear old auth
       var overlay = document.getElementById('poker-login-overlay');
       var toast = document.getElementById('login-toast');
       var countdownTimer = null;
+
+      // Force-clear old auth data from previous versions
+      (function migrateStorage() {
+        try {
+          var stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            var auth = JSON.parse(stored);
+            // Clear if version mismatch or missing version (old data)
+            if (!auth.version || auth.version < AUTH_VERSION) {
+              localStorage.removeItem(STORAGE_KEY);
+            }
+          }
+        } catch(e) { localStorage.removeItem(STORAGE_KEY); }
+      })();
 
       function showToast(msg, type) {
         toast.textContent = msg;
@@ -721,17 +736,24 @@
       function isAuthenticated() {
         try {
           var auth = JSON.parse(localStorage.getItem(STORAGE_KEY));
-          // Clean up stale skip sessions — only real logins persist
-          if (auth && auth.method === 'skip') {
+          if (!auth || !auth.loggedIn || !auth.timestamp) return false;
+          // Only keep real logins (email/password), not skip/guest
+          if (!auth.method || auth.method === 'skip' || auth.method === 'guest') {
             localStorage.removeItem(STORAGE_KEY);
             return false;
           }
-          return !!(auth && auth.loggedIn && auth.timestamp);
+          // Auth expires after 7 days
+          if (Date.now() - auth.timestamp > 7 * 24 * 60 * 60 * 1000) {
+            localStorage.removeItem(STORAGE_KEY);
+            return false;
+          }
+          return true;
         } catch (e) { return false; }
       }
 
       function saveAuth(identity, method) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          version: AUTH_VERSION,
           loggedIn: true, method: method || 'email',
           identity: identity || 'user@email.com', timestamp: Date.now()
         }));
