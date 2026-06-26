@@ -13,28 +13,17 @@
          POKER LOGIN MODAL — FULL ENHANCED STYLES
          ═══════════════════════════════════════════ */
 
-      /* ═══ Defensive reset against Tailwind preflight ═══ */
+      /* ═══ Fix: hide React app when login overlay is visible ═══ */
+      #poker-login-overlay:not(.hidden) ~ #root {
+        display: none !important;
+      }
+
+      /* ═══ Tailwind overrides: border-box on all overlay elements ═══ */
       #poker-login-overlay,
       #poker-login-overlay *,
       #poker-login-overlay *::before,
       #poker-login-overlay *::after {
         box-sizing: border-box;
-      }
-      #poker-login-overlay button {
-        background-color: initial;
-        border-radius: initial;
-        letter-spacing: initial;
-        line-height: initial;
-        -webkit-appearance: none;
-        appearance: none;
-      }
-      #poker-login-overlay input {
-        background-color: initial;
-        border-radius: initial;
-        letter-spacing: initial;
-      }
-      #poker-login-overlay form {
-        background-color: initial;
       }
 
       /* ── Overlay ── */
