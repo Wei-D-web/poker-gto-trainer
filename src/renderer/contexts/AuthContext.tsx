@@ -80,19 +80,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!supabase || !isWeb) {
-      // Desktop: try to load cached session from electron-store
-      if (!isWeb) loadDesktopSession()
-      else {
-        // Web demo: read login modal's localStorage auth
-        const demoUser = getDemoUser()
-        if (demoUser) {
-          setUser(demoUser)
-          setTier('free')
-        }
+    // ── Listen for login modal auth changes (demo auth written to localStorage) ──
+    // Must be set up regardless of Supabase availability — the HTML login modal
+    // always runs and dispatches this event when the user logs in.
+    const handleAuthChanged = () => {
+      const demoUser = getDemoUser()
+      if (demoUser) {
+        setUser(demoUser)
+        setTier('free')
         setLoading(false)
       }
-      return
+    }
+
+    if (!supabase || !isWeb) {
+      // Desktop: try to load cached session from electron-store
+      if (!isWeb) {
+        loadDesktopSession()
+        return // no web listener needed on desktop
+      }
+
+      // Web demo (no Supabase configured): read login modal's localStorage auth
+      const demoUser = getDemoUser()
+      if (demoUser) {
+        setUser(demoUser)
+        setTier('free')
+      }
+      setLoading(false)
+
+      // Listen for subsequent modal logins (e.g. user enters email code)
+      window.addEventListener('pokerGTO_auth_changed', handleAuthChanged)
+      return () => {
+        window.removeEventListener('pokerGTO_auth_changed', handleAuthChanged)
+      }
     }
 
     // Web: standard Supabase session management
@@ -110,15 +129,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       else setTier('free')
     })
 
-    // Listen for login modal auth changes (demo auth written to localStorage)
-    const handleAuthChanged = () => {
-      const demoUser = getDemoUser()
-      if (demoUser) {
-        setUser(demoUser)
-        setTier('free')
-        setLoading(false)
-      }
-    }
     window.addEventListener('pokerGTO_auth_changed', handleAuthChanged)
 
     return () => {

@@ -1,0 +1,6 @@
+{
+  "task": "修复 PokerGTO Trainer 界面 Bugs:\n1. vercel.json outputDirectory 应为 dist/web (当前是 dist/web/web)\n2. AuthContext.tsx 与 web/index.html 登录逻辑同步 (STORAGE_KEY + skip 标记冲突)\n3. vite.config.web.mts base 路径检查 (当前 /poker-gto-trainer/，若 vercel 裸域名需改 /)\n4. 登录模态隐藏后 React AuthContext 未自动重渲染的问题\n请详细审查代码后修复，提交 PR。",
+  "priority": "high",
+  "from": "weixin",
+  "created": "2026-06-26T05:36:00Z"
+}

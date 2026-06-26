@@ -10,6 +10,7 @@
     "dev:web": "vite --config vite.config.web.mts",
     "build": "electron-vite build",
     "build:web": "vite build --config vite.config.web.mts",
+    "build:app": "vite build --config vite.config.app.mts",
     "preview": "electron-vite preview",
     "typecheck": "tsc --noEmit",
     "typecheck:main": "tsc --noEmit -p tsconfig.node.json",
