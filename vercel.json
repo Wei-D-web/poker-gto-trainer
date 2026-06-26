@@ -1,6 +1,6 @@
 {
   "buildCommand": "npx vite build --config vite.config.web.mts",
-  "outputDirectory": "dist/web/web",
+  "outputDirectory": "dist/web",
   "framework": null,
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }

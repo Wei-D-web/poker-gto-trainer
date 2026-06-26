@@ -110,7 +110,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       else setTier('free')
     })
 
-    return () => subscription.unsubscribe()
+    // Listen for login modal auth changes (demo auth written to localStorage)
+    const handleAuthChanged = () => {
+      const demoUser = getDemoUser()
+      if (demoUser) {
+        setUser(demoUser)
+        setTier('free')
+        setLoading(false)
+      }
+    }
+    window.addEventListener('pokerGTO_auth_changed', handleAuthChanged)
+
+    return () => {
+      subscription.unsubscribe()
+      window.removeEventListener('pokerGTO_auth_changed', handleAuthChanged)
+    }
   }, [isWeb])
 
   // ── Desktop: load cached session ──

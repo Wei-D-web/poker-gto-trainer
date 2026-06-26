@@ -14,7 +14,7 @@ const __dirname = dirname(__filename)
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   root: resolve(__dirname, 'web'),
-  base: '/poker-gto-trainer/',
+  base: '/',
   build: {
     outDir: resolve(__dirname, 'dist/web'),
     emptyOutDir: true,
