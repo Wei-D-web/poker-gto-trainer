@@ -13,16 +13,28 @@
          POKER LOGIN MODAL — FULL ENHANCED STYLES
          ═══════════════════════════════════════════ */
 
-      :root {
-        --felt-dark: #0a3d1a;
-        --felt-mid: #0e5228;
-        --felt-light: #156b34;
-        --gold: #ffd700;
-        --gold-dim: #b8960f;
-        --neon-red: #ff2d55;
-        --neon-blue: #0a84ff;
-        --neon-purple: #af52de;
-        --neon-cyan: #00d4aa;
+      /* ═══ Defensive reset against Tailwind preflight ═══ */
+      #poker-login-overlay,
+      #poker-login-overlay *,
+      #poker-login-overlay *::before,
+      #poker-login-overlay *::after {
+        box-sizing: border-box;
+      }
+      #poker-login-overlay button {
+        background-color: initial;
+        border-radius: initial;
+        letter-spacing: initial;
+        line-height: initial;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      #poker-login-overlay input {
+        background-color: initial;
+        border-radius: initial;
+        letter-spacing: initial;
+      }
+      #poker-login-overlay form {
+        background-color: initial;
       }
 
       /* ── Overlay ── */
@@ -738,8 +750,11 @@
         }, 600);
       }
 
-      // Already logged in → skip
-      if (isAuthenticated()) { hideOverlay(); }
+      // Force show login via URL param (for testing)
+      var forceShow = (new URLSearchParams(window.location.search)).get('showLogin') === '1';
+
+      // Already logged in → skip (unless forceShow)
+      if (isAuthenticated() && !forceShow) { hideOverlay(); }
 
       // ═════════════════════════════════════
       //  MOUSE PARALLAX
