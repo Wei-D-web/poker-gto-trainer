@@ -1,6 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Tell Tailwind v4 where to scan for utility classes */
+@source "../**/*.tsx";
+@source "../**/*.ts";
+@source "../../shared/**/*.ts";
+
 @custom-variant dark (&:is(.dark *));
 
 /* ============================================================
