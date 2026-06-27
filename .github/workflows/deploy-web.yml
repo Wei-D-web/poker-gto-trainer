@@ -22,8 +22,10 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Build web (SPA)
-        run: npx vite build --config vite.config.web.mts
+      - name: Clean & Build web (SPA)
+        run: |
+          rm -rf dist/web
+          npx vite build --config vite.config.web.mts
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITESUPABASEURL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITESUPABASEANONKEY }}
