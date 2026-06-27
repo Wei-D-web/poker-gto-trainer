@@ -30,20 +30,22 @@ jobs:
           VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITESTRIPEPUBLISHABLEKEY }}
           VITE_STRIPE_PRICE_PRO_MONTHLY: ${{ secrets.VITESTRIPEPRICEPROMONTHLY }}
           VITE_STRIPE_PRICE_LIFETIME: ${{ secrets.VITESTRIPEPRICELIFETIME }}
-          VITE_STRIPE_LINK_PRO_MONTHLY: ${{ secrets.VITESTRIPELINKPROMONTHLY }}
-          VITE_STRIPE_LINK_LIFETIME: ${{ secrets.VITESTRIPELINKLIFETIME }}
+          # VITE_STRIPE_LINK_PRO_MONTHLY and VITE_STRIPE_LINK_LIFETIME are optional (Stripe Payment Links)
       - name: Prepare pages structure
         run: |
           mkdir -p dist/pages/app
-          # Move SPA assets to root /assets/
-          mv dist/web/assets dist/pages/assets/
-          # Move SPA index.html to /app/
+          # SPA: move assets to /app/assets/, index.html to /app/
+          mv dist/web/assets dist/pages/app/assets/
           mv dist/web/index.html dist/pages/app/index.html
-          # Copy landing page to root
-          cp landing-page.html dist/pages/index.html
-          # Copy payment QR images (WeChat/Alipay)
-          cp -r payment dist/pages/payment 2>/dev/null || echo "payment/ dir not found, skipping"
-          # Add .nojekyll
+          # Landing page on root
+          cp deploy/index.html dist/pages/index.html
+          # Privacy / Terms
+          cp deploy/privacy.html dist/pages/privacy.html 2>/dev/null || true
+          cp deploy/terms.html dist/pages/terms.html 2>/dev/null || true
+          # Payment QR images
+          cp -r deploy/payment dist/pages/payment/ 2>/dev/null || echo "payment/ not found, skipping"
+          # Generate a minimal favicon
+          printf '\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10\x00\x00\x00\x10\x08\x06\x00\x00\x00\x1f\xf3\xff\xae\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x19IDATx\xda\x63\xfc\xff\xff?\x03\x05\x00\x00\xff\xff\x03\x00\x01\x00\x01F\x15\x07\xb9\x00\x00\x00\x00IEND\xae\x42\x60\x82' > dist/pages/icon.png
           touch dist/pages/.nojekyll
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

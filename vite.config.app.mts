@@ -1,12 +1,12 @@
 /**
- * Vite config for the GitHub Pages build (docs/app/).
- *
+ * Vite config for the web-only build.
  * Entry: web/index.html → src/renderer/web-main.tsx
- * Output: docs/app/
+ * Output: dist/web/
  * Base: /poker-gto-trainer/app/
  *
- * Unlike the Vercel build, this does NOT empty the output directory
- * because docs/app/ contains companion files (payment/, privacy.html, terms.html).
+ * Used by deploy-web.yml (GitHub Actions → GitHub Pages).
+ * Landing page is deploy/index.html (static, on root).
+ * SPA goes to /poker-gto-trainer/app/.
  */
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -22,8 +22,8 @@ export default defineConfig({
   root: resolve(__dirname, 'web'),
   base: '/poker-gto-trainer/app/',
   build: {
-    outDir: resolve(__dirname, 'docs/app'),
-    emptyOutDir: false,
+    outDir: resolve(__dirname, 'dist/web'),
+    emptyOutDir: true,
   },
   resolve: {
     alias: {

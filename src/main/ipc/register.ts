@@ -5,6 +5,7 @@ import { registerSpotLibraryIpc } from './spot-library.ipc'
 import { registerAuthIpc } from './auth'
 import { registerSessionReviewIpc } from './session-review.ipc'
 import { registerLicenseIpc } from './license.ipc'
+import { registerAiCoachIpc } from './ai-coach.ipc'
 
 export function registerAllIpcHandlers(): void {
   registerStrategyIpc()
@@ -14,4 +15,5 @@ export function registerAllIpcHandlers(): void {
   registerAuthIpc()
   registerSessionReviewIpc()
   registerLicenseIpc()
+  registerAiCoachIpc()
 }
