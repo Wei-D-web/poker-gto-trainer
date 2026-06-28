@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "poker-gto": {
+      "command": "npx",
+      "args": ["tsx", "mcp-server/src/index.ts"]
+    }
+  }
+}
