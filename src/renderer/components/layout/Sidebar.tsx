@@ -34,7 +34,7 @@ export function Sidebar() {
   const activeRoute = useUIStore((s) => s.activeRoute)
   const collapsed = useUIStore((s) => s.sidebarCollapsed)
   const setActiveRoute = useUIStore((s) => s.setActiveRoute)
-  const { tier, user } = useAuth()
+  const { tier, user, signOut } = useAuth()
   const isFree = tier === 'free'
 
   if (collapsed) return null
@@ -139,29 +139,45 @@ export function Sidebar() {
 
       {/* Footer */}
       <div className="px-4 py-3 border-t border-[#152233] space-y-2">
-        {user && (
-          <div className="flex items-center gap-2 text-[11px] text-neutral-400">
-            <span className="text-xs">👤</span>
-            <span className="truncate font-medium text-neutral-300">{user.email}</span>
-          </div>
-        )}
-        {isDemoMode() && (
-          <button
-            onClick={() => {
+        <div className="flex items-center gap-2 text-[11px]">
+          {user ? (
+            <>
+              <span className="text-xs">👤</span>
+              <span className="truncate font-medium text-neutral-300 flex-1">{user.email}</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+            </>
+          ) : isDemoMode() ? (
+            <>
+              <span className="text-xs">👁</span>
+              <span className="font-medium text-amber-300/80 flex-1">演示模式</span>
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+            </>
+          ) : (
+            <>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+              <span className="font-medium text-neutral-500 flex-1">离线就绪</span>
+            </>
+          )}
+        </div>
+
+        {/* Universal exit button — always visible */}
+        <button
+          onClick={async () => {
+            if (isDemoMode()) {
               localStorage.removeItem(DEMO_KEY)
               localStorage.removeItem('pokergto_post_login_dismissed')
-              window.location.href = '/poker-gto-trainer/app/'
-            }}
-            className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[11px] text-amber-400/70 hover:text-amber-300 hover:bg-amber-500/8 transition-all font-medium"
-          >
-            <LogOut size={11} />
-            退出演示
-          </button>
-        )}
-        <div className="flex items-center gap-2 text-[11px] text-neutral-500">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-subtle shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
-          <span className="font-medium">Offline Ready</span>
-        </div>
+            }
+            if (user) {
+              try { await signOut() } catch {}
+            }
+            window.location.href = '/poker-gto-trainer/app/'
+          }}
+          className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] text-neutral-500 hover:text-neutral-300 hover:bg-white/[0.04] transition-all font-medium"
+          title="返回登录页面"
+        >
+          <LogOut size={11} />
+          {isDemoMode() ? '退出演示' : user ? '退出登录' : '返回登录'}
+        </button>
       </div>
     </nav>
   )
