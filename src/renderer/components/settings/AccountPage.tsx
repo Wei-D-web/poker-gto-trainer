@@ -6,7 +6,7 @@
  */
 import { useState } from 'react'
 import { useAuth, type SubscriptionTier } from '../../contexts/AuthContext'
-import { STRIPE_PRICES, redirectToCheckout, redirectToCustomerPortal } from '../../lib/stripe'
+import { LS_PRICES, redirectToCheckout, redirectToCustomerPortal } from '../../lib/lemon-squeezy'
 import { cn } from '../../lib/utils'
 import { LicenseActivation } from './LicenseActivation'
 import {
@@ -66,7 +66,7 @@ export function AccountPage() {
 
   const handleUpgrade = async (planTier: 'pro' | 'lifetime', priceId: string) => {
     if (!priceId) {
-      setError('Stripe price ID not configured. Check environment variables.')
+      setError('Lemon Squeezy variant ID not configured. Check environment variables.')
       return
     }
     setActionLoading(planTier)
@@ -170,7 +170,7 @@ export function AccountPage() {
                 ]}
                 highlighted={true}
                 loading={actionLoading === 'pro'}
-                onClick={() => handleUpgrade('pro', STRIPE_PRICES.proMonthly)}
+                onClick={() => handleUpgrade('pro', LS_PRICES.proMonthly)}
               />
 
               {/* Pro Yearly */}
@@ -186,7 +186,7 @@ export function AccountPage() {
                   '专属 Discord 频道',
                 ]}
                 loading={actionLoading === 'pro-yearly'}
-                onClick={() => handleUpgrade('pro', STRIPE_PRICES.proYearly)}
+                onClick={() => handleUpgrade('pro', LS_PRICES.proYearly)}
               />
 
               {/* Lifetime */}
@@ -204,12 +204,12 @@ export function AccountPage() {
                 ]}
                 lifetime
                 loading={actionLoading === 'lifetime'}
-                onClick={() => handleUpgrade('lifetime', STRIPE_PRICES.lifetime)}
+                onClick={() => handleUpgrade('lifetime', LS_PRICES.lifetime)}
               />
             </div>
 
             <p className="text-[10px] text-neutral-600 text-center">
-              7 天免费试用 · 随时取消 · 安全支付由 Stripe 提供
+              7 天免费试用 · 随时取消 · 安全支付由 Lemon Squeezy 提供
             </p>
           </div>
         )}
@@ -235,7 +235,7 @@ export function AccountPage() {
             </button>
 
             <p className="text-[10px] text-neutral-600 text-center">
-              由 Stripe 安全处理 · 可随时取消续订
+              由 Lemon Squeezy 安全处理 · 可随时取消续订
             </p>
           </div>
         )}

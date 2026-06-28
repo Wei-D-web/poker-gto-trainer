@@ -6,7 +6,7 @@ import { RangeMatrix } from '../matrix/RangeMatrix'
 import { cn } from '../../lib/utils'
 import { useToastStore } from '../../stores/toastStore'
 import { useAuth, type SubscriptionTier } from '../../contexts/AuthContext'
-import { STRIPE_PRICES, redirectToCheckout } from '../../lib/stripe'
+import { LS_PRICES, redirectToCheckout } from '../../lib/lemon-squeezy'
 import {
   Zap, Calendar, TrendingUp, Download, FileJson, Image, FileSpreadsheet,
   Flame, Trophy, Target, RotateCcw, BarChart3, ArrowUp, AlertTriangle,
@@ -673,7 +673,7 @@ function ExploitAdvisorPreview() {
 }
 
 /* ================================================================
-   PRICING VIEW — Stripe Checkout Integration
+   PRICING VIEW — Lemon Squeezy Checkout Integration
    ================================================================ */
 
 function PricingView() {
@@ -683,7 +683,7 @@ function PricingView() {
 
   const handleSubscribe = async (planTier: 'pro' | 'lifetime', priceId: string) => {
     if (!priceId) {
-      setError('Stripe price ID not configured.')
+      setError('LS variant ID not configured.')
       return
     }
     setLoading(planTier)
@@ -738,7 +738,7 @@ function PricingView() {
             ))}
           </ul>
           <button
-            onClick={() => handleSubscribe('pro', STRIPE_PRICES.proMonthly)}
+            onClick={() => handleSubscribe('pro', LS_PRICES.proMonthly)}
             disabled={loading === 'pro' || tier === 'pro'}
             className="w-full py-2.5 bg-amber-600 hover:bg-amber-500 disabled:bg-neutral-700 text-white rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-40"
           >
@@ -767,7 +767,7 @@ function PricingView() {
             ))}
           </ul>
           <button
-            onClick={() => handleSubscribe('pro', STRIPE_PRICES.proYearly)}
+            onClick={() => handleSubscribe('pro', LS_PRICES.proYearly)}
             disabled={loading === 'pro-yearly' || tier === 'pro' || tier === 'lifetime'}
             className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-neutral-700 text-white rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-40"
           >
@@ -799,7 +799,7 @@ function PricingView() {
             ))}
           </ul>
           <button
-            onClick={() => handleSubscribe('lifetime', STRIPE_PRICES.lifetime)}
+            onClick={() => handleSubscribe('lifetime', LS_PRICES.lifetime)}
             disabled={loading === 'lifetime' || tier === 'lifetime'}
             className="w-full py-2.5 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 disabled:from-neutral-700 disabled:to-neutral-700 text-white rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 disabled:opacity-40 shadow-[0_2px_16px_rgba(245,158,11,0.15)]"
           >
@@ -818,7 +818,7 @@ function PricingView() {
 
       {/* Footer */}
       <p className="text-[10px] text-neutral-600 text-center">
-        7 天免费试用 · 随时取消 · 安全支付由 <ExternalLink size={10} className="inline" /> Stripe 提供
+        7 天免费试用 · 随时取消 · 安全支付由 <ExternalLink size={10} className="inline" /> Lemon Squeezy 提供
       </p>
     </div>
   )

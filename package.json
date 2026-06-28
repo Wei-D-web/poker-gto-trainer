@@ -20,10 +20,13 @@
     "test:run": "vitest run",
     "package:mac": "electron-vite build && electron-builder --mac",
     "package:win": "electron-vite build && electron-builder --win",
-    "package:linux": "electron-vite build && electron-builder --linux"
+    "package:linux": "electron-vite build && electron-builder --linux",
+    "mcp:dev": "tsx mcp-server/src/index.ts",
+    "mcp:build": "tsc -p mcp-server/tsconfig.json",
+    "mcp:start": "node mcp-server/dist/index.js"
   },
   "dependencies": {
-    "@stripe/stripe-js": "^9.7.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@supabase/supabase-js": "^2.107.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
@@ -37,7 +40,6 @@
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.0",
     "sql.js": "^1.12.0",
-    "stripe": "^22.2.0",
     "tailwind-merge": "^2.6.0",
     "zod": "^3.24.0",
     "zustand": "^5.0.0"
@@ -58,6 +60,7 @@
     "jsdom": "^25.0.0",
     "prettier": "^3.4.0",
     "tailwindcss": "^4.0.0",
+    "tsx": "^4.22.4",
     "tw-animate-css": "^1.2.0",
     "typescript": "^5.7.0",
     "vite": "^5.4.0",

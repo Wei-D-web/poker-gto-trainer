@@ -6,7 +6,7 @@
  */
 import { type ReactNode } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
-import { STRIPE_PRICES, redirectToCheckout } from '../../lib/stripe'
+import { LS_PRICES, redirectToCheckout } from '../../lib/lemon-squeezy'
 import { cn } from '../../lib/utils'
 import { Lock, Zap, Crown, ArrowRight, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
@@ -138,7 +138,7 @@ export function UpgradePrompt({ feature }: { feature?: string }) {
         <div className="grid gap-3">
           {/* Pro Monthly */}
           <button
-            onClick={() => handleUpgrade(STRIPE_PRICES.proMonthly, 'pro')}
+            onClick={() => handleUpgrade(LS_PRICES.proMonthly, 'pro')}
             disabled={loading === 'pro'}
             className="w-full text-left bg-[#090D14] border border-[#152233] hover:border-blue-500/30 rounded-xl p-4 transition-all group"
           >
@@ -161,7 +161,7 @@ export function UpgradePrompt({ feature }: { feature?: string }) {
 
           {/* Pro Yearly */}
           <button
-            onClick={() => handleUpgrade(STRIPE_PRICES.proYearly, 'pro')}
+            onClick={() => handleUpgrade(LS_PRICES.proYearly, 'pro')}
             disabled={loading === 'pro'}
             className="w-full text-left bg-[#090D14] border border-emerald-500/20 hover:border-emerald-500/40 rounded-xl p-4 transition-all group"
           >
@@ -187,7 +187,7 @@ export function UpgradePrompt({ feature }: { feature?: string }) {
 
           {/* Lifetime */}
           <button
-            onClick={() => handleUpgrade(STRIPE_PRICES.lifetime, 'lifetime')}
+            onClick={() => handleUpgrade(LS_PRICES.lifetime, 'lifetime')}
             disabled={loading === 'lifetime'}
             className="w-full text-left bg-gradient-to-r from-amber-500/[0.05] to-orange-500/[0.05] border border-amber-500/20 hover:border-amber-500/40 rounded-xl p-4 transition-all group"
           >
@@ -217,7 +217,7 @@ export function UpgradePrompt({ feature }: { feature?: string }) {
         )}
 
         <p className="text-[10px] text-neutral-600">
-          7 天免费试用 · 随时取消 · 安全支付由 Stripe 提供
+          7 天免费试用 · 随时取消 · 安全支付由 Lemon Squeezy 提供
         </p>
       </div>
     </div>
