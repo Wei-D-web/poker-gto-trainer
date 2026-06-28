@@ -170,7 +170,7 @@ export function Sidebar() {
             if (user) {
               try { await signOut() } catch {}
             }
-            window.location.href = '/poker-gto-trainer/app/'
+            window.location.href = '/poker-gto-trainer/'
           }}
           className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[11px] text-neutral-500 hover:text-neutral-300 hover:bg-white/[0.04] transition-all font-medium"
           title="返回登录页面"

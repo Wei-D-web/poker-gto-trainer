@@ -132,6 +132,17 @@ const electronAPI = {
     getVersion: (): Promise<string> => ipcRenderer.invoke('app:getVersion'),
   },
 
+  training: {
+    generateBluffCatchScenarios: (params: {
+      count: number
+      includePaired?: boolean
+      includeFlushBoards?: boolean
+      includeStraightBoards?: boolean
+      difficulty?: 'beginner' | 'intermediate' | 'advanced'
+    }): Promise<any> =>
+      ipcRenderer.invoke('training:generateBluffCatchScenarios', params),
+  },
+
   auth: {
     getSession: (): Promise<any> => ipcRenderer.invoke('auth:getSession'),
     setSession: (data: any): Promise<void> => ipcRenderer.invoke('auth:setSession', data),
