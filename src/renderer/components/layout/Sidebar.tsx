@@ -6,8 +6,14 @@ import { cn } from '../../lib/utils'
 import {
   Globe, Settings, BookOpen, BarChart3, Target, Edit3,
   Search, Lock, DollarSign, ArrowRight, Users, Zap, HelpCircle, Swords, Play, Library, Bookmark, Calculator, Flame,
-  GitCompare, Crosshair, Shield, type LucideIcon,
+  GitCompare, Crosshair, Shield, LogOut, type LucideIcon,
 } from 'lucide-react'
+
+const DEMO_KEY = 'pokergto_demo_mode'
+
+function isDemoMode(): boolean {
+  try { return localStorage.getItem(DEMO_KEY) === '1' } catch { return false }
+}
 
 interface NavSection {
   label: string
@@ -51,6 +57,7 @@ export function Sidebar() {
       items: [
         { id: 'analytics', label: '数据分析', icon: BarChart3, accent: 'text-purple-400' },
         { id: 'equitytrainer', label: '胜率训练', icon: Target, accent: 'text-cyan-400' },
+        { id: 'bluffcatcher', label: 'Bluff Catcher', icon: Shield, accent: 'text-orange-400' },
         { id: 'charts', label: '翻前图册', icon: Library, accent: 'text-blue-400' },
         { id: 'battle', label: 'Range Battle', icon: Swords, accent: 'text-red-400' },
         { id: 'cashmttcompare', label: 'Cash vs MTT', icon: GitCompare, accent: 'text-indigo-400' },
@@ -137,6 +144,19 @@ export function Sidebar() {
             <span className="text-xs">👤</span>
             <span className="truncate font-medium text-neutral-300">{user.email}</span>
           </div>
+        )}
+        {isDemoMode() && (
+          <button
+            onClick={() => {
+              localStorage.removeItem(DEMO_KEY)
+              localStorage.removeItem('pokergto_post_login_dismissed')
+              window.location.href = '/poker-gto-trainer/app/'
+            }}
+            className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-[11px] text-amber-400/70 hover:text-amber-300 hover:bg-amber-500/8 transition-all font-medium"
+          >
+            <LogOut size={11} />
+            退出演示
+          </button>
         )}
         <div className="flex items-center gap-2 text-[11px] text-neutral-500">
           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-subtle shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
