@@ -11,10 +11,14 @@ import { useAuth } from '../../contexts/AuthContext'
 import { cn } from '../../lib/utils'
 import {
   Target, Mail, Lock, ArrowRight, AlertCircle, Check,
-  Sparkles, type LucideIcon,
+  Sparkles, Eye, type LucideIcon,
 } from 'lucide-react'
 
 type AuthTab = 'magic-link' | 'social' | 'password'
+
+interface LoginPageProps {
+  onDemoMode?: () => void
+}
 
 /* ── Floating poker chip component ── */
 function FloatingChip({ color, delay, x, y, size = 48 }: {
@@ -119,7 +123,7 @@ function CardStackLogo() {
   )
 }
 
-export function LoginPage() {
+export function LoginPage({ onDemoMode }: LoginPageProps) {
   const { signIn, signUp, signInWithMagicLink, signInWithOAuth } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -521,12 +525,25 @@ export function LoginPage() {
         </div>
 
         {/* ── Footer ── */}
-        <div className="mt-6 text-center space-y-2">
+        <div className="mt-8 text-center space-y-4">
           <p className="text-[11px] text-neutral-600 tracking-wide">
             {tab === 'password' && mode === 'signup' && '注册即同意服务条款 · '}
             <span className="text-emerald-400/40 font-medium">{tab === 'password' && mode === 'signup' ? '7 天' : '注册即享 7 天'}</span>{' '}
             <span className="text-neutral-500">{tab === 'password' && mode === 'signup' ? '免费试用专业版' : '免费试用 · 无需信用卡'}</span>
           </p>
+
+          {/* Demo mode — skip login */}
+          {onDemoMode && (
+            <button
+              onClick={onDemoMode}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.05] hover:border-white/[0.1] text-neutral-600 hover:text-neutral-400 text-xs font-medium transition-all group"
+            >
+              <Eye size={13} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+              <span>先看看 · 无需登录</span>
+              <span className="text-[9px] text-neutral-700 ml-0.5">演示模式</span>
+            </button>
+          )}
+
           {/* Decorative chip line */}
           <div className="flex items-center justify-center gap-1.5 opacity-20">
             {['♠', '♥', '♦', '♣'].map((s, i) => (

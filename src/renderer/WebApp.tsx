@@ -1,6 +1,7 @@
 /**
  * Web App shell — shows login page if not authenticated, main app if logged in.
  * On first login from web, shows a one-time "Download Desktop App" interstitial.
+ * Demo mode: click "先看看" on login page to skip auth entirely.
  */
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from './contexts/AuthContext'
@@ -8,11 +9,17 @@ import { App } from './App'
 import { LoginPage } from './components/auth/LoginPage'
 import { PostLoginScreen } from './components/auth/PostLoginScreen'
 
-const STORAGE_KEY = 'pokergto_post_login_dismissed'
+const POST_LOGIN_KEY = 'pokergto_post_login_dismissed'
+const DEMO_KEY = 'pokergto_demo_mode'
 
 export function WebApp() {
   const { user, loading } = useAuth()
   const isDev = import.meta.env.VITE_POKERGTO_DEV_BUILD === 'true'
+
+  // Demo mode — skips auth entirely
+  const [demoMode, setDemoMode] = useState(() => {
+    return localStorage.getItem(DEMO_KEY) === '1'
+  })
 
   // Track whether to show the post-login interstitial
   const [showPostLogin, setShowPostLogin] = useState(false)
@@ -21,25 +28,26 @@ export function WebApp() {
   useEffect(() => {
     // User just logged in (null → user)
     if (!prevUser.current && user) {
-      // Only show if user hasn't previously dismissed it
-      const dismissed = localStorage.getItem(STORAGE_KEY)
+      const dismissed = localStorage.getItem(POST_LOGIN_KEY)
       if (!dismissed || dismissed === '') {
         setShowPostLogin(true)
       }
     }
-    // User logged out → reset
     if (prevUser.current && !user) {
       setShowPostLogin(false)
     }
     prevUser.current = user
   }, [user])
 
-  const handlePostLoginContinue = () => {
-    setShowPostLogin(false)
+  const handlePostLoginContinue = () => setShowPostLogin(false)
+
+  const handleDemoMode = () => {
+    localStorage.setItem(DEMO_KEY, '1')
+    setDemoMode(true)
   }
 
   // ── Loading ──
-  if (loading) {
+  if (loading && !demoMode) {
     return (
       <div className="h-screen w-screen bg-[#05080C] flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -50,13 +58,13 @@ export function WebApp() {
     )
   }
 
-  // ── Not authenticated ──
-  if (!isDev && !user) {
-    return <LoginPage />
+  // ── Not authenticated (and not in demo/dev mode) ──
+  if (!isDev && !demoMode && !user) {
+    return <LoginPage onDemoMode={handleDemoMode} />
   }
 
-  // ── Post-login interstitial (web only, first time, not in dev mode) ──
-  if (showPostLogin && !isDev) {
+  // ── Post-login interstitial (real login only, not demo) ──
+  if (showPostLogin && !isDev && !demoMode) {
     return <PostLoginScreen onContinue={handlePostLoginContinue} />
   }
 
