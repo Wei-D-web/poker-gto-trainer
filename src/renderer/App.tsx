@@ -22,6 +22,7 @@ import { SpotLibraryPage } from './components/spots/SpotLibraryPage'
 import { ToolsPage } from './components/tools/ToolsPage'
 import { AnalyticsPage } from './components/analytics/AnalyticsPage'
 import { EquityTrainerPage } from './components/training/EquityTrainerPage'
+import { BluffCatcherPage } from './components/training/BluffCatcherPage'
 import { PremiumFeatures } from './components/premium/PremiumFeatures'
 import { SettingsPage } from './components/settings/SettingsPage'
 import { AccountPage } from './components/settings/AccountPage'
@@ -32,6 +33,7 @@ import { ErrorBoundary } from './components/common/ErrorBoundary'
 import { ToastContainer } from './components/common/ToastContainer'
 import { OnboardingTour } from './components/common/OnboardingTour'
 import { useKeyboardShortcuts, DEFAULT_SHORTCUTS } from './hooks/useKeyboard'
+import { DemoBanner } from './components/auth/DemoBanner'
 import type { FC } from 'react'
 
 const ROUTES: Record<string, FC> = {
@@ -59,6 +61,7 @@ const ROUTES: Record<string, FC> = {
   account: AccountPage,
   guide: GuidePage,
   review: SessionReviewPage,
+  bluffcatcher: BluffCatcherPage,
 }
 
 export function App() {
@@ -90,6 +93,7 @@ export function App() {
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-neutral-950">
+      <DemoBanner />
       <TitleBar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
