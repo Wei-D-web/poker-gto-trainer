@@ -4,6 +4,7 @@ import { registerAllIpcHandlers } from './ipc/register'
 import { initDatabase, getDatabase, closeDatabase } from './data/database'
 import { generateSamplePreflopData } from './data/generate-sample-data'
 import { generatePresetSolutions } from './data/preset-solutions'
+import { setupAutoUpdater } from './update/updater'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -16,7 +17,7 @@ function createWindow(): void {
     title: 'PokerGTO Trainer',
     titleBarStyle: 'hiddenInset',
     backgroundColor: '#0A0A0A',
-    show: false,
+    show: true,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -24,8 +25,6 @@ function createWindow(): void {
       nodeIntegration: false,
     },
   })
-
-  mainWindow.on('ready-to-show', () => mainWindow?.show())
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
     return { action: 'deny' }
@@ -65,6 +64,9 @@ app.whenReady().then(async () => {
   } catch (e) {
     console.error('DB init error (window still works):', e)
   }
+
+  // Setup auto-updater after window is ready
+  setupAutoUpdater(mainWindow)
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()

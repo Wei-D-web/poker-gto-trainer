@@ -7,6 +7,9 @@ directories:
 files:
   - out/**/*
   - "!node_modules/**/*"
+  - node_modules/lru-cache/dist/**/*
+  - node_modules/sql.js/dist/**/*
+  - node_modules/sql.js/package.json
 extraResources:
   - from: resources/data
     to: data
@@ -17,7 +20,10 @@ extraResources:
 asar:
   smartUnpack: true
 asarUnpack:
-  - "node_modules/sql.js/**"
+  - "**/*.wasm"
+  - "**/*.node"
+  - node_modules/sql.js/dist/*.js
+  - node_modules/sql.js/package.json
 mac:
   category: public.app-category.educational-games
   icon: resources/icon.icns

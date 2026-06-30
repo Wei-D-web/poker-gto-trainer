@@ -5,7 +5,9 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()],
+    plugins: [externalizeDepsPlugin({
+      exclude: ['lru-cache'],
+    })],
     build: {
       outDir: 'out/main',
     },
