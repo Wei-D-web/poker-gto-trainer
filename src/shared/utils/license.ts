@@ -109,27 +109,23 @@ export async function validateLicenseKey(key: string): Promise<LicenseInfo> {
   const cleaned = normalizeKeyInput(key)
 
   // ── Developer key — always valid ──
-  if (cleaned === 'PGTODEVADMINKEY' || key.toUpperCase().trim() === 'PGTO-DEV-ADMIN-KEY') {
+  if (cleaned === 'PGTODEVADMINKEY') {
     return { valid: true, tier: 'developer', message: '🔑 开发者模式已激活' }
   }
 
   // ── Demo keys — always valid (for testing) ──
-  if (cleaned === 'PGTODEMOPROKEY' || key.toUpperCase().trim() === 'PGTO-DEMO-PRO-KEY') {
+  if (cleaned === 'PGTODEMOPROKEY') {
     return { valid: true, tier: 'pro', message: 'Pro 激活成功！(演示)' }
   }
-  if (cleaned === 'PGTODEMOLIFEKEY' || key.toUpperCase().trim() === 'PGTO-DEMO-LIFE-KEY') {
+  if (cleaned === 'PGTODEMOLIFEKEY') {
     return { valid: true, tier: 'lifetime', message: '终身会员激活成功！(演示)' }
   }
 
   // ── Customer keys: validate HMAC signature ──
   // Format: PGTO-XXXX-XXXX-XXXX → 12 base32 chars after PGTO
-  if (cleaned.length < 12) {
-    return { valid: false, message: '卡密格式不正确，需要至少 12 位字符' }
-  }
-
   const core = cleaned.startsWith('PGTO') ? cleaned.slice(4) : cleaned
   if (core.length < 12) {
-    return { valid: false, message: '卡密格式不正确' }
+    return { valid: false, message: '卡密格式不正确，需要至少 12 位字符' }
   }
 
   const body = core.slice(0, 8)
