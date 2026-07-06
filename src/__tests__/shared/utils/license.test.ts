@@ -23,14 +23,14 @@ describe('License Key Validation — Roundtrip', () => {
   // These keys were generated with scripts/generate-license-keys.mjs
   // using the POKERGTO_LICENSE_SECRET from .env
   it('validates a Pro key (12-month expiry)', async () => {
-    const result = await validateLicenseKey('PGTO-0019-8SR2-747W')
+    const result = await validateLicenseKey('PGTO-001A-2W8B-6N8G')
     expect(result.valid).toBe(true)
     expect(result.tier).toBe('pro')
     expect(result.expiry).toBeDefined()
   })
 
   it('validates a Lifetime key', async () => {
-    const result = await validateLicenseKey('PGTO-01W4-T9HZ-H0F7')
+    const result = await validateLicenseKey('PGTO-01W4-G4G6-ACQ3')
     expect(result.valid).toBe(true)
     expect(result.tier).toBe('lifetime')
   })
@@ -112,7 +112,7 @@ describe('License Validation Edge Cases', () => {
   })
 
   it('handles key with extra dashes and spacing', async () => {
-    const result = await validateLicenseKey('  PGTO-0019-8SR2-747W  ')
+    const result = await validateLicenseKey('  PGTO-001A-2W8B-6N8G  ')
     // After normalization, should be valid
     expect(result.valid).toBe(true)
     expect(result.tier).toBe('pro')

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { POSITION_LABELS, type Position } from '@shared/types/poker'
 import { RangeMatrix } from '../matrix/RangeMatrix'
 import { MatrixLegend } from '../matrix/MatrixLegend'
+import { ComboDetail } from '../matrix/ComboDetail'
 import type { ComboStrategy } from '@shared/types/strategy'
 import { cn } from '../../lib/utils'
 import { BookOpen, Search, Grid3X3, ChevronLeft, ChevronRight, Target, Layers } from 'lucide-react'
@@ -29,6 +30,7 @@ export function PreflopChartsPage() {
   const [selectedDepth, setSelectedDepth] = useState(100)
   const [viewMode, setViewMode] = useState<'grid' | 'detail'>('grid')
   const [detailChart, setDetailChart] = useState<ChartEntry | null>(null)
+  const [selectedCombo, setSelectedCombo] = useState<string | null>(null)
 
   useEffect(() => {
     loadAllCharts()
@@ -221,11 +223,35 @@ export function PreflopChartsPage() {
                     </span>
                   </div>
                 </div>
-                <MatrixLegend />
+                <MatrixLegend showActionColors={true} />
               </div>
-              <div className="flex justify-center">
-                <RangeMatrix combos={detailChart.combos} selectedCombo={null} hoveredCombo={null}
-                  onSelectCombo={() => {}} onHoverCombo={() => {}} size="comfortable" />
+              <div className="flex gap-5">
+                <div className="shrink-0">
+                  <RangeMatrix
+                    combos={detailChart.combos}
+                    selectedCombo={selectedCombo as any}
+                    hoveredCombo={null}
+                    onSelectCombo={combo => setSelectedCombo(combo)}
+                    onHoverCombo={() => {}}
+                    size="comfortable"
+                    showActionSplits={true}
+                  />
+                </div>
+                <div className="flex-1 min-w-[200px] max-w-[260px]">
+                  <div className="bg-[#0B1019] rounded-xl p-4 border border-[#152233] h-full">
+                    {selectedCombo ? (
+                      <ComboDetail
+                        comboKey={selectedCombo}
+                        data={detailChart.combos.find(c => c.comboKey === selectedCombo) ?? null}
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-neutral-600 gap-2 py-10">
+                        <Target size={24} className="opacity-30" />
+                        <span className="text-xs">Click a hand to see details</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 

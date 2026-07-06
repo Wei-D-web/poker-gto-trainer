@@ -41,9 +41,10 @@ jobs:
           mv dist/web/index.html dist/pages/app/index.html
           # Landing page on root
           cp deploy/index.html dist/pages/index.html
-          # Privacy / Terms
+          # Privacy / Terms / Download
           cp deploy/privacy.html dist/pages/privacy.html 2>/dev/null || true
           cp deploy/terms.html dist/pages/terms.html 2>/dev/null || true
+          cp deploy/download.html dist/pages/download.html 2>/dev/null || true
           # Payment QR images
           cp -r deploy/payment dist/pages/payment/ 2>/dev/null || echo "payment/ not found, skipping"
           # Demo screenshots (for landing page preview)

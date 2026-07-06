@@ -51,7 +51,7 @@ export function DemoBanner() {
 
   const handleDownload = () => {
     track('web_demo_download_clicked')
-    window.open('https://github.com/Wei-D-web/poker-gto-trainer/releases/latest', '_blank')
+    window.open('/poker-gto-trainer/download.html', '_blank')
   }
 
   return (

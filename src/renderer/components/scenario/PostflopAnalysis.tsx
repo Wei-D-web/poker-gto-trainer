@@ -2,8 +2,10 @@ import { useMemo, useState } from 'react'
 import type { PostflopResult } from '../../../../src/main/solver/postflop-engine'
 import { RangeMatrix } from '../matrix/RangeMatrix'
 import { MatrixLegend } from '../matrix/MatrixLegend'
+import { ComboDetail } from '../matrix/ComboDetail'
+import type { ComboKey } from '@shared/types/poker'
 import { cn } from '../../lib/utils'
-import { Zap, BarChart3, ChevronDown, ChevronUp } from 'lucide-react'
+import { Zap, BarChart3, ChevronDown, ChevronUp, Target } from 'lucide-react'
 
 interface PostflopAnalysisProps {
   result: PostflopResult
@@ -12,6 +14,7 @@ interface PostflopAnalysisProps {
 export function PostflopAnalysis({ result }: PostflopAnalysisProps) {
   const [showMatrix, setShowMatrix] = useState(true)
   const [filterHandType, setFilterHandType] = useState<string | null>(null)
+  const [selectedCombo, setSelectedCombo] = useState<ComboKey | null>(null)
 
   const matrixCombos = useMemo(() => {
     return result.combos.map(c => ({
@@ -101,18 +104,41 @@ export function PostflopAnalysis({ result }: PostflopAnalysisProps) {
         <div className="bg-[#090D14] rounded-2xl p-5 border border-[#152233] shadow-[0_2px_16px_rgba(0,0,0,0.3)]">
           <div className="mb-3 flex items-center justify-between">
             <span className="text-xs text-neutral-500">
-              Color = frequency · Number = c-bet%
+              Click a hand to see action breakdown
             </span>
-            <MatrixLegend />
+            <MatrixLegend showActionColors={true} />
           </div>
-          <RangeMatrix
-            combos={matrixCombos}
-            selectedCombo={null}
-            hoveredCombo={null}
-            onSelectCombo={() => {}}
-            onHoverCombo={() => {}}
-            size="compact"
-          />
+          <div className="flex gap-5">
+            {/* Matrix */}
+            <div className="shrink-0">
+              <RangeMatrix
+                combos={matrixCombos}
+                selectedCombo={selectedCombo}
+                hoveredCombo={null}
+                onSelectCombo={combo => setSelectedCombo(combo)}
+                onHoverCombo={() => {}}
+                size="compact"
+                showActionSplits={true}
+              />
+            </div>
+
+            {/* Selected combo detail panel */}
+            <div className="flex-1 min-w-[200px] max-w-[280px]">
+              <div className="bg-[#0B1019] rounded-xl p-4 border border-[#152233] h-full">
+                {selectedCombo ? (
+                  <ComboDetail
+                    comboKey={selectedCombo}
+                    data={matrixCombos.find(c => c.comboKey === selectedCombo) ?? null}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-neutral-600 gap-2 py-10">
+                    <Target size={24} className="opacity-30" />
+                    <span className="text-xs">Click a hand to see details</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

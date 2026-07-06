@@ -77,14 +77,20 @@
   --duration-normal: 200ms;
   --duration-slow: 350ms;
 
-  /* ── Matrix heatmap gradient (7-stop, PioSolver-grade) ── */
-  --heatmap-0: #0D1219;
-  --heatmap-15: #0A2E1F;
-  --heatmap-30: #0B5C3B;
-  --heatmap-50: #0D8C56;
-  --heatmap-70: #D4850A;
-  --heatmap-90: #E04A1A;
-  --heatmap-100: #E0243F;
+  /* ── Matrix heatmap gradient (GTO Wizard 标准 6-stop) ──
+     Empty(0%) → Green(~25%) → Yellow(~50%) → Orange(~70%) → Red(~85%) → DeepRed(100%)
+     在深色背景上保持最高视觉区分度 */
+  --heatmap-empty: #0F141F;
+  --heatmap-low: #0B5C33;
+  --heatmap-mid-low: #3B8C3B;
+  --heatmap-mid: #B8860B;
+  --heatmap-mid-high: #D4650A;
+  --heatmap-high: #C0392B;
+  --heatmap-max: #A01020;
+
+  /* ── Gridlines ── */
+  --matrix-grid-color: rgba(255, 255, 255, 0.03);
+  --matrix-grid-hover: rgba(255, 255, 255, 0.06);
 }
 
 /* ============================================================
@@ -124,24 +130,43 @@ body {
 .matrix-cell {
   transition: transform var(--duration-fast) var(--ease-out),
               box-shadow var(--duration-fast) var(--ease-out),
-              border-color var(--duration-fast) var(--ease-out);
+              border-color var(--duration-fast) var(--ease-out),
+              filter var(--duration-fast) var(--ease-out);
   position: relative;
   cursor: pointer;
 }
 .matrix-cell:hover {
-  transform: scale(1.10);
+  transform: scale(1.12);
   z-index: 10;
-  box-shadow: var(--shadow-glow);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
   border-color: rgba(255, 255, 255, 0.2) !important;
+  filter: brightness(1.15);
 }
 .matrix-cell:active {
   transform: scale(0.94);
 }
 
-/* Matrix grid line overlay for professional look */
-.matrix-grid-line {
+/* Grid line overlay for GTO Wizard professional look */
+.matrix-grid-overlay {
   position: absolute;
-  background: var(--border-subtle);
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.matrix-grid-line-h,
+.matrix-grid-line-v {
+  position: absolute;
+  background: var(--matrix-grid-color);
+}
+.matrix-grid-line-h {
+  height: 1px;
+  left: 0;
+  right: 0;
+}
+.matrix-grid-line-v {
+  width: 1px;
+  top: 0;
+  bottom: 0;
 }
 
 /* ============================================================

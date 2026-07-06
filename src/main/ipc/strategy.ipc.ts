@@ -170,7 +170,7 @@ export function registerStrategyIpc(): void {
         params.stackDepth,
         params.gameType ?? 'cash',
         params.ante ?? 0,
-        params.iterations ?? 500
+        params.iterations ?? 2000
       )
     }
   )

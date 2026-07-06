@@ -10,9 +10,14 @@ import {
 } from 'lucide-react'
 
 const DEMO_KEY = 'pokergto_demo_mode'
+const RECORDING_KEY = 'pokergto_recording_mode'
 
 function isDemoMode(): boolean {
   try { return localStorage.getItem(DEMO_KEY) === '1' } catch { return false }
+}
+
+function isRecording(): boolean {
+  try { return localStorage.getItem(RECORDING_KEY) === '1' } catch { return false }
 }
 
 interface NavSection {
@@ -147,11 +152,18 @@ export function Sidebar() {
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
             </>
           ) : isDemoMode() ? (
-            <>
-              <span className="text-xs">👁</span>
-              <span className="font-medium text-amber-300/80 flex-1">演示模式</span>
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-            </>
+            isRecording() ? (
+              <>
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                <span className="font-medium text-neutral-300 flex-1">PokerGTO Trainer</span>
+              </>
+            ) : (
+              <>
+                <span className="text-xs">👁</span>
+                <span className="font-medium text-amber-300/80 flex-1">演示模式</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
+              </>
+            )
           ) : (
             <>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
@@ -176,7 +188,7 @@ export function Sidebar() {
           title="返回登录页面"
         >
           <LogOut size={11} />
-          {isDemoMode() ? '退出演示' : user ? '退出登录' : '返回登录'}
+          {isRecording() ? 'PokerGTO Trainer' : isDemoMode() ? '退出演示' : user ? '退出登录' : '返回登录'}
         </button>
       </div>
     </nav>

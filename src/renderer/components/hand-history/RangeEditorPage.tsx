@@ -265,16 +265,21 @@ function EditableRangeMatrix({
 }: { combos: FrequencyMap; selectedCombo: ComboKey | null; onSelectCombo: (key: ComboKey) => void }) {
   const ALL_RANKS = [14,13,12,11,10,9,8,7,6,5,4,3,2] as const
   const RANK_CHARS: Record<number,string> = {14:'A',13:'K',12:'Q',11:'J',10:'T',9:'9',8:'8',7:'7',6:'6',5:'5',4:'4',3:'3',2:'2'}
+  // GTO Wizard 标准 6-stop: Empty(0)→Green(<25%)→Yellow-Green(25-50%)→Gold(50-70%)→Orange(70-85%)→Red(>85%)
   const getColor = (freq: number) => {
-    if (freq <= 0) return '#0D1219'
-    if (freq <= 0.25) return '#064E3B'
-    if (freq <= 0.5) return '#047857'
-    if (freq <= 0.75) return '#F59E0B'
-    return '#DC2626'
+    if (freq <= 0) return '#0F141F'
+    if (freq <= 0.25) return '#0B5C33'
+    if (freq <= 0.50) return '#3B8C3B'
+    if (freq <= 0.70) return '#B8860B'
+    if (freq <= 0.85) return '#D4650A'
+    return '#C0392B'
   }
   const getTextColor = (freq: number) => {
-    if (freq <= 0) return '#4B5563'
-    if (freq <= 0.5) return '#E5E5E5'
+    if (freq <= 0) return '#3A4556'
+    if (freq <= 0.25) return '#A8D8BA'
+    if (freq <= 0.50) return '#D0F0C0'
+    if (freq <= 0.70) return '#FFE8A0'
+    if (freq <= 0.85) return '#FFE0D0'
     return '#FFFFFF'
   }
   return (
