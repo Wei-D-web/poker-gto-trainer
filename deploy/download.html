@@ -6,49 +6,80 @@
 <title>下载 PokerGTO Trainer 桌面版</title>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #05080C; color: #EDF1F7; line-height:1.6; min-height:100vh; display:flex; align-items:center; justify-content:center; }
-  .card { max-width: 480px; margin: 24px; background: #090D14; border: 1px solid #152233; border-radius: 24px; padding: 48px 40px; text-align: center; }
-  .card .icon { width: 72px; height: 72px; margin: 0 auto 28px; background: linear-gradient(135deg, #10B98110, #3B82F610); border: 1px solid #10B98120; border-radius: 20px; display:flex; align-items:center; justify-content:center; font-size: 34px; }
-  .card h1 { font-size: 24px; font-weight: 900; margin-bottom: 10px; }
-  .card p { font-size: 14px; color: #94A3B8; margin-bottom: 6px; line-height: 1.7; }
-  .card .platforms { display: flex; gap: 10px; justify-content: center; margin: 28px 0; }
-  .card .platforms span { padding: 8px 18px; border-radius: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); font-size: 13px; font-weight: 600; color: #94A3B8; }
-  .btn { display: inline-block; padding: 12px 28px; border-radius: 14px; font-size: 14px; font-weight: 700; text-decoration: none; transition: all 0.2s; }
-  .btn-primary { background: linear-gradient(135deg, #10B981, #059669); color: white; }
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 24px rgba(16,185,129,0.3); }
-  .btn-outline { background: transparent; color: #94A3B8; border: 1px solid #1C2A3D; margin-left: 10px; }
-  .btn-outline:hover { border-color: #3B82F6; color: #EDF1F7; }
-  .note { margin-top: 24px; padding: 14px 18px; background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.1); border-radius: 14px; }
-  .note p { font-size: 12px; color: #F59E0B; margin: 0; }
-  .footer-links { margin-top: 32px; font-size: 12px; }
-  .footer-links a { color: #475569; text-decoration: none; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #05080C; color: #EDF1F7; line-height:1.6; min-height:100vh; }
+  .container { max-width: 600px; margin: 0 auto; padding: 60px 24px; }
+  .card { background: #090D14; border: 1px solid #152233; border-radius: 24px; padding: 48px 40px; text-align: center; margin-bottom: 16px; }
+  .card .icon { font-size: 48px; margin-bottom: 20px; }
+  .card h1 { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+  .card .version { font-size: 14px; color: #34D399; font-weight: 700; margin-bottom: 20px; }
+  .card p { font-size: 14px; color: #94A3B8; line-height: 1.7; }
+  .download-btn { display: flex; align-items: center; gap: 14px; padding: 16px 24px; border-radius: 16px; text-decoration: none; transition: all 0.2s; text-align: left; margin-bottom: 10px; }
+  .download-btn.primary { background: linear-gradient(135deg, #10B981, #059669); color: white; font-weight: 700; }
+  .download-btn.primary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(16,185,129,0.3); }
+  .download-btn.secondary { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); color: #94A3B8; }
+  .download-btn.secondary:hover { border-color: rgba(255,255,255,0.12); color: #EDF1F7; }
+  .download-btn .os-icon { font-size: 28px; width: 44px; text-align: center; }
+  .download-btn .info { flex:1; }
+  .download-btn .info .title { font-size: 15px; font-weight: 700; }
+  .download-btn .info .desc { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+  .download-btn .info .size { font-size: 11px; opacity: 0.5; }
+  .install-note { background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.1); border-radius: 14px; padding: 16px; margin-top: 20px; text-align: left; }
+  .install-note p { font-size: 12px; color: #F59E0B; margin: 0; line-height: 1.8; }
+  .install-note code { background: rgba(245,158,11,0.1); padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+  .footer-links { text-align: center; margin-top: 24px; font-size: 12px; }
+  .footer-links a { color: #475569; text-decoration: none; margin: 0 8px; }
   .footer-links a:hover { color: #94A3B8; }
 </style>
 </head>
 <body>
 
-<div class="card">
-  <div class="icon">📦</div>
-  <h1>桌面版即将发布</h1>
-  <p>PokerGTO Trainer 桌面客户端正在打包测试中。</p>
-  <p>目前可通过 <b>Web Demo</b> 直接体验核心功能，无需下载。</p>
-
-  <div class="platforms">
-    <span>🍎 macOS</span>
-    <span>🪟 Windows</span>
-    <span>🐧 Linux</span>
+<div class="container">
+  <div class="card">
+    <div class="icon">📦</div>
+    <h1>PokerGTO Trainer</h1>
+    <div class="version">v0.1.0 · 桌面版</div>
+    <p>本地 CFR 求解器 · 离线使用 · 全部 26 个模块 · macOS 首发</p>
   </div>
 
-  <a href="/poker-gto-trainer/app/?demo=1" class="btn btn-primary">🎯 在线体验 Demo</a>
-  <a href="/poker-gto-trainer/" class="btn btn-outline">← 返回首页</a>
+  <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/download/v0.1.0/PokerGTO+Trainer-0.1.0-arm64.dmg" class="download-btn primary">
+    <span class="os-icon">🍎</span>
+    <span class="info">
+      <span class="title">下载 macOS 版 (DMG)</span>
+      <span class="desc">Apple Silicon · macOS 11+</span>
+      <span class="size">99 MB</span>
+    </span>
+    <span style="font-size:20px;">⬇</span>
+  </a>
 
-  <div class="note">
-    <p>📢 桌面版发布后会通过 GitHub Releases 推送，届时在本页面提供下载。</p>
+  <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/download/v0.1.0/PokerGTO+Trainer-0.1.0-arm64-mac.zip" class="download-btn secondary">
+    <span class="os-icon">🍎</span>
+    <span class="info">
+      <span class="title">下载 macOS 版 (ZIP)</span>
+      <span class="desc">Apple Silicon · 便携版</span>
+      <span class="size">96 MB</span>
+    </span>
+    <span style="font-size:16px;">⬇</span>
+  </a>
+
+  <div style="text-align:center; margin-top: 12px;">
+    <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" style="color: #3B82F6; font-size: 13px; text-decoration: none;">查看所有版本 →</a>
+  </div>
+
+  <div class="install-note">
+    <p><b>📋 安装说明</b><br>
+    1️⃣ 下载 <code>.dmg</code> 文件并双击打开<br>
+    2️⃣ 拖拽 <b>PokerGTO Trainer</b> 到 <b>Applications</b> 文件夹<br>
+    3️⃣ 如提示「无法验证开发者」→ <b>系统设置 → 隐私与安全性 → 仍要打开</b><br>
+    4️⃣ 🪟 Windows / 🐧 Linux 版本即将发布</p>
+  </div>
+
+  <div style="text-align:center; margin-top: 20px;">
+    <a href="/poker-gto-trainer/app/?demo=1" style="color: #10B981; font-size: 13px; text-decoration: none; font-weight: 600;">🎯 或者先在线体验 Demo →</a>
   </div>
 
   <div class="footer-links">
-    <a href="/poker-gto-trainer/privacy.html">隐私政策</a> ·
-    <a href="/poker-gto-trainer/terms.html">服务条款</a>
+    <a href="/poker-gto-trainer/">← 返回首页</a>
+    <a href="/poker-gto-trainer/privacy.html">隐私政策</a>
   </div>
 </div>
 

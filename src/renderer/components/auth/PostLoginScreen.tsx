@@ -20,7 +20,7 @@ function detectOS(): 'mac' | 'win' | 'linux' {
   return 'mac'
 }
 
-const DOWNLOAD_URL = '/poker-gto-trainer/download.html'
+const DOWNLOAD_URL = 'https://github.com/Wei-D-web/poker-gto-trainer/releases/latest'
 
 export function PostLoginScreen({ onContinue }: Props) {
   const [showDownload, setShowDownload] = useState(false)

@@ -50,7 +50,7 @@ function detectOS(): 'mac' | 'win' | 'linux' {
   return 'mac' // default to mac
 }
 
-const DOWNLOAD_URL = '/poker-gto-trainer/download.html'
+const DOWNLOAD_URL = 'https://github.com/Wei-D-web/poker-gto-trainer/releases/latest'
 
 const OS_LABELS: Record<string, string> = {
   mac: 'macOS',

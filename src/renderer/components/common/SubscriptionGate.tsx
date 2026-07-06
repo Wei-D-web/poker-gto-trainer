@@ -252,7 +252,7 @@ export function UpgradePrompt({ feature }: { feature?: string }) {
         {/* Desktop nudge — show on web only */}
         {!isRunningInElectron() && (
           <a
-            href="/poker-gto-trainer/download.html"
+            href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest"
             target="_blank"
             rel="noopener noreferrer"
             className="block text-[11px] text-blue-400/60 hover:text-blue-400 transition-colors underline-offset-2 hover:underline"
