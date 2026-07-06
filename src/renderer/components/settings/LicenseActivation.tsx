@@ -221,7 +221,7 @@ export function LicenseActivation({ onActivated, compact }: Props) {
       {/* Help text */}
       <p className="mt-3 text-xs text-neutral-600 leading-relaxed">
         购买卡密后在此输入激活。支持微信/支付宝付款，
-        <a href="#" onClick={(e) => { e.preventDefault(); window.open('https://pokergto.app/buy') }}
+        <a href="#" onClick={(e) => { e.preventDefault(); window.open('https://wei-d-web.github.io/poker-gto-trainer/') }}
            className="text-cyan-400 hover:underline mx-0.5">
           点此购买
         </a>

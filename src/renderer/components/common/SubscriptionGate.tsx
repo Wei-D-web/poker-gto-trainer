@@ -255,7 +255,7 @@ export function UpgradePrompt({ feature }: { feature?: string }) {
             也支持微信/支付宝购买卡密，购买后在「账户」页面激活
           </p>
           <a
-            href="https://pokergto.app/buy"
+            href="https://wei-d-web.github.io/poker-gto-trainer/"
             target="_blank"
             rel="noopener noreferrer"
             className="block w-full text-center py-2 rounded-lg bg-[#0F141C] hover:bg-[#151B28] border border-[#1C2A3D] hover:border-[#2A3B52] text-xs text-neutral-400 hover:text-neutral-200 transition-all"
