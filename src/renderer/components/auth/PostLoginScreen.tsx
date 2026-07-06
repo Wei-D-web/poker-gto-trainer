@@ -2,8 +2,9 @@
  * PostLoginScreen — shown once after login to guide users toward the desktop app.
  * Only appears on web (not in Electron), and only once unless re-login.
  */
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Monitor, ExternalLink, Download, X, Sparkles } from 'lucide-react'
+import { track } from '../../services/analytics'
 
 interface Props {
   onContinue: () => void
@@ -11,23 +12,41 @@ interface Props {
 
 const STORAGE_KEY = 'pokergto_post_login_dismissed'
 
+function detectOS(): 'mac' | 'win' | 'linux' {
+  if (typeof navigator === 'undefined') return 'mac'
+  const ua = navigator.userAgent
+  if (ua.includes('Win')) return 'win'
+  if (ua.includes('Linux') && !ua.includes('Android')) return 'linux'
+  return 'mac'
+}
+
+const DOWNLOAD_URL = 'https://github.com/Wei-D-web/poker-gto-trainer/releases/latest'
+
 export function PostLoginScreen({ onContinue }: Props) {
   const [showDownload, setShowDownload] = useState(false)
+  const [detectedOS, setDetectedOS] = useState<'mac' | 'win' | 'linux'>('mac')
+
+  useEffect(() => {
+    setDetectedOS(detectOS())
+  }, [])
 
   const handleContinue = () => {
     // Remember user prefers browser
     localStorage.setItem(STORAGE_KEY, 'browser')
+    track('web_postlogin_browser_clicked')
     onContinue()
   }
 
   const handleDownload = () => {
     // Remember user wants desktop
     localStorage.setItem(STORAGE_KEY, 'desktop')
+    track('web_postlogin_download_clicked')
     setShowDownload(true)
   }
 
   const handleClose = () => {
     localStorage.setItem(STORAGE_KEY, 'dismissed')
+    track('web_postlogin_dismissed')
     onContinue()
   }
 
@@ -51,13 +70,16 @@ export function PostLoginScreen({ onContinue }: Props) {
             <p className="text-sm text-neutral-400 leading-relaxed max-w-sm mx-auto">
               桌面版拥有完整的训练体验：本地求解器引擎、离线使用、
               更大的牌桌视图，以及更流畅的键盘快捷键操作。
+              <br />
+              <span className="text-emerald-400/80">⚡ 桌面版比浏览器版快 10x — 本地 CFR 求解器 vs 云端计算</span>
             </p>
           </div>
 
-          {/* Download cards */}
+          {/* Download cards — OS-aware ordering */}
           <div className="grid gap-3 max-w-xs mx-auto">
+            {/* Primary: detected OS */}
             <a
-              href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest"
+              href={DOWNLOAD_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold text-sm transition-all shadow-[0_4px_24px_rgba(16,185,129,0.2)] group"
@@ -66,27 +88,52 @@ export function PostLoginScreen({ onContinue }: Props) {
                 <Download size={18} />
               </div>
               <div className="text-left">
-                <div className="font-bold">macOS 版本</div>
-                <div className="text-xs text-emerald-200/70">Apple Silicon · Intel</div>
+                <div className="font-bold">
+                  {detectedOS === 'mac' ? 'macOS 版本' : detectedOS === 'win' ? 'Windows 版本' : 'Linux 版本'}
+                  <span className="text-emerald-200/70 font-normal text-[10px] ml-1.5">推荐</span>
+                </div>
+                <div className="text-xs text-emerald-200/70">
+                  {detectedOS === 'mac' ? 'Apple Silicon · Intel' : detectedOS === 'win' ? 'Windows 10 / 11' : 'AppImage · deb'}
+                </div>
               </div>
               <ExternalLink size={14} className="ml-auto opacity-50 group-hover:opacity-100 transition-opacity" />
             </a>
 
-            <a
-              href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] text-neutral-300 font-medium text-sm transition-all group"
-            >
-              <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center shrink-0">
-                <Monitor size={18} />
-              </div>
-              <div className="text-left">
-                <div className="font-medium">Windows 版本</div>
-                <div className="text-xs text-neutral-500">Windows 10 / 11</div>
-              </div>
-              <ExternalLink size={14} className="ml-auto opacity-30 group-hover:opacity-100 transition-opacity" />
-            </a>
+            {/* Secondary: other OS */}
+            {detectedOS !== 'mac' && (
+              <a
+                href={DOWNLOAD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] text-neutral-300 font-medium text-sm transition-all group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center shrink-0">
+                  <Monitor size={18} />
+                </div>
+                <div className="text-left">
+                  <div className="font-medium">macOS 版本</div>
+                  <div className="text-xs text-neutral-500">Apple Silicon · Intel</div>
+                </div>
+                <ExternalLink size={14} className="ml-auto opacity-30 group-hover:opacity-100 transition-opacity" />
+              </a>
+            )}
+            {detectedOS !== 'win' && (
+              <a
+                href={DOWNLOAD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 px-5 py-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.06] text-neutral-300 font-medium text-sm transition-all group"
+              >
+                <div className="w-10 h-10 rounded-xl bg-white/[0.04] flex items-center justify-center shrink-0">
+                  <Monitor size={18} />
+                </div>
+                <div className="text-left">
+                  <div className="font-medium">Windows 版本</div>
+                  <div className="text-xs text-neutral-500">Windows 10 / 11</div>
+                </div>
+                <ExternalLink size={14} className="ml-auto opacity-30 group-hover:opacity-100 transition-opacity" />
+              </a>
+            )}
           </div>
 
           {/* Continue in browser anyway */}

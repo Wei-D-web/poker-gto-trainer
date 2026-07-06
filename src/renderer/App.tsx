@@ -1,5 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useUIStore } from './stores/uiStore'
+import { useDemoData } from './hooks/useDemoData'
 import { Sidebar } from './components/layout/Sidebar'
 import { TitleBar } from './components/layout/TitleBar'
 import { StrategyExplorer } from './components/scenario/StrategyExplorer'
@@ -28,12 +29,14 @@ import { SettingsPage } from './components/settings/SettingsPage'
 import { AccountPage } from './components/settings/AccountPage'
 import { GuidePage } from './components/guide/GuidePage'
 import { SessionReviewPage } from './components/session-review/SessionReviewPage'
-import { SubscriptionGate, isPremiumFeature } from './components/common/SubscriptionGate'
+import { SubscriptionGate, isPremiumFeature, DESKTOP_ONLY_FEATURES, isRunningInElectron } from './components/common/SubscriptionGate'
 import { ErrorBoundary } from './components/common/ErrorBoundary'
 import { ToastContainer } from './components/common/ToastContainer'
 import { OnboardingTour } from './components/common/OnboardingTour'
 import { useKeyboardShortcuts, DEFAULT_SHORTCUTS } from './hooks/useKeyboard'
 import { DemoBanner } from './components/auth/DemoBanner'
+import { DesktopRequiredModal, getDesktopRequiredInfo } from './components/auth/DesktopRequiredModal'
+import { WelcomeFlow, shouldShowWelcome } from './components/common/WelcomeFlow'
 import type { FC } from 'react'
 
 const ROUTES: Record<string, FC> = {
@@ -69,6 +72,9 @@ export function App() {
   const setActiveRoute = useUIStore((s) => s.setActiveRoute)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
 
+  // Inject demo data when in demo mode
+  useDemoData()
+
   useEffect(() => {
     const onNavigate = (e: Event) => {
       const detail = (e as CustomEvent).detail
@@ -88,8 +94,30 @@ export function App() {
 
   useKeyboardShortcuts(DEFAULT_SHORTCUTS)
 
+  // ── Desktop-only feature gate (web only) ──
+  const [desktopRequiredFeature, setDesktopRequiredFeature] = useState<string | null>(null)
+  const desktopGated = !isRunningInElectron() && DESKTOP_ONLY_FEATURES.has(activeRoute)
+
+  // Watch for desktop-only feature access on web
+  useEffect(() => {
+    if (desktopGated) {
+      setDesktopRequiredFeature(activeRoute)
+    }
+  }, [activeRoute, desktopGated])
+
+  const handleDesktopRequiredClose = useCallback(() => {
+    setDesktopRequiredFeature(null)
+    // Navigate to a safe feature
+    setActiveRoute('explore')
+  }, [setActiveRoute])
+
   const ActiveComponent = ROUTES[activeRoute] || HandAnalyzerPage
-  const needsGate = isPremiumFeature(activeRoute)
+  const needsGate = isPremiumFeature(activeRoute) || DESKTOP_ONLY_FEATURES.has(activeRoute)
+
+  // Get desktop feature info for the modal
+  const desktopInfo = desktopRequiredFeature
+    ? getDesktopRequiredInfo(desktopRequiredFeature)
+    : null
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-neutral-950">
@@ -111,6 +139,21 @@ export function App() {
       </div>
       <ToastContainer />
       <OnboardingTour />
+
+      {/* Desktop Required Modal — web users trying to access desktop-only features */}
+      {desktopRequiredFeature && desktopInfo && (
+        <DesktopRequiredModal
+          featureId={desktopRequiredFeature}
+          featureName={desktopInfo.name}
+          description={desktopInfo.desc}
+          onClose={handleDesktopRequiredClose}
+        />
+      )}
+
+      {/* Welcome Flow — first desktop launch only */}
+      {isRunningInElectron() && shouldShowWelcome() && (
+        <WelcomeFlow />
+      )}
     </div>
   )
 }

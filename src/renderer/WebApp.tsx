@@ -2,15 +2,37 @@
  * Web App shell — shows login page if not authenticated, main app if logged in.
  * On first login from web, shows a one-time "Download Desktop App" interstitial.
  * Demo mode: click "先看看" on login page to skip auth entirely.
+ * URL param: ?demo=1 auto-enables demo mode and skips login.
+ * URL param: ?plan=pro|lifetime pre-selects upgrade plan on account page.
  */
 import { useState, useEffect, useRef } from 'react'
 import { useAuth } from './contexts/AuthContext'
 import { App } from './App'
 import { LoginPage } from './components/auth/LoginPage'
 import { PostLoginScreen } from './components/auth/PostLoginScreen'
+import { track } from './services/analytics'
 
 const POST_LOGIN_KEY = 'pokergto_post_login_dismissed'
 const DEMO_KEY = 'pokergto_demo_mode'
+
+/**
+ * Check URL search params for ?demo=1 and auto-enable demo mode.
+ * Called once on mount.
+ */
+function applyUrlParams(): void {
+  try {
+    const params = new URLSearchParams(window.location.search)
+
+    // ?demo=1 → auto-enable demo mode
+    if (params.get('demo') === '1') {
+      localStorage.setItem(DEMO_KEY, '1')
+      // Clean URL without reload
+      const url = new URL(window.location.href)
+      url.searchParams.delete('demo')
+      window.history.replaceState({}, '', url.toString())
+    }
+  } catch { /* ignore in non-browser env */ }
+}
 
 export function WebApp() {
   const { user, loading } = useAuth()
@@ -18,7 +40,12 @@ export function WebApp() {
 
   // Demo mode — skips auth entirely
   const [demoMode, setDemoMode] = useState(() => {
-    return localStorage.getItem(DEMO_KEY) === '1'
+    // Apply URL params before reading state
+    applyUrlParams()
+    const isDemo = localStorage.getItem(DEMO_KEY) === '1'
+    if (isDemo) track('web_demo_entered')
+    track('session_started')
+    return isDemo
   })
 
   // Track whether to show the post-login interstitial
@@ -43,6 +70,7 @@ export function WebApp() {
 
   const handleDemoMode = () => {
     localStorage.setItem(DEMO_KEY, '1')
+    track('web_demo_entered', { source: 'login_page' })
     setDemoMode(true)
   }
 

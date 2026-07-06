@@ -3,6 +3,9 @@
  *
  * Free tier: basic features only (explore, training, compare, editor, history, charts, playground, guide, settings, account)
  * Pro/Lifetime: all features unlocked
+ *
+ * DESKTOP_ONLY_FEATURES: require Electron (CFR solver, heavy compute).
+ * On web, these show DesktopRequiredModal instead of UpgradePrompt.
  */
 import { type ReactNode } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
@@ -10,6 +13,7 @@ import { LS_PRICES, redirectToCheckout } from '../../lib/lemon-squeezy'
 import { cn } from '../../lib/utils'
 import { Lock, Zap, Crown, ArrowRight, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
+import { track } from '../../services/analytics'
 
 /**
  * List of premium feature IDs (require Pro or Lifetime subscription).
@@ -22,13 +26,34 @@ export const PREMIUM_FEATURES = new Set([
   'cashmttcompare',
   'exploitadvisor',
   'analyzer',
-  'advanced',
-  'turnriver',
-  'multiway',
   'tools',
   'spots',
   'icm',
 ])
+
+/**
+ * Features that require the Electron desktop app (CFR solver, local compute).
+ * On web, these trigger DesktopRequiredModal instead of UpgradePrompt.
+ * On desktop (Electron), they behave like normal premium features.
+ */
+export const DESKTOP_ONLY_FEATURES = new Set([
+  'advanced',    // Node Locking via CFR solver
+  'turnriver',   // Heavy board enumeration
+  'multiway',    // 3-6 player heuristic analysis
+])
+
+/**
+ * Detect if running in Electron desktop vs browser/web.
+ */
+export function isRunningInElectron(): boolean {
+  try {
+    return !!(window as any).electronAPI?.app?.getPlatform?.() !== 'browser'
+  } catch {
+    // If electronAPI exists and is not the web bridge, we're in Electron
+    const api = (window as any).electronAPI
+    return api != null && typeof api.app?.quit === 'function'
+  }
+}
 
 /**
  * Check if a feature requires a paid subscription.
@@ -113,8 +138,12 @@ export function UpgradePrompt({ feature }: { feature?: string }) {
     if (!priceId) return
     setLoading(tier)
     setError('')
+    track('upgrade_checkout_started', { tier, feature: feature || 'unknown' })
     const result = await redirectToCheckout(priceId, tier, user?.email)
-    if (result.error) setError(result.error)
+    if (result.error) {
+      track('upgrade_checkout_error', { tier, error: result.error })
+      setError(result.error)
+    }
     setLoading(null)
   }
 
@@ -219,6 +248,18 @@ export function UpgradePrompt({ feature }: { feature?: string }) {
         <p className="text-[10px] text-neutral-600">
           7 天免费试用 · 随时取消 · 安全支付由 Lemon Squeezy 提供
         </p>
+
+        {/* Desktop nudge — show on web only */}
+        {!isRunningInElectron() && (
+          <a
+            href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block text-[11px] text-blue-400/60 hover:text-blue-400 transition-colors underline-offset-2 hover:underline"
+          >
+            💡 桌面版体验更快更流畅 — 点击下载
+          </a>
+        )}
       </div>
     </div>
   )
