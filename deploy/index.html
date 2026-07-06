@@ -9,7 +9,13 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior: smooth; scroll-padding-top: 80px; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #05080C; color: #EDF1F7; line-height:1.6; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 28px 28px; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  @keyframes glowPulse { 0%,100% { box-shadow: 0 4px 24px rgba(16,185,129,0.3); } 50% { box-shadow: 0 4px 40px rgba(16,185,129,0.55), 0 0 80px rgba(16,185,129,0.1); } }
+  @keyframes matrixBreathe { 0%,100% { opacity: 0.5; transform: translate(-50%,-50%) scale(1); } 50% { opacity: 0.8; transform: translate(-50%,-50%) scale(1.05); } }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
   /* ── Top Sticky Nav ── */
   .nav { position: sticky; top: 0; z-index: 101; background: rgba(5,8,12,0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(21,34,51,0.5); }
@@ -34,8 +40,8 @@
 
   /* ── Buttons ── */
   .btn { padding: 14px 32px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
-  .btn-primary { background: linear-gradient(135deg, #10B981, #059669); color: white; box-shadow: 0 4px 24px rgba(16,185,129,0.3); border: none; }
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(16,185,129,0.4); }
+  .btn-primary { background: linear-gradient(135deg, #10B981, #059669); color: white; box-shadow: 0 4px 24px rgba(16,185,129,0.3); border: none; animation: glowPulse 3s ease-in-out infinite; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(16,185,129,0.5); animation: none; }
   .btn-secondary { background: linear-gradient(135deg, #2563EB, #7C3AED); color: white; box-shadow: 0 4px 24px rgba(37,99,235,0.2); border: none; }
   .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(37,99,235,0.3); }
   .btn-outline { background: transparent; color: #94A3B8; border: 1px solid #1C2A3D; }
@@ -54,7 +60,7 @@
   .range-cell.fold     { background: #1F2937; }
   .range-axis { display: flex; justify-content: space-around; margin-top: 8px; }
   .range-axis span { font-size: 9px; color: #64748B; font-weight: 600; letter-spacing: 0.05em; }
-  .matrix-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 80%; height: 80%; background: radial-gradient(ellipse, rgba(16,185,129,0.06) 0%, transparent 70%); pointer-events: none; border-radius: 50%; }
+  .matrix-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 80%; height: 80%; background: radial-gradient(ellipse, rgba(16,185,129,0.06) 0%, transparent 70%); pointer-events: none; border-radius: 50%; animation: matrixBreathe 4s ease-in-out infinite; }
 
   /* Sticky Bottom CTA */
   .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: rgba(5,8,12,0.95); backdrop-filter: blur(20px); border-top: 1px solid #152233; padding: 14px 24px; transform: translateY(100%); transition: transform 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 12px; }
@@ -72,7 +78,7 @@
   /* Stats bar */
   .stats-bar { display: flex; justify-content: center; gap: 48px; padding: 32px 0; border-top: 1px solid #152233; border-bottom: 1px solid #152233; margin-bottom: 80px; }
   .stat { text-align: center; }
-  .stat .num { font-size: 32px; font-weight: 900; color: #EDF1F7; }
+  .stat .num { font-size: 32px; font-weight: 900; background: linear-gradient(135deg, #EDF1F7 0%, #A78BFA 50%, #60A5FA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .stat .label { font-size: 13px; color: #64748B; margin-top: 4px; }
 
   /* Section */
@@ -88,8 +94,8 @@
   .module-cat-header .cat-title { font-size: 15px; font-weight: 700; color: #94A3B8; letter-spacing: -0.01em; }
   .module-cat-header .cat-count { font-size: 11px; color: #475569; font-weight: 500; }
   .module-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .module-card { background: #090D14; border: 1px solid #152233; border-radius: 16px; padding: 20px; transition: all 0.2s; }
-  .module-card:hover { border-color: #2A3B52; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+  .module-card { background: linear-gradient(180deg, rgba(13,17,23,0.8) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(21,34,51,0.6); border-radius: 16px; padding: 20px; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .module-card:hover { border-color: rgba(59,130,246,0.25); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.08); }
   .module-card .icon { font-size: 24px; margin-bottom: 8px; }
   .module-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
   .module-card p { font-size: 12px; color: #64748B; }
@@ -97,8 +103,9 @@
 
   /* Pricing */
   .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; margin: 0 auto; }
-  .pricing-card { background: #090D14; border: 1px solid #152233; border-radius: 20px; padding: 32px; text-align: center; position: relative; }
-  .pricing-card.popular { border-color: #3B82F6; box-shadow: 0 0 40px rgba(59,130,246,0.1); }
+  .pricing-card { background: linear-gradient(180deg, rgba(13,17,23,0.8) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(21,34,51,0.6); border-radius: 20px; padding: 32px; text-align: center; position: relative; transition: all 0.3s; }
+  .pricing-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+  .pricing-card.popular { border-color: rgba(59,130,246,0.5); background: linear-gradient(180deg, rgba(30,58,138,0.1) 0%, rgba(9,13,20,0.9) 100%); box-shadow: 0 0 60px rgba(59,130,246,0.12), 0 0 120px rgba(59,130,246,0.04); }
   .pricing-card.popular::before { content: '最受欢迎'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3B82F6; color: white; padding: 4px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; }
   .pricing-card h3 { font-size: 18px; margin-bottom: 8px; }
   .pricing-card .price { font-size: 44px; font-weight: 900; margin: 16px 0; }
@@ -109,6 +116,14 @@
 
   /* Footer */
   .footer { text-align: center; padding: 40px 0 80px; color: #475569; font-size: 13px; border-top: 1px solid #152233; margin-top: 60px; }
+
+  /* ── Scroll Animation ── */
+  .animate { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
+  .animate.visible { opacity: 1; transform: translateY(0); }
+  .animate-delay-1 { transition-delay: 0.08s; }
+  .animate-delay-2 { transition-delay: 0.16s; }
+  .animate-delay-3 { transition-delay: 0.24s; }
+  .animate-delay-4 { transition-delay: 0.32s; }
 
   /* Download Section */
   .download-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 900px; margin: 0 auto; }
@@ -207,7 +222,7 @@
 </section>
 
 <!-- Stats -->
-<div class="stats-bar">
+<div class="stats-bar animate">
   <div class="stat"><div class="num">26</div><div class="label">专业模块</div></div>
   <div class="stat"><div class="num">4.8 ⭐</div><div class="label">用户好评</div></div>
   <div class="stat"><div class="num">中/EN</div><div class="label">双语支持</div></div>
@@ -220,19 +235,19 @@
     <h2>👀 看看里面长什么样</h2>
     <p class="subtitle">Demo 里能直接上手操作这些功能</p>
     <div class="preview-grid">
-      <div class="preview-card">
+      <div class="preview-card animate animate-delay-1">
         <img src="/poker-gto-trainer/demo-screenshots/01-strategy-explorer.png" alt="策略浏览器 - 翻前范围矩阵" loading="lazy" onerror="this.parentElement.style.display='none'">
         <div class="caption">🌐 策略浏览器 — 13×13 范围矩阵 · CFR 求解</div>
       </div>
-      <div class="preview-card">
+      <div class="preview-card animate animate-delay-2">
         <img src="/poker-gto-trainer/demo-screenshots/04-training-quiz.png" alt="GTO训练模式" loading="lazy" onerror="this.parentElement.style.display='none'">
         <div class="caption">🎯 训练模式 — 随机出题 · EV 即时反馈</div>
       </div>
-      <div class="preview-card">
+      <div class="preview-card animate animate-delay-3">
         <img src="/poker-gto-trainer/demo-screenshots/07-range-battle.png" alt="Range Battle 范围对战" loading="lazy" onerror="this.parentElement.style.display='none'">
         <div class="caption">⚔️ Range Battle — 范围对战 · 胜率分布图</div>
       </div>
-      <div class="preview-card">
+      <div class="preview-card animate animate-delay-4">
         <img src="/poker-gto-trainer/demo-screenshots/03-range-editor.png" alt="范围编辑器" loading="lazy" onerror="this.parentElement.style.display='none'">
         <div class="caption">✏️ 范围编辑器 — 构建自定义手牌范围</div>
       </div>
@@ -247,7 +262,7 @@
     <p class="subtitle">本地 CFR 求解器 · 离线使用 · 键盘快捷键 · 全部 26 个模块</p>
     <div class="download-grid" id="downloadGrid">
       <!-- macOS -->
-      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card" data-os="mac" style="text-decoration:none;">
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-1" data-os="mac" style="text-decoration:none;">
         <div class="os-icon">🍎</div>
         <h3 style="color:#EDF1F7;">macOS</h3>
         <div class="arch">Apple Silicon · Intel</div>
@@ -256,7 +271,7 @@
         <div class="size">~180 MB · DMG</div>
       </a>
       <!-- Windows -->
-      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card" data-os="win" style="text-decoration:none;">
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-2" data-os="win" style="text-decoration:none;">
         <div class="os-icon">🪟</div>
         <h3 style="color:#EDF1F7;">Windows</h3>
         <div class="arch">Windows 10 / 11 · x64</div>
@@ -265,7 +280,7 @@
         <div class="size">~160 MB · EXE / MSI</div>
       </a>
       <!-- Linux -->
-      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card" data-os="linux" style="text-decoration:none;">
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-3" data-os="linux" style="text-decoration:none;">
         <div class="os-icon">🐧</div>
         <h3 style="color:#EDF1F7;">Linux</h3>
         <div class="arch">Ubuntu · Debian · Fedora</div>
@@ -302,7 +317,7 @@
 
       <!-- 🎓 学习与训练 -->
       <div class="module-category" style="grid-column: 1 / -1;">
-        <div class="module-cat-header"><span class="cat-icon">🎓</span><span class="cat-title">学习与训练</span><span class="cat-count">6 个模块</span></div>
+        <div class="module-cat-header animate"><span class="cat-icon">🎓</span><span class="cat-title">学习与训练</span><span class="cat-count">6 个模块</span></div>
         <div class="module-grid">
           <div class="module-card"><div class="icon">🔥</div><h4>Daily Drills<span class="new-badge">New</span></h4><p>每日GTO挑战 + 连击追踪</p></div>
           <div class="module-card"><div class="icon">🎮</div><h4>实战模拟</h4><p>对抗GTO AI，真实牌桌体验</p></div>
@@ -315,7 +330,7 @@
 
       <!-- ⚔️ 实战与分析 -->
       <div class="module-category" style="grid-column: 1 / -1;">
-        <div class="module-cat-header"><span class="cat-icon">⚔️</span><span class="cat-title">实战与分析</span><span class="cat-count">6 个模块</span></div>
+        <div class="module-cat-header animate"><span class="cat-icon">⚔️</span><span class="cat-title">实战与分析</span><span class="cat-count">6 个模块</span></div>
         <div class="module-grid">
           <div class="module-card"><div class="icon">🔍</div><h4>手牌分析器</h4><p>逐条决策GTO偏差分析</p></div>
           <div class="module-card"><div class="icon">⚔️</div><h4>Range Battle<span class="new-badge">New</span></h4><p>范围对战 · 胜率分布图</p></div>
@@ -328,7 +343,7 @@
 
       <!-- 📊 数据与报告 -->
       <div class="module-category" style="grid-column: 1 / -1;">
-        <div class="module-cat-header"><span class="cat-icon">📊</span><span class="cat-title">数据与报告</span><span class="cat-count">5 个模块</span></div>
+        <div class="module-cat-header animate"><span class="cat-icon">📊</span><span class="cat-title">数据与报告</span><span class="cat-count">5 个模块</span></div>
         <div class="module-grid">
           <div class="module-card"><div class="icon">📊</div><h4>数据分析<span class="new-badge">New</span></h4><p>批量手牌聚合Dashboard</p></div>
           <div class="module-card"><div class="icon">📄</div><h4>PDF报告<span class="new-badge">New</span></h4><p>一键导出分析报告</p></div>
@@ -340,7 +355,7 @@
 
       <!-- 🛠 工具与配置 -->
       <div class="module-category" style="grid-column: 1 / -1;">
-        <div class="module-cat-header"><span class="cat-icon">🛠</span><span class="cat-title">工具与配置</span><span class="cat-count">5 个模块</span></div>
+        <div class="module-cat-header animate"><span class="cat-icon">🛠</span><span class="cat-title">工具与配置</span><span class="cat-count">5 个模块</span></div>
         <div class="module-grid">
           <div class="module-card"><div class="icon">🔧</div><h4>工具箱<span class="new-badge">New</span></h4><p>Pot Odds/Replayer/参考</p></div>
           <div class="module-card"><div class="icon">✏️</div><h4>范围编辑器</h4><p>构建自定义手牌范围</p></div>
@@ -352,7 +367,7 @@
 
       <!-- 🎯 高级功能 -->
       <div class="module-category" style="grid-column: 1 / -1;">
-        <div class="module-cat-header"><span class="cat-icon">🎯</span><span class="cat-title">高级功能</span><span class="cat-count">4 个模块</span></div>
+        <div class="module-cat-header animate"><span class="cat-icon">🎯</span><span class="cat-title">高级功能</span><span class="cat-count">4 个模块</span></div>
         <div class="module-grid">
           <div class="module-card"><div class="icon">🔄</div><h4>Cash vs MTT<span class="new-badge">NEW</span></h4><p>现金局vs锦标赛策略差异</p></div>
           <div class="module-card"><div class="icon">🎯</div><h4>对手剥削顾问<span class="new-badge">NEW</span></h4><p>7种对手类型针对性偏移</p></div>
@@ -372,7 +387,7 @@
     <p class="subtitle">对标 GTO Wizard ($59-119/月)，我们提供 90% 功能，1/3 价格</p>
     <div class="pricing-grid">
 
-      <div class="pricing-card">
+      <div class="pricing-card animate animate-delay-1">
         <h3>🆓 免费版</h3>
         <div class="price">免费<span></span></div>
         <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">永久免费</div>
@@ -387,7 +402,7 @@
         <a href="/poker-gto-trainer/app/?demo=1" class="btn btn-outline" style="width:100%;text-align:center;">免费开始</a>
       </div>
 
-      <div class="pricing-card popular">
+      <div class="pricing-card popular animate animate-delay-2">
         <h3>⭐ 专业版</h3>
         <div class="price">$29.99<span>/月</span></div>
         <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">美金 · 或 ¥219/月 (人民币)</div>
@@ -409,7 +424,7 @@
         <a href="/poker-gto-trainer/app/" class="btn btn-primary" style="width:100%;text-align:center;">开始 7 天免费试用</a>
       </div>
 
-      <div class="pricing-card">
+      <div class="pricing-card animate animate-delay-3">
         <h3>💎 终身版</h3>
         <div class="price">$299<span> 买断</span></div>
         <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">美金 · 或 ¥2,199 (人民币)</div>
@@ -509,7 +524,7 @@
     </div>
 
     <!-- Community -->
-    <div id="community" style="text-align:center; margin-top:60px; padding:40px 24px; background: linear-gradient(135deg, #0F172A, #1A1040); border: 1px solid #1E293B; border-radius:20px; max-width:600px; margin-left:auto; margin-right:auto;">
+    <div id="community" class="animate" style="text-align:center; margin-top:60px; padding:40px 24px; background: linear-gradient(135deg, #0F172A, #1A1040); border: 1px solid #1E293B; border-radius:20px; max-width:600px; margin-left:auto; margin-right:auto;">
       <p style="font-size:14px; color:#A78BFA; font-weight:700; margin-bottom:8px; letter-spacing:0.05em;">🧠 加入社群</p>
       <p style="font-size:24px; font-weight:900; color:#EDF1F7; margin-bottom:8px;">PokerGTO 学习交流群</p>
       <p style="font-size:14px; color:#94A3B8; margin-bottom:24px; max-width:400px; margin-left:auto; margin-right:auto;">
@@ -756,6 +771,22 @@
       ticking = true;
     }
   }, { passive: true });
+})();
+
+// ── Scroll Animations ──
+(function(){
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.animate').forEach(function(el){
+    observer.observe(el);
+  });
 })();
 
 // ── OS Detection — highlight recommended download ──
