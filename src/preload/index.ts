@@ -149,6 +149,15 @@ const electronAPI = {
     clearSession: (): Promise<void> => ipcRenderer.invoke('auth:clearSession'),
   },
 
+  license: {
+    store: (params: { key: string; tier: string }): Promise<{ success: boolean; error?: string }> =>
+      ipcRenderer.invoke('license:store', params),
+    get: (): Promise<{ key: string; tier: string; activatedAt: number; lastValidated: number } | null> =>
+      ipcRenderer.invoke('license:get'),
+    validateFormat: (params: { key: string }): Promise<{ valid: boolean }> =>
+      ipcRenderer.invoke('license:validateFormat', params),
+  },
+
   sessionReview: {
     importFromFiles: (): Promise<{ success: boolean; sessionId?: string; handCount: number; errors: string[] }> =>
       ipcRenderer.invoke('session:importFromFiles'),

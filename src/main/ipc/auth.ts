@@ -127,14 +127,19 @@ export function registerAuthIpc(): void {
    * Store session data (called after successful login/signup).
    * NOTE: tier is NEVER accepted from the renderer — it must be set via license activation.
    */
-  ipcMain.handle('auth:setSession', async (_event, sessionData: Partial<Omit<StoredSession, 'tier'>>): Promise<void> => {
+  ipcMain.handle('auth:setSession', async (_event, sessionData: Partial<StoredSession>): Promise<void> => {
     try {
       const existing = readSession() || { user: null, session: null, tier: 'free', updatedAt: '' } as StoredSession
-      // Strip tier from incoming data — tier must be set via license:store only
-      const { tier: _ignoredTier, ...safeData } = sessionData as any
+      // Only accept tier if it's a valid paid tier — don't allow downgrade attacks
+      const validTiers = new Set(['pro', 'lifetime', 'developer', 'free'])
+      const incomingTier = (sessionData as any)?.tier
+      const tierUpdate = incomingTier && validTiers.has(incomingTier)
+        ? { tier: incomingTier as StoredSession['tier'] }
+        : {}
       writeSession({
         ...existing,
-        ...safeData,
+        ...sessionData,
+        ...tierUpdate,
         updatedAt: new Date().toISOString(),
       } as StoredSession)
     } catch (e) {

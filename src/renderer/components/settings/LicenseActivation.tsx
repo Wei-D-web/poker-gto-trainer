@@ -39,9 +39,17 @@ export function LicenseActivation({ onActivated, compact }: Props) {
       return
     }
 
-    if (!user) {
-      setResult({ success: false, message: '请先登录后再激活卡密 (开发者密钥无需登录)' })
-      return
+    // Offline/desktop: no login required — HMAC validation is local
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
+
+    if (!supabaseUrl && !user) {
+      // Desktop offline mode: skip login check, validate directly
+    } else if (!user && supabaseUrl) {
+      // Web mode with Supabase: require login for non-dev keys
+      if (!isTypingDevKey(keyInput) && rawInput !== 'PGTODEVADMINKEY') {
+        setResult({ success: false, message: '请先登录后再激活卡密 (开发者密钥无需登录)' })
+        return
+      }
     }
 
     setLoading(true)

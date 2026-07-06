@@ -148,7 +148,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setSession(cached.session || null)
         }
         // Always load tier from cache (works without login)
-        if (cached?.tier) setTier(cached.tier)
+        if (cached?.tier && cached.tier !== 'free') {
+          setTier(cached.tier)
+        }
+      }
+      // Also check license storage for tier (more reliable persistence)
+      if (api?.license?.get) {
+        const license = await api.license.get()
+        if (license?.tier) {
+          setTier(license.tier as SubscriptionTier)
+          // Sync tier to auth session if it's out of date
+          if (api?.auth?.setSession) {
+            await api.auth.setSession({ tier: license.tier })
+          }
+        }
       }
     } catch (e) {
       console.error('Failed to load desktop session:', e)
@@ -263,12 +276,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const activateLicense = async (key: string) => {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
 
-    // Offline/desktop mode: validate locally via HMAC
+    // Offline/desktop mode: validate locally via HMAC (no login required)
     if (!supabaseUrl || !user) {
       const result = await validateLicenseKey(key)
       if (result.valid && result.tier) {
-        setTier(result.tier as SubscriptionTier)
-        cacheDesktopData({ tier: result.tier as SubscriptionTier })
+        const newTier = result.tier as SubscriptionTier
+        setTier(newTier)
+        // Persist tier via BOTH auth session AND license storage
+        cacheDesktopData({ tier: newTier })
+        // Also store in SQLite license table for reliable persistence
+        try {
+          const api = (window as any).electronAPI
+          if (api?.license?.store) {
+            await api.license.store({ key, tier: newTier })
+          }
+        } catch {}
         return { success: true, message: result.message, tier: result.tier }
       }
       return { success: false, message: result.message }
@@ -295,6 +317,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (data.success) {
         setTier(data.tier)
         cacheDesktopData({ tier: data.tier })
+        // Also store in SQLite license table for reliable persistence
+        try {
+          const api = (window as any).electronAPI
+          if (api?.license?.store) {
+            await api.license.store({ key, tier: data.tier })
+          }
+        } catch {}
       }
 
       return {

@@ -36,7 +36,7 @@ export function TitleBar() {
           {routeLabels[activeRoute] || 'PokerGTO'}
         </span>
 
-        {isWeb && user && <TierBadge />}
+        <TierBadge />
       </div>
 
       <div className="flex items-center no-drag gap-1">

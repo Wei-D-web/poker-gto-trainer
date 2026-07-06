@@ -16,10 +16,36 @@
  */
 
 import { createHmac, randomBytes } from 'crypto';
+import { readFileSync, existsSync } from 'fs';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 // ⚠️ CHANGE THIS SECRET before generating real keys for customers!
 // Keep it in sync with src/shared/license.ts (LICENSE_SECRET).
-const LICENSE_SECRET = process.env.POKERGTO_LICENSE_SECRET || 'pokergto-trainer-secret-key-2026';
+//
+// Reads from: POKERGTO_LICENSE_SECRET env var → VITE_LICENSE_SECRET env var → .env file
+function loadSecret() {
+  // 1) Explicit env var for the key generator
+  if (process.env.POKERGTO_LICENSE_SECRET) return process.env.POKERGTO_LICENSE_SECRET;
+  // 2) VITE_ prefixed var (same as what the app uses at build time)
+  if (process.env.VITE_LICENSE_SECRET) return process.env.VITE_LICENSE_SECRET;
+  // 3) Try to read from .env file
+  try {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = dirname(__filename);
+    const envPath = resolve(__dirname, '..', '.env');
+    if (existsSync(envPath)) {
+      const envContent = readFileSync(envPath, 'utf-8');
+      const match = envContent.match(/^VITE_LICENSE_SECRET=(.+)$/m);
+      if (match && match[1]) return match[1];
+    }
+  } catch {}
+  // 4) Fallback (development only!)
+  console.warn('⚠️  WARNING: Using default license secret. Set POKERGTO_LICENSE_SECRET or VITE_LICENSE_SECRET in .env!');
+  return 'pokergto-trainer-secret-key-2026';
+}
+
+const LICENSE_SECRET = loadSecret();
 
 // ── Base32 encoding (Crockford, no I/L/O/U to avoid confusion) ──
 const BASE32_ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';

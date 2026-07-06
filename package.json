@@ -1,6 +1,6 @@
 {
   "name": "poker-gto-trainer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "GTO Poker Training Desktop App — preflop ranges, postflop strategies, training mode",
   "main": "./out/main/index.js",
   "author": "PokerGTO",
