@@ -72,10 +72,29 @@
   /* Footer */
   .footer { text-align: center; padding: 40px 0 80px; color: #475569; font-size: 13px; border-top: 1px solid #152233; margin-top: 60px; }
 
+  /* Download Section */
+  .download-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 900px; margin: 0 auto; }
+  .download-card { background: #090D14; border: 1px solid #152233; border-radius: 20px; padding: 28px 24px; text-align: center; transition: all 0.2s; position: relative; }
+  .download-card:hover { border-color: #2A3B52; transform: translateY(-2px); }
+  .download-card.recommended { border-color: #10B981; box-shadow: 0 0 32px rgba(16,185,129,0.08); }
+  .download-card.recommended::before { content: '推荐'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #10B981; color: #05080C; padding: 3px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; }
+  .download-card .os-icon { font-size: 36px; margin-bottom: 10px; }
+  .download-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .download-card .arch { font-size: 11px; color: #64748B; margin-bottom: 14px; }
+  .download-card .version { font-size: 11px; color: #475569; margin-bottom: 14px; }
+  .download-card .btn { width: 100%; text-align: center; }
+  .download-card .size { font-size: 10px; color: #475569; margin-top: 10px; }
+  .reqs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 900px; margin: 24px auto 0; }
+  .req-card { background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 14px 16px; text-align: center; }
+  .req-card .label { font-size: 10px; color: #64748B; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+  .req-card .value { font-size: 13px; color: #94A3B8; font-weight: 600; }
+
   @media (max-width: 900px) {
     .module-grid { grid-template-columns: repeat(2, 1fr); }
     .pricing-grid { grid-template-columns: 1fr; }
     .preview-grid { grid-template-columns: 1fr; }
+    .download-grid { grid-template-columns: 1fr; }
+    .reqs-grid { grid-template-columns: 1fr; }
     .hero h1 { font-size: 36px; }
     .stats-bar { gap: 24px; flex-wrap: wrap; }
     .sticky-cta { flex-direction: column; gap: 8px; text-align: center; }
@@ -134,6 +153,59 @@
       <div class="preview-card">
         <img src="/poker-gto-trainer/demo-screenshots/03-range-editor.png" alt="范围编辑器" loading="lazy" onerror="this.parentElement.style.display='none'">
         <div class="caption">✏️ 范围编辑器 — 构建自定义手牌范围</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Download Section -->
+<div class="container" id="download">
+  <div class="section">
+    <h2>💻 下载桌面版 App</h2>
+    <p class="subtitle">本地 CFR 求解器 · 离线使用 · 键盘快捷键 · 全部 26 个模块</p>
+    <div class="download-grid" id="downloadGrid">
+      <!-- macOS -->
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card" data-os="mac" style="text-decoration:none;">
+        <div class="os-icon">🍎</div>
+        <h3 style="color:#EDF1F7;">macOS</h3>
+        <div class="arch">Apple Silicon · Intel</div>
+        <div class="version">v0.2.0 · Universal</div>
+        <span class="btn btn-primary" style="display:block;">下载 macOS 版</span>
+        <div class="size">~180 MB · DMG</div>
+      </a>
+      <!-- Windows -->
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card" data-os="win" style="text-decoration:none;">
+        <div class="os-icon">🪟</div>
+        <h3 style="color:#EDF1F7;">Windows</h3>
+        <div class="arch">Windows 10 / 11 · x64</div>
+        <div class="version">v0.2.0 · Installer</div>
+        <span class="btn btn-secondary" style="display:block;">下载 Windows 版</span>
+        <div class="size">~160 MB · EXE / MSI</div>
+      </a>
+      <!-- Linux -->
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card" data-os="linux" style="text-decoration:none;">
+        <div class="os-icon">🐧</div>
+        <h3 style="color:#EDF1F7;">Linux</h3>
+        <div class="arch">Ubuntu · Debian · Fedora</div>
+        <div class="version">v0.2.0 · AppImage</div>
+        <span class="btn btn-outline" style="display:block;">下载 Linux 版</span>
+        <div class="size">~170 MB · AppImage / deb</div>
+      </a>
+    </div>
+
+    <!-- System Requirements -->
+    <div class="reqs-grid">
+      <div class="req-card">
+        <div class="label">💾 内存</div>
+        <div class="value">4 GB+ RAM</div>
+      </div>
+      <div class="req-card">
+        <div class="label">💿 磁盘</div>
+        <div class="value">500 MB 可用空间</div>
+      </div>
+      <div class="req-card">
+        <div class="label">🌐 网络</div>
+        <div class="value">离线可用 · 更新需联网</div>
       </div>
     </div>
   </div>
@@ -371,7 +443,7 @@
 </div>
 
 <script>
-// Sticky CTA bar — show when user scrolls past hero
+// ── Sticky CTA bar ──
 (function() {
   var sticky = document.getElementById('stickyCta');
   var hero = document.getElementById('hero');
@@ -394,6 +466,21 @@
       ticking = true;
     }
   }, { passive: true });
+})();
+
+// ── OS Detection — highlight recommended download ──
+(function() {
+  var ua = navigator.userAgent || '';
+  var detected = 'mac'; // default
+  if (/Win/.test(ua)) detected = 'win';
+  else if (/Linux/.test(ua) && !/Android/.test(ua)) detected = 'linux';
+
+  var cards = document.querySelectorAll('.download-card[data-os]');
+  cards.forEach(function(card) {
+    if (card.getAttribute('data-os') === detected) {
+      card.classList.add('recommended');
+    }
+  });
 })();
 </script>
 
