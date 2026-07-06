@@ -9,7 +9,7 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior: smooth; scroll-padding-top: 80px; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #05080C; color: #EDF1F7; line-height:1.6; }
-  body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 28px 28px; }
+  #bgCanvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; width: 100%; height: 100%; }
   .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 
   @keyframes glowPulse { 0%,100% { box-shadow: 0 4px 24px rgba(16,185,129,0.3); } 50% { box-shadow: 0 4px 40px rgba(16,185,129,0.55), 0 0 80px rgba(16,185,129,0.1); } }
@@ -172,6 +172,8 @@
 </style>
 </head>
 <body>
+
+<canvas id="bgCanvas"></canvas>
 
 <!-- ═══════ Top Sticky Nav ═══════ -->
 <nav class="nav" id="navbar">
@@ -802,6 +804,481 @@
       card.classList.add('recommended');
     }
   });
+})();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════
+// Animated Poker Background
+// Particles · Glow Orbs · Floating Cards · Suits
+// ═══════════════════════════════════════════════
+(function(){
+  var canvas = document.getElementById('bgCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+
+  var W, H, dpr;
+  function resize() {
+    W = window.innerWidth;
+    H = window.innerHeight;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    canvas.style.width = W + 'px';
+    canvas.style.height = H + 'px';
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.scale(dpr, dpr);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ── roundRect polyfill ──
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r) {
+      if (typeof r === 'number') r = {tl:r, tr:r, br:r, bl:r};
+      this.beginPath();
+      this.moveTo(x+r.tl, y);
+      this.lineTo(x+w-r.tr, y);
+      this.quadraticCurveTo(x+w, y, x+w, y+r.tr);
+      this.lineTo(x+w, y+h-r.br);
+      this.quadraticCurveTo(x+w, y+h, x+w-r.br, y+h);
+      this.lineTo(x+r.bl, y+h);
+      this.quadraticCurveTo(x, y+h, x, y+h-r.bl);
+      this.lineTo(x, y+r.tl);
+      this.quadraticCurveTo(x, y, x+r.tl, y);
+      this.closePath();
+    };
+  }
+
+  // ── Utils ──
+  function lerp(a,b,t) { return a+(b-a)*t; }
+  function clamp(v,lo,hi) { return Math.max(lo,Math.min(hi,v)); }
+  function rand(a,b) { return Math.random()*(b-a)+a; }
+  function dist(x1,y1,x2,y2) {
+    var dx=x1-x2, dy=y1-y2;
+    return Math.sqrt(dx*dx+dy*dy);
+  }
+
+  // ── Rhythm state ──
+  var bassEnergy=0, midEnergy=0, beatStrength=0, beatDecay=0, beatDetected=false;
+  var rhythmTimer=0;
+
+  function generateRhythm() {
+    rhythmTimer++;
+    var interval = 60 + Math.sin(rhythmTimer*0.013)*18;
+    if (rhythmTimer % Math.floor(interval) < 3) {
+      beatDetected=true;
+      beatStrength=0.4+Math.random()*0.7;
+      beatDecay=1;
+      bassEnergy=lerp(bassEnergy, 0.15+Math.random()*0.35, 0.2);
+      midEnergy=lerp(midEnergy, 0.08+Math.random()*0.15, 0.12);
+    }
+  }
+
+  // ── Palette ──
+  var PAL = { primary: [59,130,246], secondary: [139,92,246], accent: [16,185,129], glow: [59,130,246] };
+
+  // ── Pre-render Playing Cards ──
+  var RANKS = ['A','K','Q','J','10','9','8','7','6','5','4','3','2'];
+  var SUITS = ['♠','♥','♦','♣'];
+  var cardCache = {}; // key: "rank|suit" -> offscreen canvas
+
+  function getCardCanvas(rank, suit, w) {
+    var key = rank + '|' + suit + '|' + Math.floor(w);
+    if (cardCache[key]) return cardCache[key];
+
+    var isRed = suit === '♥' || suit === '♦';
+    var color = isRed ? '#DC2626' : '#1F2937';
+    var h = w * 1.4;
+    var scale = 2;
+    var c = document.createElement('canvas');
+    c.width = w * scale;
+    c.height = h * scale;
+    var cx = c.getContext('2d');
+    cx.scale(scale, scale);
+
+    // Card shadow
+    cx.shadowColor = 'rgba(0,0,0,0.4)';
+    cx.shadowBlur = w * 0.08;
+    cx.shadowOffsetX = 1;
+    cx.shadowOffsetY = 2;
+
+    // Card body
+    var r = w * 0.1;
+    cx.beginPath();
+    cx.roundRect(0, 0, w, h, r);
+    cx.fillStyle = '#F5F1EB';
+    cx.fill();
+    cx.shadowColor = 'transparent';
+    cx.shadowBlur = 0;
+    cx.shadowOffsetX = 0;
+    cx.shadowOffsetY = 0;
+
+    // Border
+    cx.strokeStyle = 'rgba(0,0,0,0.25)';
+    cx.lineWidth = 0.8;
+    cx.stroke();
+
+    // Inner border
+    var inset = w * 0.06;
+    cx.beginPath();
+    cx.roundRect(inset, inset, w - inset*2, h - inset*2, r*0.7);
+    cx.strokeStyle = 'rgba(0,0,0,0.08)';
+    cx.lineWidth = 0.5;
+    cx.stroke();
+
+    // Top-left rank + suit
+    var fs = w * 0.24;
+    cx.font = 'bold ' + fs + 'px -apple-system, "SF Pro Display", sans-serif';
+    cx.fillStyle = color;
+    cx.textAlign = 'left';
+    cx.textBaseline = 'top';
+    cx.fillText(rank, w * 0.12, h * 0.08);
+
+    cx.font = (fs * 0.6) + 'px -apple-system, "SF Pro Display", sans-serif';
+    cx.fillText(suit, w * 0.12 + fs * 0.9, h * 0.09);
+
+    // Center large suit
+    cx.font = (w * 0.45) + 'px -apple-system, "SF Pro Display", sans-serif';
+    cx.textAlign = 'center';
+    cx.textBaseline = 'middle';
+    cx.fillText(suit, w / 2, h / 2);
+
+    // Bottom-right (inverted)
+    cx.save();
+    cx.translate(w - w * 0.12, h - h * 0.08);
+    cx.rotate(Math.PI);
+    cx.textAlign = 'left';
+    cx.textBaseline = 'top';
+    cx.font = 'bold ' + fs + 'px -apple-system, "SF Pro Display", sans-serif';
+    cx.fillText(rank, 0, 0);
+    cx.font = (fs * 0.6) + 'px -apple-system, "SF Pro Display", sans-serif';
+    cx.fillText(suit, fs * 0.9, 0);
+    cx.restore();
+
+    cardCache[key] = c;
+    return c;
+  }
+
+  // ── Floating Card ──
+  var cards = [];
+  var NUM_CARDS = 16;
+  function createCard() {
+    var suit = SUITS[Math.floor(Math.random()*4)];
+    return {
+      rank: RANKS[Math.floor(Math.random()*13)],
+      suit: suit,
+      x: rand(-100, W+100),
+      y: rand(-100, H+100),
+      w: rand(55, 95),
+      vx: rand(-0.25, 0.25),
+      vy: rand(-0.35, -0.08),
+      rot: rand(-0.25, 0.25),
+      rotSpeed: rand(-0.003, 0.003),
+      alpha: rand(0.12, 0.28),
+      phase: rand(0, Math.PI*2),
+      wobbleAmp: rand(0.3, 1.2),
+    };
+  }
+  function initCards() {
+    cards = [];
+    for (var i=0; i<NUM_CARDS; i++) cards.push(createCard());
+  }
+  initCards();
+
+  // ── Particles ──
+  var particles = [];
+  var NUM_PARTICLES = 80;
+  function createParticle() {
+    var colors = [PAL.primary, PAL.secondary, PAL.accent];
+    var c = colors[Math.floor(Math.random()*3)];
+    return {
+      x: rand(-50, W+50), y: rand(-50, H+50),
+      vx: rand(-0.3, 0.3), vy: rand(-0.5, -0.1),
+      size: rand(0.6, 3), alpha: rand(0.1, 0.45), color: c,
+      life: rand(0, 600), maxLife: rand(400, 1000),
+      phase: rand(0, Math.PI*2),
+    };
+  }
+  function initParticles() {
+    particles = [];
+    for (var i=0; i<NUM_PARTICLES; i++) particles.push(createParticle());
+  }
+  initParticles();
+
+  // ── Glow Orbs ──
+  var orbs = [];
+  var NUM_ORBS = 4;
+  function createOrb(i) {
+    return {
+      x: rand(W*0.15, W*0.85), y: rand(H*0.15, H*0.85),
+      baseR: rand(Math.min(W,H)*0.12, Math.min(W,H)*0.28),
+      r: 0, angle: rand(0, Math.PI*2),
+      speed: rand(0.00015, 0.0004),
+      driftR: rand(40, 100),
+      baseX: 0, baseY: 0,
+      idx: i,
+    };
+  }
+  function initOrbs() {
+    orbs = [];
+    for (var i=0; i<NUM_ORBS; i++) {
+      var o = createOrb(i);
+      o.baseX = o.x; o.baseY = o.y; o.r = o.baseR;
+      orbs.push(o);
+    }
+  }
+  initOrbs();
+
+  // ── Floating Suits ──
+  var suits = [];
+  var NUM_SUITS = 8;
+  function createSuit() {
+    return {
+      suit: SUITS[Math.floor(Math.random()*4)],
+      x: rand(0, W), y: rand(0, H),
+      size: rand(50, 140), alpha: rand(0.025, 0.07),
+      vx: rand(-0.12, 0.12), vy: rand(-0.08, -0.01),
+      rot: rand(0, Math.PI*2), rotSpeed: rand(-0.002, 0.002),
+    };
+  }
+  function initSuits() {
+    suits = [];
+    for (var i=0; i<NUM_SUITS; i++) suits.push(createSuit());
+  }
+  initSuits();
+
+  // ── Draw felt dots ──
+  function drawFelt() {
+    var spacing = 4, alpha = 0.02;
+    ctx.fillStyle = 'rgba(255,255,255,'+alpha+')';
+    for (var x=0; x<W; x+=spacing) {
+      for (var y=0; y<H; y+=spacing) {
+        if ((Math.floor(x/spacing)+Math.floor(y/spacing))%3===0) {
+          ctx.fillRect(x, y, 0.7, 0.7);
+        }
+      }
+    }
+  }
+
+  // ── Vignette ──
+  function drawVignette() {
+    var grad = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.5, W/2, H/2, Math.max(W,H)*0.78);
+    grad.addColorStop(0, 'rgba(0,0,0,0)');
+    grad.addColorStop(1, 'rgba(0,0,0,0.55)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  // ── Render ──
+  var lastTime = performance.now();
+
+  function render(time) {
+    requestAnimationFrame(render);
+
+    var dt = (time - lastTime) / 16.667;
+    if (dt > 3) dt = 3;
+    lastTime = time;
+
+    if (W !== window.innerWidth || H !== window.innerHeight) resize();
+
+    generateRhythm();
+    beatStrength *= 0.85;
+    beatDecay *= 0.9;
+
+    var speedMul = 1 + midEnergy*2 + beatStrength*1.0;
+    var cardSpeedMul = 1 + bassEnergy*1.2;
+
+    // ── Clear ──
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#05080C';
+    ctx.fillRect(0, 0, W, H);
+
+    // ── Felt ──
+    drawFelt();
+
+    // ── Glow Orbs ──
+    var orbColors = [PAL.primary, PAL.secondary, PAL.accent, PAL.glow];
+    for (var oi=0; oi<orbs.length; oi++) {
+      var orb = orbs[oi];
+      orb.angle += orb.speed * dt;
+      orb.x = orb.baseX + Math.cos(orb.angle)*orb.driftR;
+      orb.y = orb.baseY + Math.sin(orb.angle*0.7)*orb.driftR*0.6;
+      var pulse = 1 + bassEnergy*1.0 + beatStrength*1.8;
+      orb.r = orb.baseR * lerp(orb.r/orb.baseR, pulse, 0.04);
+
+      var c = orbColors[orb.idx % orbColors.length];
+      var alpha = 0.03 + bassEnergy*0.02 + beatStrength*0.04;
+      var grad = ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.r);
+      grad.addColorStop(0, 'rgba('+c[0]+','+c[1]+','+c[2]+','+(alpha*3)+')');
+      grad.addColorStop(0.4, 'rgba('+c[0]+','+c[1]+','+c[2]+','+alpha+')');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    // ── Floating Suits ──
+    for (var si=0; si<suits.length; si++) {
+      var s = suits[si];
+      s.x += s.vx * cardSpeedMul;
+      s.y += s.vy * cardSpeedMul;
+      s.rot += s.rotSpeed * cardSpeedMul;
+      if (s.x < -200) s.x = W+200;
+      if (s.x > W+200) s.x = -200;
+      if (s.y < -200) s.y = H+200;
+      if (s.y > H+200) s.y = -200;
+
+      var sc = orbColors[si % 4];
+      var sa = s.alpha + beatStrength*0.02;
+      ctx.save();
+      ctx.translate(s.x, s.y);
+      ctx.rotate(s.rot);
+      ctx.font = s.size+'px -apple-system, "SF Pro Display", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      // Glow blur
+      ctx.fillStyle = 'rgba('+sc[0]+','+sc[1]+','+sc[2]+','+(sa*0.3)+')';
+      ctx.fillText(s.suit, 2, 2);
+      ctx.fillText(s.suit, -2, 2);
+      ctx.fillText(s.suit, 2, -2);
+      ctx.fillText(s.suit, -2, -2);
+      // Main
+      ctx.fillStyle = 'rgba('+sc[0]+','+sc[1]+','+sc[2]+','+sa+')';
+      ctx.fillText(s.suit, 0, 0);
+      ctx.restore();
+    }
+
+    // ── Floating Cards ──
+    for (var ci=0; ci<cards.length; ci++) {
+      var card = cards[ci];
+      card.x += card.vx * cardSpeedMul;
+      card.y += card.vy * cardSpeedMul;
+      card.rot += card.rotSpeed * cardSpeedMul;
+      // Gentle wobble
+      card.x += Math.sin(time*0.0005 + card.phase) * card.wobbleAmp * 0.03;
+      card.y += Math.cos(time*0.0006 + card.phase) * card.wobbleAmp * 0.02;
+
+      if (card.x < -200) card.x = W+200;
+      if (card.x > W+200) card.x = -200;
+      if (card.y < -200) card.y = H+200;
+      if (card.y > H+200) card.y = -200;
+
+      var h = card.w * 1.4;
+      var ca = card.alpha + beatStrength*0.04;
+
+      ctx.save();
+      ctx.globalAlpha = ca;
+      ctx.translate(card.x, card.y);
+      ctx.rotate(card.rot);
+
+      // Glow under card
+      var glowGrad = ctx.createRadialGradient(0, 0, card.w*0.2, 0, 0, card.w*0.8);
+      var gc = orbColors[ci % 4];
+      glowGrad.addColorStop(0, 'rgba('+gc[0]+','+gc[1]+','+gc[2]+',0.25)');
+      glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = glowGrad;
+      ctx.fillRect(-card.w*0.8, -h*0.8, card.w*1.6, h*1.6);
+
+      // Draw pre-rendered card
+      var cardImg = getCardCanvas(card.rank, card.suit, card.w);
+      ctx.drawImage(cardImg, -card.w/2, -h/2, card.w, h);
+      ctx.restore();
+    }
+
+    // ── Particles ──
+    for (var pi=0; pi<particles.length; pi++) {
+      var p = particles[pi];
+      p.life++;
+      if (p.life > p.maxLife) {
+        // respawn
+        var colors = [PAL.primary, PAL.secondary, PAL.accent];
+        p.color = colors[Math.floor(Math.random()*3)];
+        p.x = rand(-50, W+50);
+        p.y = rand(-50, H+50);
+        p.vx = rand(-0.3, 0.3);
+        p.vy = rand(-0.5, -0.1);
+        p.size = rand(0.6, 3);
+        p.alpha = rand(0.1, 0.45);
+        p.life = 0;
+        p.maxLife = rand(400, 1000);
+        p.phase = rand(0, Math.PI*2);
+      }
+      var driftX = Math.sin(p.life*0.008+p.phase)*0.2;
+      var driftY = Math.cos(p.life*0.006+p.phase)*0.15;
+      p.x += (p.vx+driftX)*speedMul;
+      p.y += (p.vy+driftY)*speedMul;
+      if (p.x<-60) p.x=W+60;
+      if (p.x>W+60) p.x=-60;
+      if (p.y<-60) p.y=H+60;
+      if (p.y>H+60) p.y=-60;
+
+      var pa = p.alpha*(0.6+0.4*Math.sin(p.life*0.03+p.phase));
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba('+p.color[0]+','+p.color[1]+','+p.color[2]+','+pa+')';
+      ctx.fill();
+      // Glow halo
+      if (p.size > 1.5) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size*3.5, 0, Math.PI*2);
+        ctx.fillStyle = 'rgba('+p.color[0]+','+p.color[1]+','+p.color[2]+','+(pa*0.12)+')';
+        ctx.fill();
+      }
+    }
+
+    // ── Constellation Lines ──
+    var maxDist = Math.min(W, H)*0.12;
+    for (var i=0; i<particles.length; i++) {
+      for (var j=i+1; j<particles.length; j++) {
+        var d = dist(particles[i].x, particles[i].y, particles[j].x, particles[j].y);
+        if (d < maxDist) {
+          var la = (1-d/maxDist)*0.05*(1+beatStrength*0.6);
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = 'rgba('+PAL.primary[0]+','+PAL.primary[1]+','+PAL.primary[2]+','+la+')';
+          ctx.lineWidth = 0.3;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // ── Beat Flash ──
+    if (beatDetected && beatStrength > 0.5) {
+      var fa = beatStrength*0.02;
+      var fg = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.08, W/2, H/2, Math.max(W,H)*0.8);
+      fg.addColorStop(0, 'rgba('+PAL.glow[0]+','+PAL.glow[1]+','+PAL.glow[2]+','+(fa*3)+')');
+      fg.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = fg;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    // ── Vignette ──
+    drawVignette();
+
+    // ── Subtle watermark ──
+    var la = 0.08 + beatStrength*0.03;
+    ctx.fillStyle = 'rgba('+PAL.primary[0]+','+PAL.primary[1]+','+PAL.primary[2]+','+la+')';
+    ctx.font = '500 11px -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('POKER GTO', 24, H-28);
+    ctx.fillStyle = 'rgba(148,163,184,'+(la*0.5)+')';
+    ctx.fillText('TRAINER', 24, H-14);
+  }
+
+  // ── Re-init on resize (reposition elements) ──
+  var resizeTimeout;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(function() {
+      initOrbs();
+      initCards();
+      initSuits();
+      initParticles();
+    }, 500);
+  });
+
+  requestAnimationFrame(render);
 })();
 </script>
 
