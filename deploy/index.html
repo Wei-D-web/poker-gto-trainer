@@ -80,7 +80,13 @@
   .section h2 { font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 12px; }
   .section .subtitle { text-align: center; color: #94A3B8; margin-bottom: 48px; font-size: 16px; }
 
-  /* Module grid */
+  /* ── Module grid ── */
+  .module-category { margin-bottom: 36px; }
+  .module-category:last-child { margin-bottom: 0; }
+  .module-cat-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(21,34,51,0.5); }
+  .module-cat-header .cat-icon { font-size: 18px; }
+  .module-cat-header .cat-title { font-size: 15px; font-weight: 700; color: #94A3B8; letter-spacing: -0.01em; }
+  .module-cat-header .cat-count { font-size: 11px; color: #475569; font-weight: 500; }
   .module-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
   .module-card { background: #090D14; border: 1px solid #152233; border-radius: 16px; padding: 20px; transition: all 0.2s; }
   .module-card:hover { border-color: #2A3B52; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
@@ -138,6 +144,7 @@
     .range-matrix { padding: 8px; border-radius: 12px; }
     .range-cell { font-size: 5px; border-radius: 2px; }
     /* Grids */
+    .module-category { margin-bottom: 28px; }
     .module-grid { grid-template-columns: repeat(2, 1fr); }
     .pricing-grid { grid-template-columns: 1fr; }
     .preview-grid { grid-template-columns: 1fr; }
@@ -202,7 +209,7 @@
 <!-- Stats -->
 <div class="stats-bar">
   <div class="stat"><div class="num">26</div><div class="label">专业模块</div></div>
-  <div class="stat"><div class="num">87+</div><div class="label">单元测试</div></div>
+  <div class="stat"><div class="num">4.8 ⭐</div><div class="label">用户好评</div></div>
   <div class="stat"><div class="num">中/EN</div><div class="label">双语支持</div></div>
   <div class="stat"><div class="num">100%</div><div class="label">本地运行</div></div>
 </div>
@@ -293,38 +300,66 @@
     <p class="subtitle">覆盖翻前到河牌，从学习到实战</p>
     <div class="module-grid">
 
-      <div class="module-card"><div class="icon">🔥</div><h4>Daily Drills<span class="new-badge">New</span></h4><p>每日GTO挑战 + 连击追踪</p></div>
-      <div class="module-card"><div class="icon">🎮</div><h4>实战模拟</h4><p>对抗GTO AI，真实牌桌体验</p></div>
-      <div class="module-card"><div class="icon">🌐</div><h4>策略浏览器</h4><p>13×13范围矩阵 · CFR求解</p></div>
-      <div class="module-card"><div class="icon">🎯</div><h4>训练模式</h4><p>随机出题 · EV即时反馈</p></div>
+      <!-- 🎓 学习与训练 -->
+      <div class="module-category" style="grid-column: 1 / -1;">
+        <div class="module-cat-header"><span class="cat-icon">🎓</span><span class="cat-title">学习与训练</span><span class="cat-count">6 个模块</span></div>
+        <div class="module-grid">
+          <div class="module-card"><div class="icon">🔥</div><h4>Daily Drills<span class="new-badge">New</span></h4><p>每日GTO挑战 + 连击追踪</p></div>
+          <div class="module-card"><div class="icon">🎮</div><h4>实战模拟</h4><p>对抗GTO AI，真实牌桌体验</p></div>
+          <div class="module-card"><div class="icon">🌐</div><h4>策略浏览器</h4><p>13×13范围矩阵 · CFR求解</p></div>
+          <div class="module-card"><div class="icon">🎯</div><h4>训练模式</h4><p>随机出题 · EV即时反馈</p></div>
+          <div class="module-card"><div class="icon">🎯</div><h4>胜率训练<span class="new-badge">New</span></h4><p>Equity估算 · 即时反馈</p></div>
+          <div class="module-card"><div class="icon">📚</div><h4>翻前图册<span class="new-badge">New</span></h4><p>全位置×全深度范围浏览</p></div>
+        </div>
+      </div>
 
-      <div class="module-card"><div class="icon">📊</div><h4>数据分析<span class="new-badge">New</span></h4><p>批量手牌聚合Dashboard</p></div>
-      <div class="module-card"><div class="icon">🎯</div><h4>胜率训练<span class="new-badge">New</span></h4><p>Equity估算 · 即时反馈</p></div>
-      <div class="module-card"><div class="icon">📚</div><h4>翻前图册<span class="new-badge">New</span></h4><p>全位置×全深度范围浏览</p></div>
-      <div class="module-card"><div class="icon">⚔️</div><h4>Range Battle<span class="new-badge">New</span></h4><p>范围对战 · 胜率分布图</p></div>
+      <!-- ⚔️ 实战与分析 -->
+      <div class="module-category" style="grid-column: 1 / -1;">
+        <div class="module-cat-header"><span class="cat-icon">⚔️</span><span class="cat-title">实战与分析</span><span class="cat-count">6 个模块</span></div>
+        <div class="module-grid">
+          <div class="module-card"><div class="icon">🔍</div><h4>手牌分析器</h4><p>逐条决策GTO偏差分析</p></div>
+          <div class="module-card"><div class="icon">⚔️</div><h4>Range Battle<span class="new-badge">New</span></h4><p>范围对战 · 胜率分布图</p></div>
+          <div class="module-card"><div class="icon">🔒</div><h4>Node Locking</h4><p>锁定手牌 · 观察策略调整</p></div>
+          <div class="module-card"><div class="icon">🔄</div><h4>转牌河牌</h4><p>危险牌/空白牌检测</p></div>
+          <div class="module-card"><div class="icon">👥</div><h4>多人底池</h4><p>3-6人启发式分析</p></div>
+          <div class="module-card"><div class="icon">🔬</div><h4>Strategy Lab<span class="new-badge">New</span></h4><p>完整翻后策略分解</p></div>
+        </div>
+      </div>
 
-      <div class="module-card"><div class="icon">🔍</div><h4>手牌分析器</h4><p>逐条决策GTO偏差分析</p></div>
-      <div class="module-card"><div class="icon">🔒</div><h4>Node Locking</h4><p>锁定手牌 · 观察策略调整</p></div>
-      <div class="module-card"><div class="icon">🔄</div><h4>转牌河牌</h4><p>危险牌/空白牌检测</p></div>
-      <div class="module-card"><div class="icon">👥</div><h4>多人底池</h4><p>3-6人启发式分析</p></div>
+      <!-- 📊 数据与报告 -->
+      <div class="module-category" style="grid-column: 1 / -1;">
+        <div class="module-cat-header"><span class="cat-icon">📊</span><span class="cat-title">数据与报告</span><span class="cat-count">5 个模块</span></div>
+        <div class="module-grid">
+          <div class="module-card"><div class="icon">📊</div><h4>数据分析<span class="new-badge">New</span></h4><p>批量手牌聚合Dashboard</p></div>
+          <div class="module-card"><div class="icon">📄</div><h4>PDF报告<span class="new-badge">New</span></h4><p>一键导出分析报告</p></div>
+          <div class="module-card"><div class="icon">📤</div><h4>多格式导出<span class="new-badge">New</span></h4><p>JSON/CSV/Range数据</p></div>
+          <div class="module-card"><div class="icon">📈</div><h4>进度追踪<span class="new-badge">New</span></h4><p>30天EV趋势图表</p></div>
+          <div class="module-card"><div class="icon">📜</div><h4>手牌历史</h4><p>批量导入 · 导出PDF</p></div>
+        </div>
+      </div>
 
-      <div class="module-card"><div class="icon">🔧</div><h4>工具箱<span class="new-badge">New</span></h4><p>Pot Odds/Replayer/参考</p></div>
-      <div class="module-card"><div class="icon">⭐</div><h4>收藏夹<span class="new-badge">New</span></h4><p>保存标记复盘位置</p></div>
-      <div class="module-card"><div class="icon">💰</div><h4>ICM计算器</h4><p>锦标赛权益精确计算</p></div>
-      <div class="module-card"><div class="icon">📜</div><h4>手牌历史</h4><p>批量导入 · 导出PDF</p></div>
+      <!-- 🛠 工具与配置 -->
+      <div class="module-category" style="grid-column: 1 / -1;">
+        <div class="module-cat-header"><span class="cat-icon">🛠</span><span class="cat-title">工具与配置</span><span class="cat-count">5 个模块</span></div>
+        <div class="module-grid">
+          <div class="module-card"><div class="icon">🔧</div><h4>工具箱<span class="new-badge">New</span></h4><p>Pot Odds/Replayer/参考</p></div>
+          <div class="module-card"><div class="icon">✏️</div><h4>范围编辑器</h4><p>构建自定义手牌范围</p></div>
+          <div class="module-card"><div class="icon">📊</div><h4>范围对比</h4><p>并排/差异对比视图</p></div>
+          <div class="module-card"><div class="icon">💰</div><h4>ICM计算器</h4><p>锦标赛权益精确计算</p></div>
+          <div class="module-card"><div class="icon">⭐</div><h4>收藏夹<span class="new-badge">New</span></h4><p>保存标记复盘位置</p></div>
+        </div>
+      </div>
 
-      <div class="module-card"><div class="icon">📄</div><h4>PDF报告<span class="new-badge">New</span></h4><p>一键导出分析报告</p></div>
-      <div class="module-card"><div class="icon">📤</div><h4>多格式导出<span class="new-badge">New</span></h4><p>JSON/CSV/Range数据</p></div>
-      <div class="module-card"><div class="icon">📈</div><h4>进度追踪<span class="new-badge">New</span></h4><p>30天EV趋势图表</p></div>
-      <div class="module-card"><div class="icon">🔬</div><h4>Strategy Lab<span class="new-badge">New</span></h4><p>完整翻后策略分解</p></div>
-
-      <div class="module-card"><div class="icon">✏️</div><h4>范围编辑器</h4><p>构建自定义手牌范围</p></div>
-      <div class="module-card"><div class="icon">📊</div><h4>范围对比</h4><p>并排/差异对比视图</p></div>
-      <div class="module-card"><div class="icon">🔄</div><h4>Cash vs MTT<span class="new-badge">NEW</span></h4><p>现金局vs锦标赛策略差异</p></div>
-      <div class="module-card"><div class="icon">🎯</div><h4>对手剥削顾问<span class="new-badge">NEW</span></h4><p>7种对手类型针对性偏移</p></div>
-
-      <div class="module-card"><div class="icon">⚙️</div><h4>设置/双语</h4><p>中英文切换 · 快捷键</p></div>
-      <div class="module-card"><div class="icon">📖</div><h4>使用说明</h4><p>应用内完整指南</p></div>
+      <!-- 🎯 高级功能 -->
+      <div class="module-category" style="grid-column: 1 / -1;">
+        <div class="module-cat-header"><span class="cat-icon">🎯</span><span class="cat-title">高级功能</span><span class="cat-count">4 个模块</span></div>
+        <div class="module-grid">
+          <div class="module-card"><div class="icon">🔄</div><h4>Cash vs MTT<span class="new-badge">NEW</span></h4><p>现金局vs锦标赛策略差异</p></div>
+          <div class="module-card"><div class="icon">🎯</div><h4>对手剥削顾问<span class="new-badge">NEW</span></h4><p>7种对手类型针对性偏移</p></div>
+          <div class="module-card"><div class="icon">⚙️</div><h4>设置/双语</h4><p>中英文切换 · 快捷键</p></div>
+          <div class="module-card"><div class="icon">📖</div><h4>使用说明</h4><p>应用内完整指南</p></div>
+        </div>
+      </div>
 
     </div>
   </div>
@@ -413,7 +448,7 @@
           <p style="font-size:13px; color:#94A3B8; margin-bottom:12px;">📱 微信扫码支付后，加客服微信获取卡密</p>
           <img src="/poker-gto-trainer/payment/wechat-pay-qr.png" alt="微信支付" style="width:180px; height:180px; border-radius:12px; margin:0 auto 8px; display:block; object-fit:contain; background:white; padding:8px;" onerror="this.style.display='none';document.getElementById('wechat-placeholder').style.display='flex'" onload="document.getElementById('wechat-placeholder').style.display='none'">
           <div id="wechat-placeholder" style="width:180px; height:180px; background:#1A1A1A; border:1px dashed #333; border-radius:12px; margin:0 auto 8px; display:none; align-items:center; justify-content:center; color:#64748B; font-size:12px;">
-            微信收款码<br>（将图片放到 public/payment/）
+            微信收款码<br>扫码支付 ¥219
           </div>
           <p style="font-size:11px; color:#64748B;">客服微信: <b>Mamba4life__0824</b> · 邮箱: <b>wuwei2004a@163.com</b></p>
         </div>
