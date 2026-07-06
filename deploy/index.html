@@ -7,15 +7,32 @@
 <meta name="description" content="PokerGTO Trainer 是专业的 GTO 扑克训练工具，26 个模块覆盖翻前到河牌。支持免费 Demo 体验，无需下载即可开始训练。">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #05080C; color: #EDF1F7; line-height:1.6; }
   .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 
-  /* Hero */
-  .hero { text-align: center; padding: 100px 0 60px; }
+  /* ── Top Sticky Nav ── */
+  .nav { position: sticky; top: 0; z-index: 101; background: rgba(5,8,12,0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(21,34,51,0.5); }
+  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .nav-logo { font-size: 18px; font-weight: 800; text-decoration: none; background: linear-gradient(135deg, #60A5FA, #A78BFA); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; flex-shrink: 0; }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a { color: #94A3B8; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
+  .nav-links a:hover { color: #EDF1F7; }
+  .btn-nav { padding: 8px 20px; border-radius: 10px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, #10B981, #059669); color: white; text-decoration: none; transition: all 0.2s; }
+  .btn-nav:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(16,185,129,0.4); }
+  .nav-toggle { display: none; background: none; border: none; color: #94A3B8; font-size: 24px; cursor: pointer; padding: 4px; line-height: 1; }
+
+  /* ── Hero ── */
+  .hero { padding: 80px 0 60px; }
+  .hero-grid { display: flex; align-items: center; gap: 60px; }
+  .hero-text { flex: 1; min-width: 0; }
+  .hero-visual { flex: 0 0 420px; }
   .hero .badge { display: inline-block; padding: 6px 16px; border-radius: 20px; background: rgba(16,185,129,0.1); color: #34D399; font-size: 13px; font-weight: 600; margin-bottom: 24px; border: 1px solid rgba(16,185,129,0.2); }
   .hero h1 { font-size: 56px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 16px; background: linear-gradient(135deg, #60A5FA, #A78BFA, #34D399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .hero p { font-size: 18px; color: #94A3B8; max-width: 600px; margin: 0 auto 32px; }
-  .hero .cta-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .hero p { font-size: 18px; color: #94A3B8; max-width: 600px; margin-bottom: 32px; }
+  .hero .cta-group { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  /* ── Buttons ── */
   .btn { padding: 14px 32px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
   .btn-primary { background: linear-gradient(135deg, #10B981, #059669); color: white; box-shadow: 0 4px 24px rgba(16,185,129,0.3); border: none; }
   .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(16,185,129,0.4); }
@@ -23,6 +40,21 @@
   .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(37,99,235,0.3); }
   .btn-outline { background: transparent; color: #94A3B8; border: 1px solid #1C2A3D; }
   .btn-outline:hover { border-color: #3B82F6; color: #EDF1F7; }
+
+  /* ── Range Matrix Visual ── */
+  .range-matrix-wrap { position: relative; }
+  .range-matrix { display: grid; grid-template-columns: repeat(13, 1fr); gap: 2px; aspect-ratio: 1; background: #0A0F18; border: 1px solid #1C2A3D; border-radius: 16px; padding: 12px; box-shadow: 0 20px 60px rgba(16,185,129,0.08), 0 0 120px rgba(37,99,235,0.05); }
+  .range-cell { aspect-ratio: 1; border-radius: 3px; font-size: 7px; font-weight: 700; display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.15s; }
+  .range-cell:hover { transform: scale(1.3); z-index: 1; color: rgba(255,255,255,0.8); }
+  .range-cell.premium  { background: #DC2626; }
+  .range-cell.strong   { background: #EA580C; }
+  .range-cell.playable { background: #16A34A; }
+  .range-cell.speculative { background: #2563EB; }
+  .range-cell.marginal { background: #4B5563; }
+  .range-cell.fold     { background: #1F2937; }
+  .range-axis { display: flex; justify-content: space-around; margin-top: 8px; }
+  .range-axis span { font-size: 9px; color: #64748B; font-weight: 600; letter-spacing: 0.05em; }
+  .matrix-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 80%; height: 80%; background: radial-gradient(ellipse, rgba(16,185,129,0.06) 0%, transparent 70%); pointer-events: none; border-radius: 50%; }
 
   /* Sticky Bottom CTA */
   .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: rgba(5,8,12,0.95); backdrop-filter: blur(20px); border-top: 1px solid #152233; padding: 14px 24px; transform: translateY(100%); transition: transform 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 12px; }
@@ -90,6 +122,22 @@
   .req-card .value { font-size: 13px; color: #94A3B8; font-weight: 600; }
 
   @media (max-width: 900px) {
+    /* Nav mobile */
+    .nav-links { display: none; }
+    .nav-toggle { display: block; }
+    .nav-links.open { display: flex; flex-direction: column; position: absolute; top: 60px; left: 0; right: 0; background: rgba(5,8,12,0.98); backdrop-filter: blur(16px); padding: 20px 24px; gap: 16px; border-bottom: 1px solid #152233; }
+    /* Hero mobile */
+    .hero { padding: 40px 0 40px; }
+    .hero-grid { flex-direction: column-reverse; gap: 32px; }
+    .hero-text { text-align: center; }
+    .hero-visual { flex: 0 0 auto; width: 100%; max-width: 340px; margin: 0 auto; }
+    .hero h1 { font-size: 36px; }
+    .hero p { font-size: 15px; margin-left: auto; margin-right: auto; }
+    .hero .badge { font-size: 12px; }
+    .hero .cta-group { justify-content: center; }
+    .range-matrix { padding: 8px; border-radius: 12px; }
+    .range-cell { font-size: 5px; border-radius: 2px; }
+    /* Grids */
     .module-grid { grid-template-columns: repeat(2, 1fr); }
     .pricing-grid { grid-template-columns: 1fr; }
     .preview-grid { grid-template-columns: 1fr; }
@@ -103,6 +151,22 @@
 </head>
 <body>
 
+<!-- ═══════ Top Sticky Nav ═══════ -->
+<nav class="nav" id="navbar">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">PokerGTO</a>
+    <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
+    <div class="nav-links" id="navLinks">
+      <a href="#features">功能</a>
+      <a href="#preview">界面预览</a>
+      <a href="#download">下载</a>
+      <a href="#pricing">定价</a>
+      <a href="#community">社群</a>
+      <a href="/poker-gto-trainer/app/" class="btn-nav">免费试用</a>
+    </div>
+  </div>
+</nav>
+
 <!-- Sticky Bottom CTA -->
 <div class="sticky-cta" id="stickyCta">
   <span class="hint">🔥 无需下载，即刻体验</span>
@@ -110,16 +174,27 @@
   <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" class="btn btn-outline">⬇ 下载桌面版</a>
 </div>
 
-<!-- Hero -->
+<!-- ═══════ Hero ═══════ -->
 <section class="hero" id="hero">
   <div class="container">
-    <div class="badge">🎯 无需注册 · 点开即用</div>
-    <h1>PokerGTO Trainer</h1>
-    <p>26 个专业模块 · 本地 CFR 求解器 · Cash vs MTT 对比 · 对手剥削顾问 · Range Battle · 实战 AI 对局<br>对标 GTO Wizard，功能覆盖 90%，价格仅 1/3</p>
-    <div class="cta-group">
-      <a href="/poker-gto-trainer/app/?demo=1" class="btn btn-primary">🎯 免费体验 Demo</a>
-      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" class="btn btn-secondary">⬇ 下载桌面版</a>
-      <a href="#pricing" class="btn btn-outline">查看价格</a>
+    <div class="hero-grid">
+      <div class="hero-text">
+        <div class="badge">🎯 无需注册 · 点开即用</div>
+        <h1>PokerGTO Trainer</h1>
+        <p>26 个专业模块 · 本地 CFR 求解器 · Cash vs MTT 对比 · 对手剥削顾问 · Range Battle · 实战 AI 对局<br>对标 GTO Wizard，功能覆盖 90%，价格仅 1/3</p>
+        <div class="cta-group">
+          <a href="/poker-gto-trainer/app/?demo=1" class="btn btn-primary">🎯 免费体验 Demo</a>
+          <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" class="btn btn-secondary">⬇ 下载桌面版</a>
+          <a href="#pricing" class="btn btn-outline">查看价格</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="range-matrix-wrap">
+          <div class="matrix-glow"></div>
+          <div class="range-matrix" id="rangeMatrix"></div>
+          <div class="range-axis"><span>A</span><span>K</span><span>Q</span><span>J</span><span>T</span><span>9</span><span>8</span><span>7</span><span>6</span><span>5</span><span>4</span><span>3</span><span>2</span></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -133,7 +208,7 @@
 </div>
 
 <!-- Feature Preview Screenshots -->
-<div class="container">
+<div class="container" id="preview">
   <div class="section">
     <h2>👀 看看里面长什么样</h2>
     <p class="subtitle">Demo 里能直接上手操作这些功能</p>
@@ -212,7 +287,7 @@
 </div>
 
 <!-- Features -->
-<div class="container">
+<div class="container" id="features">
   <div class="section">
     <h2>全部功能模块</h2>
     <p class="subtitle">覆盖翻前到河牌，从学习到实战</p>
@@ -399,7 +474,7 @@
     </div>
 
     <!-- Community -->
-    <div style="text-align:center; margin-top:60px; padding:40px 24px; background: linear-gradient(135deg, #0F172A, #1A1040); border: 1px solid #1E293B; border-radius:20px; max-width:600px; margin-left:auto; margin-right:auto;">
+    <div id="community" style="text-align:center; margin-top:60px; padding:40px 24px; background: linear-gradient(135deg, #0F172A, #1A1040); border: 1px solid #1E293B; border-radius:20px; max-width:600px; margin-left:auto; margin-right:auto;">
       <p style="font-size:14px; color:#A78BFA; font-weight:700; margin-bottom:8px; letter-spacing:0.05em;">🧠 加入社群</p>
       <p style="font-size:24px; font-weight:900; color:#EDF1F7; margin-bottom:8px;">PokerGTO 学习交流群</p>
       <p style="font-size:14px; color:#94A3B8; margin-bottom:24px; max-width:400px; margin-left:auto; margin-right:auto;">
@@ -572,6 +647,57 @@
 </div>
 
 <script>
+// ── Mobile Nav Toggle ──
+(function(){
+  var t = document.getElementById('navToggle');
+  var l = document.getElementById('navLinks');
+  if (!t || !l) return;
+  t.addEventListener('click', function(){
+    l.classList.toggle('open');
+    t.textContent = l.classList.contains('open') ? '✕' : '☰';
+  });
+  l.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){
+      l.classList.remove('open');
+      t.textContent = '☰';
+    });
+  });
+})();
+
+// ── Build Range Matrix ──
+(function(){
+  var ranks = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+  var m = document.getElementById('rangeMatrix');
+  if (!m) return;
+  var html = '';
+  for (var r = 0; r < 13; r++) {
+    for (var c = 0; c < 13; c++) {
+      var hand, cls;
+      if (r === c) {
+        hand = ranks[r] + ranks[c];
+        cls = r <= 2 ? 'premium' : r <= 5 ? 'strong' : r <= 9 ? 'playable' : 'speculative';
+      } else if (r < c) {
+        hand = ranks[r] + ranks[c] + 's';
+        var hi = r, lo = c;
+        if (hi === 0 && lo <= 3) cls = 'premium';
+        else if (hi <= 1 && lo <= 4) cls = 'strong';
+        else if (hi <= 3 && lo <= 9) cls = 'playable';
+        else if (hi <= 5 && lo <= 10) cls = 'marginal';
+        else cls = 'fold';
+      } else {
+        hand = ranks[c] + ranks[r] + 'o';
+        var hi2 = c, lo2 = r;
+        if (hi2 === 0 && lo2 <= 3) cls = 'strong';
+        else if (hi2 <= 1 && lo2 <= 5) cls = 'playable';
+        else if (hi2 <= 3 && lo2 <= 9) cls = 'marginal';
+        else cls = 'fold';
+      }
+      html += '<div class="range-cell ' + cls + '">' + hand + '</div>';
+    }
+  }
+  m.innerHTML = html;
+})();
+
 // ── Sticky CTA bar ──
 (function() {
   var sticky = document.getElementById('stickyCta');
