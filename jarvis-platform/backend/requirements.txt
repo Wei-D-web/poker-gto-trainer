@@ -1,0 +1,46 @@
+# J.A.R.V.I.S. Platform — Python Dependencies
+# Python 3.11+ required
+
+# Web Framework
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+websockets>=13.0
+python-multipart>=0.0.12
+
+# Data Validation
+pydantic>=2.10.0
+pydantic-settings>=2.6.0
+
+# LLM Clients
+openai>=1.55.0         # DeepSeek (OpenAI-compatible) + GPT-4V fallback
+anthropic>=0.45.0      # Claude Vision + Claude Agent
+
+# Speech
+faster-whisper>=1.1.0  # Local Whisper STT
+soundfile>=0.12.1
+numpy>=1.26.4
+edge-tts>=6.1.0        # Cross-platform TTS fallback
+
+# Vision
+Pillow>=11.0.0
+opencv-python-headless>=4.10.0
+
+# Search
+duckduckgo-search>=7.1.0
+httpx>=0.28.0
+
+# Memory
+chromadb>=0.5.0
+
+# Scheduling
+apscheduler>=3.10.4
+
+# Utilities
+python-dotenv>=1.0.1
+loguru>=0.7.3
+markdown>=3.7.0
+python-dateutil>=2.9.0
+
+# Testing
+pytest>=8.3.0
+pytest-asyncio>=0.24.0

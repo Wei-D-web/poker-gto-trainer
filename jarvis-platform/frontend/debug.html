@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Debug</title></head>
+<body>
+<h1>Script Load Test</h1>
+<div id="log"></div>
+<script>
+function log(msg, ok) {
+  var el = document.createElement('div');
+  el.style.cssText = ok ? 'color:green' : 'color:red';
+  el.textContent = (ok ? '✅ ' : '❌ ') + msg;
+  document.getElementById('log').appendChild(el);
+}
+
+window.addEventListener('error', function(e) {
+  log('GLOBAL ERROR: ' + e.message + ' at ' + (e.filename || '') + ':' + (e.lineno || ''), false);
+});
+</script>
+
+<!-- Load Three.js locally -->
+<script src="assets/three.min.js"></script>
+<script>
+log('Three.js loaded: ' + (typeof THREE !== 'undefined'));
+</script>
+
+<!-- Load all app scripts -->
+<script src="three/scene.js"></script>
+<script src="three/particles.js"></script>
+<script src="three/rings.js"></script>
+<script src="three/scanlines.js"></script>
+<script src="three/globe.js"></script>
+<script src="three/network.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/websocket.js"></script>
+<script src="js/speech.js"></script>
+<script src="js/vision.js"></script>
+<script src="js/agents.js"></script>
+<script src="js/viz.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+log('JARVIS: ' + (typeof JARVIS !== 'undefined'));
+log('JARVIS.Chat: ' + (typeof JARVIS.Chat !== 'undefined'));
+log('JARVIS.App: ' + (typeof JARVIS.App !== 'undefined'));
+log('JARVIS.Agents: ' + (typeof JARVIS.Agents !== 'undefined'));
+log('JARVIS.WS: ' + (typeof JARVIS.WS !== 'undefined'));
+log('JARVIS.Scene: ' + (typeof JARVIS.Scene !== 'undefined'));
+
+// Simulate the exact bootstrap sequence that runs in index.html
+try {
+  log('Calling JARVIS.Chat.init()...');
+  JARVIS.Chat.init();
+  log('Chat.init() OK', true);
+
+  log('Calling JARVIS.Agents.init()...');
+  JARVIS.Agents.init('side-panel-content');
+  log('Agents.init() OK', true);
+
+  log('Calling JARVIS.App.init()...');
+  JARVIS.App.init();
+  log('App.init() OK', true);
+
+  log('ALL BOOTSTRAP STEPS PASSED - hideLoader() should work!', true);
+} catch(e) {
+  log('BOOTSTRAP ERROR: ' + e.message + '\n' + e.stack, false);
+}
+</script>
+</body>
+</html>

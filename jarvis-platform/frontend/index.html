@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#05080C">
+  <meta name="description" content="J.A.R.V.I.S. — Holographic AI Butler">
+  <title>J.A.R.V.I.S.</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🧠</text></svg>">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/reset.css?v=2">
+  <link rel="stylesheet" href="css/hud.css?v=2">
+  <link rel="stylesheet" href="css/animations.css?v=2">
+  <link rel="stylesheet" href="css/components.css?v=2">
+
+  <style>
+    /* Inline critical styles for instant paint */
+    #three-bg { position: fixed; inset: 0; z-index: 1; }
+    #jarvis-app { opacity: 0; animation: fadeIn 0.6s ease-out 0.3s forwards; }
+    #vignette {
+      position: fixed; inset: 0; pointer-events: none; z-index: 4;
+      background: radial-gradient(ellipse at center, transparent 60%, rgba(5,8,12,0.5) 100%);
+    }
+    #loading-screen {
+      position: fixed; inset: 0; z-index: 1000; background: #05080C;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+      transition: opacity 0.5s ease-out;
+    }
+    #loading-screen.hidden { opacity: 0; pointer-events: none; }
+    #loading-screen .logo-text {
+      font-family: 'JetBrains Mono', 'SF Mono', monospace;
+      font-size: 36px; font-weight: 900; letter-spacing: 0.15em;
+      background: linear-gradient(135deg, #60A5FA, #06B6D4, #8B5CF6);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 8px;
+    }
+    #loading-screen .sub-text { font-size: 12px; color: #556278; letter-spacing: 0.08em; }
+    #loading-screen .loader-bar {
+      width: 120px; height: 2px; background: #1C2A3D; border-radius: 1px;
+      margin-top: 16px; overflow: hidden;
+    }
+    #loading-screen .loader-bar-fill {
+      height: 100%; background: #3B82F6; border-radius: 1px;
+      animation: loaderProgress 2s ease-in-out infinite;
+    }
+    @keyframes loaderProgress {
+      0% { width: 0%; margin-left: 0; }
+      50% { width: 60%; margin-left: 0; }
+      100% { width: 0%; margin-left: 100%; }
+    }
+    .fallback-bg { position: fixed; inset: 0; z-index: 0; background: #05080C; }
+  </style>
+</head>
+<body>
+<script>
+window.__errors = [];
+window.onerror = function(msg, url, line, col, err) {
+  window.__errors.push(msg + ' @ ' + url + ' line ' + line);
+  var el = document.createElement('div');
+  el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#EF4444;color:#fff;padding:10px;font:13px monospace;white-space:pre-wrap;';
+  el.textContent = 'JS ERROR: ' + msg + ' (line ' + line + ')';
+  (document.body || document.documentElement).appendChild(el);
+  // Also hide the loading screen so we can SEE the error
+  var ld = document.getElementById('loading-screen');
+  if (ld) ld.style.display = 'none';
+};
+</script>
+  <!-- Loading Screen -->
+  <div id="loading-screen">
+    <div class="logo-text">J.A.R.V.I.S.</div>
+    <div class="sub-text">INITIALIZING HOLOGRAPHIC INTERFACE</div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  </div>
+
+  <!-- Three.js Background -->
+  <div id="three-bg"></div>
+
+  <!-- Fallback background -->
+  <canvas id="fallback-bg" class="fallback-bg" style="display:none;"></canvas>
+
+  <!-- Vignette -->
+  <div id="vignette"></div>
+
+  <!-- Holographic Scanlines -->
+  <div id="holo-scanlines"></div>
+
+  <!-- CSS Holographic Core (independent of Three.js) -->
+  <div id="css-holo-core">
+    <div class="core-orb"></div>
+    <div class="core-ring"></div>
+    <div class="core-ring"></div>
+    <div class="core-ring"></div>
+  </div>
+
+  <!-- Data Stream Gutters -->
+  <div class="data-stream left">
+    <div class="stream-content" id="stream-left"></div>
+  </div>
+  <div class="data-stream right">
+    <div class="stream-content" id="stream-right"></div>
+  </div>
+
+  <!-- Main HUD -->
+  <div id="jarvis-app">
+    <!-- ── Status Bar ── -->
+    <header id="status-bar">
+      <div class="status-left">
+        <span class="status-logo">[ J.A.R.V.I.S. ]</span>
+        <div class="status-indicator">
+          <span class="status-dot"></span>
+          <span>ONLINE</span>
+        </div>
+      </div>
+      <div class="status-center">
+        <div class="status-metric">
+          <span class="metric-dot cpu"></span>
+          <span class="metric-label">CPU</span>
+          <span class="metric-val" id="metric-cpu">--</span>
+        </div>
+        <div class="status-metric">
+          <span class="metric-dot mem"></span>
+          <span class="metric-label">MEM</span>
+          <span class="metric-val" id="metric-mem">--</span>
+        </div>
+        <div class="status-metric">
+          <span class="metric-dot ws"></span>
+          <span class="metric-label">WS</span>
+          <span class="metric-val" id="metric-ws">--</span>
+        </div>
+        <div class="status-metric">
+          <span class="metric-dot ping"></span>
+          <span class="metric-label">MS</span>
+          <span class="metric-val" id="metric-ping">--</span>
+        </div>
+      </div>
+      <div class="status-right">
+        <span id="status-clock">00:00</span>
+        <span style="color: var(--fg-tertiary)">·</span>
+        <span>SYS NOMINAL</span>
+      </div>
+    </header>
+
+    <!-- ── Main Chat Panel ── -->
+    <main id="main-panel">
+      <div class="panel-header">
+        <span class="label">Direct Interface</span>
+        <span class="divider"></span>
+      </div>
+      <div id="chat-container">
+        <!-- Welcome message rendered by JS -->
+      </div>
+      <!-- Bottom-left corner bracket -->
+      <div class="panel-bracket-bl"></div>
+    </main>
+
+    <!-- ── Side Data Panel ── -->
+    <aside id="side-panel">
+      <div class="panel-header">
+        <span class="label">Data Stream</span>
+      </div>
+      <div class="panel-tabs" style="margin-bottom: 12px;">
+        <button class="panel-tab active" data-panel="viz">3D Viz</button>
+        <button class="panel-tab" data-panel="agents">Agents</button>
+        <button class="panel-tab" data-panel="vision">Vision</button>
+        <button class="panel-tab" data-panel="research">Research</button>
+      </div>
+      <div id="side-panel-content" class="side-panel-content">
+        <!-- Viz tab widgets -->
+        <div class="mini-widget">
+          <div class="mini-orbit">
+            <div class="ring"><div class="dot"></div></div>
+            <div class="ring"><div class="dot"></div></div>
+            <div class="ring"><div class="dot"></div></div>
+          </div>
+          <div class="widget-title">Holographic Core</div>
+          <div class="widget-value" id="widget-core-status">NOMINAL</div>
+          <div class="widget-sub">3D engine active · 60 FPS</div>
+        </div>
+        <div class="mini-widget">
+          <div class="widget-title">Particle Field</div>
+          <div class="widget-value" id="widget-particles">2,000</div>
+          <div class="widget-sub">active nodes in field</div>
+        </div>
+        <div class="mini-widget">
+          <div class="widget-title">Session</div>
+          <div class="widget-value" id="widget-session-time">00:00</div>
+          <div class="widget-sub">since initialization</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Input Bar ── -->
+    <footer id="input-bar">
+      <div class="input-wrapper">
+        <span class="input-prefix">SIR &gt;</span>
+        <input
+          type="text"
+          id="user-input"
+          placeholder="Type your command or say &quot;Jarvis&quot;..."
+          autocomplete="off"
+          spellcheck="false"
+        >
+      </div>
+      <div id="voice-orb-wrap">
+        <div class="voice-waveform">
+          <div class="wf-bar"></div><div class="wf-bar"></div><div class="wf-bar"></div>
+          <div class="wf-bar"></div><div class="wf-bar"></div><div class="wf-bar"></div>
+          <div class="wf-bar"></div>
+        </div>
+        <button id="voice-orb" title="Voice Input">
+          <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+        </button>
+      </div>
+      <button id="send-btn" title="Send Command">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </footer>
+  </div>
+
+  <!-- Load Three.js as regular script (non-blocking) with timeout fallback -->
+  <script>
+    // Load Three.js with a timeout — if it doesn't load in 8s, skip it
+    window.__threeReady = false;
+    var threeScript = document.createElement('script');
+    threeScript.src = 'assets/three.min.js?v=2';
+    threeScript.onload = function() { window.__threeReady = true; };
+    threeScript.onerror = function() { console.warn('Three.js CDN unreachable'); };
+    document.head.appendChild(threeScript);
+    // Timeout: mark as "tried" after 8 seconds even if not loaded
+    setTimeout(function() { if (!window.__threeReady) window.__threeTimeout = true; }, 8000);
+  </script>
+
+  <!-- Three.js Modules (regular scripts, no import/export) -->
+  <script src="three/scene.js?v=3"></script>
+  <script src="three/particles.js?v=3"></script>
+  <script src="three/rings.js?v=3"></script>
+  <script src="three/scanlines.js?v=2"></script>
+  <script src="three/globe.js?v=2"></script>
+  <script src="three/network.js?v=2"></script>
+
+  <!-- App Modules -->
+  <script src="js/chat.js?v=3"></script>
+  <script src="js/websocket.js?v=2"></script>
+  <script src="js/speech.js?v=2"></script>
+  <script src="js/vision.js?v=2"></script>
+  <script src="js/agents.js?v=2"></script>
+  <script src="js/viz.js?v=2"></script>
+  <script src="js/app.js?v=5"></script>
+
+  <!-- Bootstrap -->
+  <script>
+    // ── STEP 1: Init UI IMMEDIATELY ──
+    function hideLoader() {
+      const loader = document.getElementById('loading-screen');
+      if (loader) { loader.classList.add('hidden'); setTimeout(() => loader.remove(), 600); }
+    }
+
+    let scene, camera, renderer, clock;
+    let threeLoaded = false;
+
+    // Init app UI right now
+    JARVIS.Chat.init();
+    JARVIS.Agents.init('side-panel-content');
+    JARVIS.App.init();
+    hideLoader();
+
+    // Set up fallback starfield canvas immediately
+    initFallbackBackground();
+
+    console.log('%c[J.A.R.V.I.S.] %cHUD online. %cLoading 3D engine...',
+      'color: #60A5FA; font-weight: bold;',
+      'color: #10B981;',
+      'color: #F59E0B;');
+
+    // ── Fallback Background ──
+    function initFallbackBackground() {
+      const canvas = document.getElementById('fallback-bg');
+      if (!canvas) return;
+      canvas.style.display = 'block';
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const ctx = canvas.getContext('2d');
+      const stars = [];
+      for (let i = 0; i < 200; i++) {
+        stars.push({
+          x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+          r: Math.random() * 1.5 + 0.3, opacity: Math.random(), speed: Math.random() * 0.3 + 0.1,
+        });
+      }
+      function drawStars() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stars.forEach(s => {
+          s.opacity += s.speed * 0.01;
+          if (s.opacity > 1 || s.opacity < 0.1) s.speed *= -1;
+          ctx.fillStyle = `rgba(96, 165, 250, ${s.opacity * 0.6})`;
+          ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+        });
+        requestAnimationFrame(drawStars);
+      }
+      drawStars();
+      window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+    }
+
+    // ── STEP 2: Wait for Three.js (loaded as regular script, non-blocking) ──
+    function tryInitThreeJS() {
+      if (window.THREE) {
+        const THREE = window.THREE;
+        const result = JARVIS.Scene.init('three-bg');
+        if (result) {
+          ({ scene, camera, renderer, clock } = result);
+          JARVIS.Particles.init(scene);
+          JARVIS.Rings.init(scene);
+          JARVIS.Scanlines.init();
+          JARVIS.Viz.init(scene);
+          threeLoaded = true;
+          document.getElementById('fallback-bg').style.display = 'none';
+          JARVIS.Scene.start((delta, elapsed) => {
+            JARVIS.Particles.update(delta, elapsed);
+            JARVIS.Rings.update(delta, elapsed);
+            JARVIS.Viz.update(delta, elapsed);
+          });
+          console.log('%c[J.A.R.V.I.S.] %cThree.js engine online.',
+            'color: #60A5FA;', 'color: #10B981;');
+        }
+        return true;
+      }
+      return false;
+    }
+
+    // Poll for THREE every 500ms, give up after 15 seconds
+    if (window.__threeReady) {
+      tryInitThreeJS();
+    } else {
+      var threePoll = setInterval(function() {
+        if (window.__threeReady && tryInitThreeJS()) {
+          clearInterval(threePoll);
+        }
+        if (window.__threeTimeout) {
+          clearInterval(threePoll);
+          console.warn('[J.A.R.V.I.S.] Three.js timed out — using Canvas fallback.');
+        }
+      }, 500);
+    }
+
+    // ── Connect WebSocket ──
+    JARVIS.WS.connect();
+
+    // Handle incoming responses
+    JARVIS.WS.on('response', (data) => {
+      if (data.transcription) {
+        // Show what was heard in chat
+        JARVIS.Chat.addMessage('user', data.text + ' 🎤');
+      } else {
+        JARVIS.Chat.hideTyping();
+        JARVIS.Chat.addMessage('assistant', data.text, { typewriter: true });
+        if (JARVIS.Particles && JARVIS.Particles.burst) JARVIS.Particles.burst(0.7);
+        JARVIS.App.setMode('idle');
+        // Reset core intensity
+        if (JARVIS.Scene && JARVIS.Scene.setCoreIntensity) JARVIS.Scene.setCoreIntensity(0.3);
+        JARVIS.App.triggerCoreBurst();
+      }
+    });
+
+    JARVIS.WS.on('voice_response', (data) => {
+      // Play TTS audio
+      if (data.audio) {
+        const audio = new Audio('data:audio/aiff;base64,' + data.audio);
+        audio.play().catch(() => {});
+      }
+    });
+
+    JARVIS.WS.on('error', (data) => {
+      JARVIS.Chat.hideTyping();
+      JARVIS.Chat.addMessage('assistant', '⚠️ ' + (data.message || 'An error occurred.'));
+      JARVIS.App.setMode('idle');
+      if (JARVIS.Scene && JARVIS.Scene.setCoreIntensity) JARVIS.Scene.setCoreIntensity(0.3);
+    });
+
+    // ── Vision Results ──
+    JARVIS.WS.on('vision_result', (data) => {
+      JARVIS.Chat.hideTyping();
+      JARVIS.Chat.addMessage('assistant', '👁️ **Screen Analysis:**\n\n' + data.analysis);
+      JARVIS.App.setMode('idle');
+      if (JARVIS.Scene && JARVIS.Scene.setCoreIntensity) JARVIS.Scene.setCoreIntensity(0.3);
+    });
+
+    // ── Agent Swarm Updates ──
+    JARVIS.WS.on('agent_update', (data) => {
+      if (data.agents) {
+        JARVIS.Agents.renderSwarm(data.agents);
+      }
+      if (data.phase === 'decomposing') {
+        JARVIS.Chat.addMessage('assistant', '🧠 ' + data.message);
+      }
+    });
+
+    JARVIS.WS.on('agent_complete', (data) => {
+      JARVIS.Chat.hideTyping();
+      JARVIS.Agents.renderReport(data.report);
+      JARVIS.Chat.addMessage('assistant', '✅ Research complete. See the data panel for the full report.');
+      JARVIS.App.setMode('idle');
+      if (JARVIS.Scene && JARVIS.Scene.setCoreIntensity) JARVIS.Scene.setCoreIntensity(0.3);
+      JARVIS.App.triggerCoreBurst();
+    });
+
+    // ── System Alerts ──
+    JARVIS.WS.on('system_alert', (data) => {
+      JARVIS.Chat.addMessage('assistant', '⚠️ **Alert:** ' + data.message);
+    });
+
+    JARVIS.WS.on('connected', () => {
+      console.log('%c[J.A.R.V.I.S.] %cWebSocket link established.',
+        'color: #60A5FA;', 'color: #10B981;');
+    });
+
+    JARVIS.WS.on('disconnected', () => {
+      console.log('%c[J.A.R.V.I.S.] %cWebSocket link lost.',
+        'color: #60A5FA;', 'color: #F59E0B;');
+    });
+
+    // ── Wire up voice mode with WebSocket ──
+    const voiceOrb = document.getElementById('voice-orb');
+    let isVoiceActive = false;
+
+    voiceOrb?.addEventListener('click', () => {
+      if (!JARVIS.Speech.isAvailable()) {
+        JARVIS.Chat.addMessage('assistant', '⚠️ Speech recognition is not available in this browser. Please type your command instead.');
+        return;
+      }
+
+      isVoiceActive = !isVoiceActive;
+
+      if (isVoiceActive) {
+        voiceOrb.classList.add('listening');
+        JARVIS.App.setMode('listening');
+        JARVIS.Speech.start(
+          // Final result callback
+          (text) => {
+            JARVIS.Chat.addMessage('user', text + ' 🎤');
+            JARVIS.Chat.showTyping();
+            JARVIS.App.setMode('thinking');
+            // Send via WebSocket if connected, else use local
+            if (JARVIS.WS.isConnected()) {
+              JARVIS.WS.send('chat', { text, mode: 'voice' });
+            }
+          },
+          // Interim result callback
+          (interim) => {
+            // Could show interim in UI
+          }
+        );
+      } else {
+        voiceOrb.classList.remove('listening');
+        JARVIS.App.setMode('idle');
+        JARVIS.Speech.stop();
+      }
+    });
+
+    // Focus input on load
+    setTimeout(() => {
+      document.getElementById('user-input')?.focus();
+    }, 500);
+
+    console.log('%c[J.A.R.V.I.S.] %cAll systems initialized. %cHolographic HUD active.',
+      'color: #60A5FA; font-weight: bold;',
+      'color: #10B981;',
+      'color: #556278;');
+  </script>
+</body>
+</html>

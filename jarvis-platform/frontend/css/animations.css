@@ -1,0 +1,252 @@
+/* ==========================================
+   J.A.R.V.I.S. — Animations
+   ========================================== */
+
+/* ── Status Dot Pulse ── */
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
+  50% { opacity: 0.5; box-shadow: 0 0 14px rgba(16, 185, 129, 0.8); }
+}
+
+/* ── Voice Orb Pulse ── */
+@keyframes orbPulse {
+  0%, 100% { box-shadow: 0 0 16px var(--jarvis-blue-glow), 0 0 32px rgba(249,115,22,0.1); }
+  50% { box-shadow: 0 0 36px rgba(59, 130, 246, 0.7), 0 0 64px rgba(249,115,22,0.25); }
+}
+
+/* ── Fade In Up ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Fade In ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Slide In Right ── */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Glow Pulse ── */
+@keyframes glowPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ── Typewriter Cursor ── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.typing-cursor::after {
+  content: '▍';
+  animation: blink 1s step-end infinite;
+  color: var(--jarvis-blue-light);
+}
+
+/* ── Holographic Shimmer ── */
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ── Ring Orbit ── */
+@keyframes orbit {
+  from { transform: rotate(0deg) translateX(80px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(80px) rotate(-360deg); }
+}
+
+/* ── Data Stream — vertical scrolling characters ── */
+@keyframes dataCascade {
+  0% { transform: translateY(-100%); opacity: 0; }
+  5% { opacity: 0.4; }
+  95% { opacity: 0.4; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+/* ── Holographic Border Flow ── */
+@keyframes holographicBorder {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ── Core Breathing Pulse ── */
+@keyframes coreBreath {
+  0%, 100% {
+    box-shadow:
+      0 0 20px rgba(59,130,246,0.3),
+      0 0 60px rgba(59,130,246,0.1),
+      0 0 100px rgba(59,130,246,0.05),
+      0 0 160px rgba(249,115,22,0.03);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 35px rgba(59,130,246,0.5),
+      0 0 80px rgba(59,130,246,0.2),
+      0 0 140px rgba(59,130,246,0.1),
+      0 0 200px rgba(249,115,22,0.06);
+    transform: scale(1.03);
+  }
+}
+
+/* ── Core breathing — active/thinking state ── */
+@keyframes coreBreathFast {
+  0%, 100% {
+    box-shadow:
+      0 0 30px rgba(59,130,246,0.4),
+      0 0 80px rgba(59,130,246,0.15),
+      0 0 140px rgba(59,130,246,0.08),
+      0 0 220px rgba(249,115,22,0.05);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 0 50px rgba(59,130,246,0.7),
+      0 0 120px rgba(59,130,246,0.3),
+      0 0 200px rgba(59,130,246,0.15),
+      0 0 300px rgba(249,115,22,0.1);
+    transform: scale(1.06);
+  }
+}
+
+/* ── Core burst — one-time energy surge ── */
+@keyframes coreBurst {
+  0% {
+    box-shadow:
+      0 0 40px rgba(59,130,246,0.6),
+      0 0 100px rgba(59,130,246,0.3),
+      0 0 200px rgba(249,115,22,0.15);
+    transform: scale(1.15);
+  }
+  100% {
+    box-shadow:
+      0 0 20px rgba(59,130,246,0.3),
+      0 0 60px rgba(59,130,246,0.1),
+      0 0 100px rgba(59,130,246,0.05);
+    transform: scale(1);
+  }
+}
+
+/* ── Core ring orbit ── */
+@keyframes coreRingSpin {
+  from { transform: translate(-50%, -50%) rotateX(70deg) rotateZ(0deg); }
+  to { transform: translate(-50%, -50%) rotateX(70deg) rotateZ(360deg); }
+}
+
+@keyframes coreRingSpinReverse {
+  from { transform: translate(-50%, -50%) rotateX(60deg) rotateZ(360deg); }
+  to { transform: translate(-50%, -50%) rotateX(60deg) rotateZ(0deg); }
+}
+
+/* ── Input Breathing Ring ── */
+@keyframes inputBreathe {
+  0%, 100% {
+    box-shadow: 0 0 0 0px rgba(59, 130, 246, 0.3), 0 0 0 0px rgba(249, 115, 22, 0.1), inset 0 0 16px rgba(59,130,246,0.02);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08), 0 0 0 8px rgba(249, 115, 22, 0.03), inset 0 0 24px rgba(59,130,246,0.05);
+  }
+}
+
+/* ── Electromagnetic Pulse ── */
+@keyframes emPulse {
+  0% { filter: brightness(1) drop-shadow(0 0 2px var(--jarvis-blue-glow)); }
+  10% { filter: brightness(2.5) drop-shadow(0 0 12px rgba(59,130,246,0.9)); }
+  20% { filter: brightness(1) drop-shadow(0 0 2px var(--jarvis-blue-glow)); }
+  100% { filter: brightness(1) drop-shadow(0 0 2px var(--jarvis-blue-glow)); }
+}
+
+/* ── Waveform Bars ── */
+@keyframes waveformBar {
+  0%, 100% { transform: scaleY(0.3); }
+  25% { transform: scaleY(1); }
+  50% { transform: scaleY(0.5); }
+  75% { transform: scaleY(0.9); }
+}
+
+/* ── Scan Line Sweep ── */
+@keyframes scanSweep {
+  0% { transform: translateY(-100%); opacity: 0; }
+  8% { opacity: 0.7; }
+  92% { opacity: 0.7; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+/* ── Data Stream Flicker ── */
+@keyframes dataFlicker {
+  0%, 99.5%, 100% { opacity: 1; }
+  99.6%, 99.9% { opacity: 0.3; }
+}
+
+/* ── Holo Flicker — holographic distortion ── */
+@keyframes holoFlicker {
+  0%, 99.3%, 100% { opacity: 1; transform: none; }
+  99.4% { opacity: 0.7; }
+  99.5% { opacity: 0.95; transform: translateX(0.5px); }
+  99.7% { opacity: 0.85; }
+}
+
+/* ── Chromatic Drift ── */
+@keyframes chromaticDrift {
+  0%, 100% { text-shadow: 0.5px 0 0.5px rgba(255,0,80,0.12), -0.5px 0 0.5px rgba(0,200,255,0.12); }
+  33% { text-shadow: 0.8px 0 0.8px rgba(255,0,80,0.18), -0.3px 0 0.3px rgba(0,200,255,0.1); }
+  66% { text-shadow: 0.3px 0 0.3px rgba(255,0,80,0.1), -0.8px 0 0.8px rgba(0,200,255,0.18); }
+}
+
+/* ── Status Metric Flash (blue → orange) ── */
+@keyframes metricFlash {
+  0%, 100% { color: var(--jarvis-blue-light); }
+  40% { color: var(--jarvis-cyan); }
+  70% { color: var(--jarvis-orange-light); }
+}
+
+/* ── Corner Bracket Glow ── */
+@keyframes bracketGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.9; }
+}
+
+/* ── Hex Pulse ── */
+@keyframes hexPulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.28; }
+}
+
+/* ── Utility animation classes ── */
+.animate-fade-in {
+  animation: fadeIn var(--duration-normal) var(--ease-out) forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp var(--duration-slow) var(--ease-out) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight var(--duration-normal) var(--ease-out) forwards;
+}
+
+.animate-holo-flicker {
+  animation: holoFlicker 8s linear infinite;
+}
+
+/* Stagger children */
+.stagger-children > * {
+  opacity: 0;
+  animation: fadeInUp var(--duration-slow) var(--ease-spring) forwards;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 60ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 120ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 180ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 300ms; }
+.stagger-children > *:nth-child(7) { animation-delay: 360ms; }
+.stagger-children > *:nth-child(8) { animation-delay: 420ms; }

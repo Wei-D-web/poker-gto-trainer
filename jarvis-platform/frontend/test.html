@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>JARVIS Test</title>
+<style>
+  body { margin:0; background:#05080C; color:#EDF1F7; font-family:system-ui; }
+  #loading { position:fixed; inset:0; z-index:999; background:#05080C;
+    display:flex; align-items:center; justify-content:center; font-size:24px; color:#60A5FA; }
+  #app { padding:40px; }
+  .ok { color:#10B981; } .fail { color:#EF4444; }
+</style>
+</head>
+<body>
+<div id="loading">LOADING...</div>
+<div id="app">
+  <h1>JARVIS Diagnostics</h1>
+  <div id="results"></div>
+</div>
+
+<script>
+// Test 1: Can we run JS at all?
+document.getElementById('results').innerHTML += '<p class="ok">✅ Test 1: JavaScript executes</p>';
+
+// Test 2: Hide loading
+setTimeout(function(){
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('results').innerHTML += '<p class="ok">✅ Test 2: Loading screen hidden</p>';
+}, 100);
+
+// Test 3: Can we load external JS?
+var s = document.createElement('script');
+s.src = 'js/chat.js';
+s.onload = function(){
+  document.getElementById('results').innerHTML += '<p class="ok">✅ Test 3: chat.js loaded</p>';
+  document.getElementById('results').innerHTML += '<p>JARVIS.Chat available: ' + (!!window.JARVIS && !!window.JARVIS.Chat) + '</p>';
+};
+s.onerror = function(){
+  document.getElementById('results').innerHTML += '<p class="fail">❌ Test 3: chat.js FAILED to load</p>';
+};
+document.head.appendChild(s);
+</script>
+
+<script type="module">
+document.getElementById('results').innerHTML += '<p class="ok">✅ Test 4: Module scripts execute</p>';
+
+// Test 5: Try importmap
+try {
+  const m = await import('three');
+  document.getElementById('results').innerHTML += '<p class="ok">✅ Test 5: Three.js loaded from CDN</p>';
+} catch(e) {
+  document.getElementById('results').innerHTML += '<p class="fail">❌ Test 5: Three.js FAILED - ' + e.message + '</p>';
+}
+</script>
+</body>
+</html>

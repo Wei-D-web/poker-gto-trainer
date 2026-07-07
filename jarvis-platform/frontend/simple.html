@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>J.A.R.V.I.S. — Simple</title>
+<link rel="stylesheet" href="css/reset.css">
+<link rel="stylesheet" href="css/hud.css">
+<link rel="stylesheet" href="css/animations.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+  #loading-screen {
+    position: fixed; inset: 0; z-index: 1000; background: #05080C;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    transition: opacity 0.5s ease-out;
+  }
+  #loading-screen.hidden { opacity: 0; pointer-events: none; }
+  #loading-screen .logo-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 36px; font-weight: 900; letter-spacing: 0.15em;
+    background: linear-gradient(135deg, #60A5FA, #06B6D4, #8B5CF6);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<pre id="diag" style="position:fixed;top:0;left:0;z-index:9999;color:#10B981;font:11px monospace;padding:8px;pointer-events:none;"></pre>
+
+<script>
+var diag = document.getElementById('diag');
+function ok(msg) { diag.textContent += '✅ ' + msg + '\n'; }
+function fail(msg) { diag.textContent += '❌ ' + msg + '\n'; }
+
+window.onerror = function(m,u,l) {
+  fail('JS ERROR: ' + m + ' line ' + l);
+  document.getElementById('loading-screen').style.display = 'none';
+};
+
+ok('Page parsing started');
+</script>
+
+<!-- Loading Screen -->
+<div id="loading-screen">
+  <div class="logo-text">J.A.R.V.I.S.</div>
+  <div style="font-size:12px;color:#556278;letter-spacing:0.08em;margin-top:16px">INITIALIZING</div>
+</div>
+
+<!-- Fallback BG -->
+<canvas id="fallback-bg" style="position:fixed;inset:0;z-index:0;background:#05080C;"></canvas>
+
+<!-- HUD -->
+<div id="jarvis-app">
+  <header id="status-bar">
+    <div class="status-left">
+      <span class="status-logo">[ J.A.R.V.I.S. ]</span>
+      <div class="status-indicator">
+        <span class="status-dot"></span>
+        <span>ONLINE</span>
+      </div>
+    </div>
+    <div class="status-center">
+      <span class="status-module">SIMPLE MODE</span>
+    </div>
+    <div class="status-right">
+      <span id="status-clock">00:00</span>
+      <span style="color:var(--fg-tertiary)">·</span>
+      <span>SYS NOMINAL</span>
+    </div>
+  </header>
+
+  <main id="main-panel">
+    <div class="panel-header">
+      <span class="label">Direct Interface</span>
+      <span class="divider"></span>
+    </div>
+    <div id="chat-container"></div>
+  </main>
+
+  <aside id="side-panel">
+    <div class="panel-header"><span class="label">Data Stream</span></div>
+    <div class="panel-tabs" style="margin-bottom:12px;">
+      <button class="panel-tab active" data-panel="viz">3D Viz</button>
+      <button class="panel-tab" data-panel="agents">Agents</button>
+      <button class="panel-tab" data-panel="vision">Vision</button>
+      <button class="panel-tab" data-panel="research">Research</button>
+    </div>
+    <div id="side-panel-content" class="side-panel-content">
+      <div class="empty-state">
+        <div class="empty-icon">🌐</div>
+        <div class="empty-title">Simple Mode</div>
+        <div class="empty-desc">Diagnostic page — minimal dependencies.</div>
+      </div>
+    </div>
+  </aside>
+
+  <footer id="input-bar">
+    <div class="input-wrapper">
+      <span class="input-prefix">SIR &gt;</span>
+      <input type="text" id="user-input" placeholder="Type your command..." autocomplete="off" spellcheck="false">
+    </div>
+    <button id="send-btn" title="Send">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </footer>
+</div>
+
+<!-- Vignette -->
+<div style="position:fixed;inset:0;pointer-events:none;z-index:4;background:radial-gradient(ellipse at center, transparent 60%, rgba(5,8,12,0.5) 100%);"></div>
+
+<!-- Load JS -->
+<script src="js/chat.js"></script>
+<script src="js/websocket.js"></script>
+<script src="js/speech.js"></script>
+<script src="js/vision.js"></script>
+<script src="js/agents.js"></script>
+<script src="js/viz.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+ok('All scripts loaded');
+
+// ── FALLBACK STARFIELD ──
+(function() {
+  var canvas = document.getElementById('fallback-bg');
+  var ctx = canvas.getContext('2d');
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+  var stars = [];
+  for (var i = 0; i < 200; i++) {
+    stars.push({
+      x: Math.random() * 1440, y: Math.random() * 900,
+      r: Math.random() * 1.5 + 0.3, o: Math.random(), s: Math.random() * 0.3 + 0.1
+    });
+  }
+  (function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      s.o += s.s * 0.01;
+      if (s.o > 1 || s.o < 0.1) s.s *= -1;
+      ctx.fillStyle = 'rgba(96,165,250,' + (s.o * 0.6) + ')';
+      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  })();
+  ok('Starfield running');
+})();
+
+// ── HIDE LOADER ──
+setTimeout(function() {
+  var loader = document.getElementById('loading-screen');
+  if (loader) { loader.classList.add('hidden'); }
+  ok('Loader hidden');
+}, 300);
+
+// ── INIT ──
+try {
+  JARVIS.Chat.init();
+  ok('Chat.init()');
+  JARVIS.Agents.init('side-panel-content');
+  ok('Agents.init()');
+  JARVIS.App.init();
+  ok('App.init()');
+} catch(e) {
+  fail('Init error: ' + e.message);
+}
+
+// ── WEBSOCKET ──
+try {
+  JARVIS.WS.connect();
+  ok('WS connecting...');
+} catch(e) {
+  fail('WS error: ' + e.message);
+}
+
+ok('PAGE FULLY LOADED — if you see this, everything works!');
+</script>
+
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Which file fails?</title>
+<style>body{background:#05080C;color:#EDF1F7;font:14px monospace;padding:20px}
+.ok{color:#10B981}.fail{color:#EF4444}.loading{color:#F59E0B}</style></head><body>
+<h1>JS File Load Test</h1><div id="log"></div>
+<script>
+var log = document.getElementById('log');
+function add(msg, cls) {
+  var d = document.createElement('div');
+  d.className = cls || '';
+  d.textContent = msg;
+  log.appendChild(d);
+}
+window.onerror = function(m,u,l) {
+  add('❌ GLOBAL ERROR: ' + m + ' at ' + u + ':' + l, 'fail');
+};
+add('Starting tests...', 'ok');
+</script>
+<script src="assets/three.min.js"></script>
+<script>add('✅ assets/three.min.js loaded (THREE=' + (typeof THREE) + ')', 'ok');</script>
+<script src="three/scene.js"></script>
+<script>add('✅ three/scene.js loaded', 'ok');</script>
+<script src="three/particles.js"></script>
+<script>add('✅ three/particles.js loaded', 'ok');</script>
+<script src="three/rings.js"></script>
+<script>add('✅ three/rings.js loaded', 'ok');</script>
+<script src="three/scanlines.js"></script>
+<script>add('✅ three/scanlines.js loaded', 'ok');</script>
+<script src="three/globe.js"></script>
+<script>add('✅ three/globe.js loaded', 'ok');</script>
+<script src="three/network.js"></script>
+<script>add('✅ three/network.js loaded', 'ok');</script>
+<script src="js/chat.js"></script>
+<script>add('✅ js/chat.js loaded', 'ok');</script>
+<script src="js/websocket.js"></script>
+<script>add('✅ js/websocket.js loaded', 'ok');</script>
+<script src="js/speech.js"></script>
+<script>add('✅ js/speech.js loaded', 'ok');</script>
+<script src="js/vision.js"></script>
+<script>add('✅ js/vision.js loaded', 'ok');</script>
+<script src="js/agents.js"></script>
+<script>add('✅ js/agents.js loaded', 'ok');</script>
+<script src="js/viz.js"></script>
+<script>add('✅ js/viz.js loaded', 'ok');</script>
+<script src="js/app.js"></script>
+<script>add('✅ js/app.js loaded', 'ok');</script>
+<script>
+add('', 'ok');
+add('🎉 ALL 14 FILES LOADED SUCCESSFULLY!', 'ok');
+</script>
+</body></html>
