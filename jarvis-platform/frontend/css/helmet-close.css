@@ -1,0 +1,301 @@
+/* ==========================================
+   🦾 IRON MAN HELMET CLOSE — Cinematic + Armor Mode
+   Cinematic boot sequence (plays once, cleans up)
+   + Toggleable ARMOR MODE (helmet interior overlay)
+   ========================================== */
+
+/* ── Helmet Close Sequence Overlay (one-time intro) ── */
+#helmet-close-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  pointer-events: none;
+  opacity: 0;
+  background: #000;
+}
+#helmet-close-overlay.running {
+  opacity: 1;
+  animation: helmetCloseSequence 4.5s ease-in-out forwards;
+}
+
+@keyframes helmetCloseSequence {
+  0% { background: #000; }
+  5% { background: #010204; }
+  10% { background: #020408; }
+  15% { background: #030a16; }
+  20% { background: radial-gradient(ellipse at 50% 55%, rgba(59,130,246,0.15) 0%, #05080C 60%); }
+  25% { background: radial-gradient(ellipse at 50% 55%, rgba(59,130,246,0.3) 0%, #05080C 70%); }
+  28% { background: radial-gradient(ellipse at 50% 55%, rgba(96,165,250,0.4) 0%, rgba(6,182,212,0.1) 30%, #05080C 70%); }
+  35% { background: radial-gradient(ellipse at 50% 55%, rgba(59,130,246,0.5) 0%, rgba(96,165,250,0.15) 40%, #05080C 75%); }
+  45% { background: radial-gradient(ellipse at 50% 55%, rgba(59,130,246,0.35) 0%, rgba(6,182,212,0.1) 35%, rgba(10,18,32,0.8) 70%, #05080C 100%); }
+  60% { background: radial-gradient(ellipse at 50% 50%, rgba(59,130,246,0.2) 0%, rgba(10,18,32,0.6) 55%, rgba(5,8,12,0.9) 85%); }
+  70% { background: radial-gradient(ellipse at 50% 48%, rgba(59,130,246,0.12) 0%, rgba(10,18,32,0.4) 60%, rgba(5,8,12,0.85) 90%); }
+  100% { background: radial-gradient(ellipse at 50% 48%, rgba(59,130,246,0.08) 0%, rgba(10,18,32,0.25) 55%, rgba(5,8,12,0.5) 85%, transparent 100%); }
+}
+
+
+/* ── Mechanical Pieces (intro sequence only) ── */
+.helmet-piece {
+  position: fixed;
+  z-index: 3001;
+  pointer-events: none;
+  opacity: 0;
+  background: #0a0d14;
+  display: none;
+}
+.helmet-piece.closing {
+  display: block;
+}
+.helmet-piece.top-piece {
+  top: -100%; left: 0; right: 0; height: 35%;
+  background: linear-gradient(180deg, #0a0d14 0%, #0d1018 80%, rgba(13,16,24,0.5) 100%);
+  border-bottom: 2px solid rgba(59,130,246,0.2);
+  box-shadow: 0 4px 30px rgba(0,0,0,0.8);
+}
+.helmet-piece.top-piece.closing { animation: pieceSlideDown 1.2s cubic-bezier(0.25,0.1,0.25,1) forwards; }
+.helmet-piece.bottom-piece {
+  bottom: -100%; left: 0; right: 0; height: 30%;
+  background: linear-gradient(0deg, #0a0d14 0%, #0d1018 80%, rgba(13,16,24,0.5) 100%);
+  border-top: 2px solid rgba(249,115,22,0.15);
+  box-shadow: 0 -4px 30px rgba(0,0,0,0.8);
+}
+.helmet-piece.bottom-piece.closing { animation: pieceSlideUp 1.2s cubic-bezier(0.25,0.1,0.25,1) forwards; }
+.helmet-piece.left-piece {
+  left: -30%; top: 0; bottom: 0; width: 18%;
+  background: linear-gradient(90deg, #0a0d14 0%, #0d1018 80%, rgba(13,16,24,0.3) 100%);
+  border-right: 2px solid rgba(59,130,246,0.12);
+}
+.helmet-piece.left-piece.closing { animation: pieceSlideRight 1.2s cubic-bezier(0.25,0.1,0.25,1) forwards; }
+.helmet-piece.right-piece {
+  right: -30%; top: 0; bottom: 0; width: 18%;
+  background: linear-gradient(270deg, #0a0d14 0%, #0d1018 80%, rgba(13,16,24,0.3) 100%);
+  border-left: 2px solid rgba(249,115,22,0.12);
+}
+.helmet-piece.right-piece.closing { animation: pieceSlideLeft 1.2s cubic-bezier(0.25,0.1,0.25,1) forwards; }
+
+@keyframes pieceSlideDown { 0% { top: -100%; } 100% { top: 0; } }
+@keyframes pieceSlideUp { 0% { bottom: -100%; } 100% { bottom: 0; } }
+@keyframes pieceSlideRight { 0% { left: -30%; } 100% { left: 0; } }
+@keyframes pieceSlideLeft { 0% { right: -30%; } 100% { right: 0; } }
+
+/* Pieces fade out after sequence */
+.helmet-piece.dismissing {
+  animation: pieceDismiss 0.8s ease-in forwards !important;
+}
+@keyframes pieceDismiss {
+  0% { opacity: 1; }
+  100% { opacity: 0; display: none; }
+}
+
+
+/* ═══════════════════════════════════════
+   🦾 ARMOR MODE — Toggleable Helmet HUD
+   ═══════════════════════════════════════ */
+
+/* Hidden by default; shown when body.armor-mode */
+body.armor-mode .armor-only { display: block; }
+.armor-only { display: none; }
+
+/* Eye Display Viewports */
+body.armor-mode .eye-viewport {
+  position: fixed;
+  pointer-events: none;
+  z-index: 24;
+  opacity: 0.5;
+}
+.eye-viewport.left-eye {
+  top: 8%; left: 18%; right: 55%; bottom: 35%;
+  border: 2px solid rgba(59,130,246,0.2);
+  border-radius: 45% 55% 50% 50% / 40% 45% 55% 60%;
+  box-shadow: inset 0 0 80px rgba(59,130,246,0.03), 0 0 20px rgba(59,130,246,0.06);
+  clip-path: polygon(15% 0%, 85% 0%, 95% 25%, 100% 50%, 95% 75%, 85% 100%, 15% 100%, 5% 75%, 0% 50%, 5% 25%);
+}
+.eye-viewport.right-eye {
+  top: 8%; right: 18%; left: 55%; bottom: 35%;
+  border: 2px solid rgba(249,115,22,0.15);
+  border-radius: 55% 45% 50% 50% / 40% 45% 55% 60%;
+  box-shadow: inset 0 0 80px rgba(249,115,22,0.02), 0 0 20px rgba(249,115,22,0.04);
+  clip-path: polygon(15% 0%, 85% 0%, 95% 25%, 100% 50%, 95% 75%, 85% 100%, 15% 100%, 5% 75%, 0% 50%, 5% 25%);
+}
+
+/* Chest Arc Reactor (armor mode) */
+body.armor-mode #chest-reactor {
+  position: fixed;
+  bottom: 12%; left: 50%;
+  transform: translateX(-50%);
+  z-index: 26;
+  pointer-events: none;
+  opacity: 0.5;
+}
+#chest-reactor .reactor-glow {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 45% 45%,
+    rgba(255,255,255,0.9) 0%, rgba(96,165,250,0.6) 15%,
+    rgba(59,130,246,0.3) 35%, rgba(6,182,212,0.1) 55%, transparent 70%);
+  box-shadow: 0 0 30px rgba(59,130,246,0.4), 0 0 80px rgba(59,130,246,0.15);
+  animation: chestReactorPulse 2s ease-in-out infinite;
+}
+#chest-reactor .reactor-ring {
+  position: absolute; top: 50%; left: 50%;
+  border-radius: 50%; border: 1px solid rgba(59,130,246,0.25);
+  transform: translate(-50%, -50%);
+}
+#chest-reactor .reactor-ring:nth-child(2) { width: 70px; height: 70px; animation: reactorSpin 8s linear infinite; }
+#chest-reactor .reactor-ring:nth-child(3) { width: 90px; height: 90px; border-color: rgba(249,115,22,0.18); animation: reactorSpin 12s linear infinite reverse; }
+#chest-reactor .reactor-ring:nth-child(4) { width: 110px; height: 110px; border-color: rgba(255,215,0,0.1); border-style: dashed; animation: reactorSpin 18s linear infinite; }
+
+@keyframes chestReactorPulse {
+  0%, 100% { box-shadow: 0 0 30px rgba(59,130,246,0.4), 0 0 80px rgba(59,130,246,0.15); }
+  50% { box-shadow: 0 0 50px rgba(59,130,246,0.6), 0 0 120px rgba(59,130,246,0.25); }
+}
+@keyframes reactorSpin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Helmet Mechanical Details (armor mode) */
+body.armor-mode .helmet-detail {
+  position: fixed;
+  pointer-events: none;
+  z-index: 24;
+  opacity: 0.4;
+}
+.helmet-detail.forehead {
+  top: 6%; left: 35%; right: 35%; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(59,130,246,0.3) 15%, rgba(59,130,246,0.5) 30%, rgba(96,165,250,0.4) 50%, rgba(59,130,246,0.5) 70%, rgba(59,130,246,0.3) 85%, transparent);
+  box-shadow: 0 0 6px rgba(59,130,246,0.2);
+}
+.helmet-detail.cheek-left {
+  top: 30%; bottom: 40%; left: 16%; width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(59,130,246,0.3), transparent);
+}
+.helmet-detail.cheek-right {
+  top: 30%; bottom: 40%; right: 16%; width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(249,115,22,0.25), transparent);
+}
+.helmet-detail.jaw {
+  bottom: 20%; left: 30%; right: 30%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(249,115,22,0.25) 20%, rgba(249,115,22,0.4) 50%, rgba(249,115,22,0.25) 80%, transparent);
+}
+
+/* Helmet Edge Honeycomb (armor mode only) */
+body.armor-mode #helmet-honeycomb {
+  opacity: 0.08;
+}
+
+/* Helmet Joints (armor mode only) */
+body.armor-mode .helmet-joint {
+  opacity: 0.5;
+}
+
+/* Eye viewport glow pulse (armor mode) */
+body.armor-mode .eye-viewport::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 50% 45%, rgba(59,130,246,0.06) 0%, rgba(6,182,212,0.03) 30%, transparent 60%);
+  pointer-events: none;
+  animation: eyeGlow 4s ease-in-out infinite;
+}
+@keyframes eyeGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.9; }
+}
+
+/* Curved display (armor mode) */
+body.armor-mode #jarvis-app {
+  transform: perspective(1000px) rotateX(2deg) scale(0.92) !important;
+  transform-origin: center center;
+  transition: transform 1.5s cubic-bezier(0.16,1,0.3,1);
+}
+
+/* Armor mode: slightly more transparent panels */
+body.armor-mode #status-bar {
+  background: rgba(10,18,32,0.5);
+}
+body.armor-mode #input-bar {
+  background: rgba(10,18,32,0.5);
+}
+
+/* ── Retina Scanner (intro only, cleaned up after) ── */
+#retina-scanner {
+  position: fixed;
+  pointer-events: none;
+  z-index: 3020;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  display: none;
+}
+#retina-scanner.running {
+  display: block;
+  animation: retinaScan 0.8s ease-out forwards;
+}
+#retina-scanner .scan-line {
+  position: absolute;
+  width: 120px; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(59,130,246,0.5) 30%, rgba(96,165,250,0.7) 50%, rgba(59,130,246,0.5) 70%, transparent);
+  box-shadow: 0 0 8px rgba(59,130,246,0.4);
+}
+@keyframes retinaScan {
+  0% { opacity: 1; transform: translate(-50%, -50%) scaleY(8); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scaleY(1); }
+}
+
+/* ── Data Cascades (intro only, cleaned up after) ── */
+.data-cascade {
+  position: fixed;
+  z-index: 3010;
+  pointer-events: none;
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.04em;
+}
+.data-cascade.running {
+  display: block;
+  animation: dataCascadeIn 2s ease-out forwards;
+}
+.data-cascade.left-cascade {
+  top: 15%; left: 8%;
+  text-align: right;
+  color: rgba(59,130,246,0.6);
+}
+.data-cascade.right-cascade {
+  top: 15%; right: 8%;
+  text-align: left;
+  color: rgba(249,115,22,0.5);
+}
+@keyframes dataCascadeIn {
+  0% { opacity: 0; transform: translateY(-20px); }
+  20% { opacity: 0.8; }
+  80% { opacity: 0.6; }
+  100% { opacity: 0; transform: translateY(20px); }
+}
+
+/* ── Armor mode toggle button ── */
+#view-toggle button.armor-btn {
+  border: 1px solid transparent;
+}
+#view-toggle button.armor-btn.active {
+  background: rgba(249,115,22,0.15);
+  color: var(--jarvis-orange-light);
+  box-shadow: 0 0 10px rgba(249,115,22,0.15);
+  border-color: rgba(249,115,22,0.25);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .eye-viewport { display: none !important; }
+  #chest-reactor { display: none !important; }
+  .helmet-detail { display: none !important; }
+  body.armor-mode #jarvis-app { transform: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #helmet-close-overlay.running {
+    animation: none;
+    background: radial-gradient(ellipse at 50% 48%, rgba(59,130,246,0.08) 0%, rgba(10,18,32,0.25) 55%, rgba(5,8,12,0.5) 85%, transparent 100%);
+  }
+  .helmet-piece.closing { animation: none !important; top: 0; bottom: 0; left: 0; right: 0; }
+  body.armor-mode #jarvis-app { transform: none !important; }
+}

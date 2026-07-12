@@ -1,4 +1,4 @@
-"""Text-to-speech using macOS say (Daniel voice) with edge-tts fallback."""
+"""Text-to-speech using edge-tts (multilingual neural) with macOS say fallback."""
 
 import asyncio
 import base64
@@ -13,93 +13,106 @@ from config import settings
 logger = logging.getLogger(__name__)
 
 
-async def synthesize(text: str, voice: str | None = None) -> bytes:
-    """Synthesize speech from text. Returns WAV audio bytes.
+async def synthesize(text: str, language: str = "en", voice: str | None = None) -> bytes:
+    """Synthesize speech from text. Returns MP3 audio bytes.
 
     Args:
-        text: Text to speak
-        voice: Voice name (macOS: Daniel, Samantha; edge-tts: en-US-...)
+        text: Text to speak.
+        language: ISO 639-1 language code (zh, en, ja, ko, etc.).
+        voice: Override voice. Auto-selected by language if not set.
     """
-    voice = voice or settings.tts_voice
+    voice = voice or get_voice_for_language(language)
 
+    if settings.tts_provider == "edge":
+        try:
+            return await _edge_tts_synthesize(text, voice)
+        except Exception as e:
+            logger.warning(f"edge-tts failed ({e}), falling back to macOS say")
+
+    # Fallback: macOS say (English-only, but fast)
     if platform.system() == "Darwin":
-        return await _macos_say(text, voice)
-    else:
-        return await _edge_tts(text, voice)
+        say_voice = "Daniel" if language.startswith("en") else voice
+        return await _macos_say(text, say_voice)
+
+    logger.error("No TTS engine available")
+    return b""
 
 
-async def synthesize_base64(text: str, voice: str | None = None) -> str:
-    """Synthesize and return base64-encoded audio."""
-    audio_bytes = await synthesize(text, voice)
+async def synthesize_base64(text: str, language: str = "en", voice: str | None = None) -> str:
+    """Synthesize and return base64-encoded MP3 audio."""
+    audio_bytes = await synthesize(text, language, voice)
     return base64.b64encode(audio_bytes).decode("utf-8")
 
 
+async def _edge_tts_synthesize(text: str, voice: str) -> bytes:
+    """Synthesize via Microsoft Edge TTS (neural, multilingual)."""
+    import edge_tts
+
+    communicate = edge_tts.Communicate(text, voice, rate=settings.tts_speed)
+
+    audio_chunks = []
+    async for chunk in communicate.stream():
+        if chunk["type"] == "audio":
+            audio_chunks.append(chunk["data"])
+
+    return b"".join(audio_chunks)
+
+
 async def _macos_say(text: str, voice: str = "Daniel") -> bytes:
-    """Use macOS 'say' command for TTS."""
-    # Escape special characters for shell
+    """Use macOS 'say' command (fast local fallback, English only)."""
     safe_text = text.replace('"', '\\"').replace("`", "\\`")
 
     with tempfile.NamedTemporaryFile(suffix=".aiff", delete=False) as f:
         tmp_path = f.name
 
     try:
-        # Generate AIFF audio file
         proc = await asyncio.create_subprocess_exec(
-            "say",
-            "-v", voice,
-            "-o", tmp_path,
-            safe_text,
+            "say", "-v", voice, "-o", tmp_path, safe_text,
         )
         await proc.wait()
 
         if proc.returncode != 0:
             raise RuntimeError(f"say command failed with code {proc.returncode}")
 
-        # Read the generated audio
-        audio_data = Path(tmp_path).read_bytes()
-        return audio_data
+        return Path(tmp_path).read_bytes()
 
     finally:
         Path(tmp_path).unlink(missing_ok=True)
 
 
-async def _edge_tts(text: str, voice: str = "en-GB-SoniaNeural") -> bytes:
-    """Use edge-tts for cross-platform TTS."""
-    try:
-        import edge_tts
+def get_voice_for_language(lang: str) -> str:
+    """Map ISO 639-1 language code to edge-tts neural voice.
 
-        communicate = edge_tts.Communicate(text, voice)
+    Returns a British butler voice for English, native speakers for others.
+    """
+    # Normalize: handle "zh-CN" style codes
+    lang = lang.lower().split("-")[0] if lang else "en"
 
-        audio_chunks = []
-        async for chunk in communicate.stream():
-            if chunk["type"] == "audio":
-                audio_chunks.append(chunk["data"])
+    voice_map = settings.tts_voice_map
+    if lang in voice_map:
+        return voice_map[lang]
 
-        return b"".join(audio_chunks)
+    # Chinese variants
+    if lang == "zh":
+        return "zh-CN-XiaoxiaoNeural"
 
-    except ImportError:
-        logger.warning("edge-tts not installed, TTS unavailable on non-macOS")
-        return b""
-    except Exception as e:
-        logger.error(f"edge-tts failed: {e}")
-        return b""
+    return "en-GB-SoniaNeural"  # Default: British butler style
 
 
 def list_voices() -> list[str]:
     """List available TTS voices."""
+    voices = list(settings.tts_voice_map.values())
+
     if platform.system() == "Darwin":
         try:
             result = subprocess.run(
-                ["say", "-v", "?"],
-                capture_output=True,
-                text=True,
+                ["say", "-v", "?"], capture_output=True, text=True,
             )
-            voices = []
             for line in result.stdout.strip().split("\n"):
                 parts = line.split()
                 if parts:
                     voices.append(parts[0])
-            return voices
         except Exception:
-            return ["Daniel", "Samantha", "Alex", "Victoria"]
-    return ["en-GB-SoniaNeural", "en-US-JennyNeural", "en-GB-RyanNeural"]
+            voices.extend(["Daniel", "Samantha", "Alex", "Victoria"])
+
+    return voices

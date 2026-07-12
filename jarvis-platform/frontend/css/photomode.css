@@ -1,0 +1,50 @@
+/* ═══════════════════════════════════════
+   J.A.R.V.I.S. — Photo Mode CSS
+   ═══════════════════════════════════════ */
+
+body.photo-mode #unified-control-bar,
+body.photo-mode #status-bar,
+body.photo-mode #input-bar,
+body.photo-mode #side-panel,
+body.photo-mode #chat-container,
+body.photo-mode .hud-angular-frame,
+body.photo-mode .hud-sector-ring,
+body.photo-mode #holo-scanlines,
+body.photo-mode .hud-data-label,
+body.photo-mode #target-reticle,
+body.photo-mode #radar-canvas,
+body.photo-mode #radar-label,
+body.photo-mode #weapons-panel,
+body.photo-mode #diag-panel-overlay,
+body.photo-mode #jarvis-quote,
+body.photo-mode #system-alert,
+body.photo-mode #toast-container,
+body.photo-mode .helmet-mech,
+body.photo-mode .helmet-joint,
+body.photo-mode #power-ring,
+body.photo-mode #heading-tape,
+body.photo-mode #altitude-tape {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transition: opacity 0.4s ease !important;
+}
+
+#photo-watermark {
+  position: fixed; bottom: 40px; right: 40px; z-index: 500;
+  pointer-events: none; opacity: 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 700;
+  color: rgba(96,165,250,0.4);
+  letter-spacing: 0.15em;
+  text-shadow: 0 0 10px rgba(96,165,250,0.2);
+  transition: opacity 0.6s;
+}
+body.photo-mode #photo-watermark { opacity: 1; }
+
+#photo-vignette {
+  position: fixed; inset: 0; z-index: 499;
+  pointer-events: none; opacity: 0;
+  background: radial-gradient(ellipse at 50% 50%, transparent 50%, rgba(5,8,12,0.6) 100%);
+  transition: opacity 0.4s;
+}
+body.photo-mode #photo-vignette { opacity: 1; }

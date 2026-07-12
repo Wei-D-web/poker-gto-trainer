@@ -1,5 +1,7 @@
 /* ==========================================
-   J.A.R.V.I.S. — Holographic Data Stream Particles
+   J.A.R.V.I.S. — Arc Reactor Energy Particles
+   Enhanced particle field with energy streams
+   and reactor-style burst effects
    ========================================== */
 
 var JARVIS = window.JARVIS || {};
@@ -8,11 +10,9 @@ JARVIS.Particles = (function () {
   let particles, geometry, material;
   let mouseX = 0, mouseY = 0;
   let targetMouseX = 0, targetMouseY = 0;
-  const PARTICLE_COUNT = 2000;
-  const STREAM_COUNT = 8;
+  const PARTICLE_COUNT = 2400;
+  const STREAM_COUNT = 12;
   let burstIntensity = 0;
-
-  // Store initial positions for burst reset
   let initialPositions;
   let velocities;
 
@@ -28,23 +28,29 @@ JARVIS.Particles = (function () {
     const cyanColor = new THREE.Color('#06B6D4');
     const orangeColor = new THREE.Color('#F97316');
     const amberColor = new THREE.Color('#F59E0B');
+    const goldColor = new THREE.Color('#FFD700');
     const whiteColor = new THREE.Color('#EDF1F7');
+    const purpleColor = new THREE.Color('#8B5CF6');
 
     const particlesPerStream = Math.floor(PARTICLE_COUNT / STREAM_COUNT);
 
     for (let s = 0; s < STREAM_COUNT; s++) {
+      // Distribute streams in a wider arc reactor pattern
       const angle = (s / STREAM_COUNT) * Math.PI * 2;
-      const streamRadius = 4 + Math.random() * 8; // distance from center
-      const streamHeight = 14;
-      const streamSpread = 0.6 + Math.random() * 0.8;
+      // Mix of inner (close to core) and outer streams
+      const isInner = s < 4;
+      const streamRadius = isInner
+        ? 1.5 + Math.random() * 2.5  // inner: closer to reactor
+        : 4.5 + Math.random() * 8;   // outer: wider field
+      const streamHeight = isInner ? 8 : 16;
+      const streamSpread = isInner ? 0.3 : 0.8;
 
       for (let j = 0; j < particlesPerStream; j++) {
         const idx = s * particlesPerStream + j;
         if (idx >= PARTICLE_COUNT) break;
 
-        // Column position with slight spread
         const px = Math.cos(angle) * streamRadius + (Math.random() - 0.5) * streamSpread;
-        const py = (Math.random() - 0.5) * streamHeight; // vertical distribution
+        const py = (Math.random() - 0.5) * streamHeight;
         const pz = Math.sin(angle) * streamRadius + (Math.random() - 0.5) * streamSpread;
 
         positions[idx * 3] = px;
@@ -55,29 +61,37 @@ JARVIS.Particles = (function () {
         initialPositions[idx * 3 + 1] = py;
         initialPositions[idx * 3 + 2] = pz;
 
-        // Velocity: upward drift
-        velocities[idx * 3] = (Math.random() - 0.5) * 0.1;
-        velocities[idx * 3 + 1] = 0.3 + Math.random() * 0.8; // upward speed
-        velocities[idx * 3 + 2] = (Math.random() - 0.5) * 0.1;
+        // Velocity: mainly upward with slight spiral
+        const spiralSpeed = isInner ? 0.15 : 0.05;
+        velocities[idx * 3] = Math.cos(angle) * spiralSpeed + (Math.random() - 0.5) * 0.1;
+        velocities[idx * 3 + 1] = 0.4 + Math.random() * 1.0;
+        velocities[idx * 3 + 2] = Math.sin(angle) * spiralSpeed + (Math.random() - 0.5) * 0.1;
 
-        // Color: 65% blue/cyan, 30% orange/amber, 5% white
+        // Color distribution: more white/cyan for inner streams (arc reactor energy)
         const mix = Math.random();
         let color;
-        if (mix < 0.45) {
-          color = blueColor.clone().lerp(cyanColor, Math.random());
-        } else if (mix < 0.65) {
-          color = cyanColor.clone().lerp(new THREE.Color('#8B5CF6'), Math.random() * 0.5);
-        } else if (mix < 0.90) {
-          color = orangeColor.clone().lerp(amberColor, Math.random());
+        if (isInner) {
+          if (mix < 0.22) color = whiteColor.clone().lerp(cyanColor, Math.random() * 0.6);
+          else if (mix < 0.42) color = cyanColor.clone().lerp(blueColor, Math.random());
+          else if (mix < 0.62) color = blueColor.clone().lerp(purpleColor, Math.random() * 0.5);
+          else if (mix < 0.82) color = goldColor.clone().lerp(amberColor, Math.random() * 0.5);
+          else color = orangeColor.clone().lerp(goldColor, Math.random() * 0.6);
         } else {
-          color = orangeColor.clone().lerp(whiteColor, Math.random() * 0.5);
+          if (mix < 0.32) color = blueColor.clone().lerp(cyanColor, Math.random());
+          else if (mix < 0.52) color = cyanColor.clone().lerp(purpleColor, Math.random() * 0.5);
+          else if (mix < 0.72) color = goldColor.clone().lerp(amberColor, Math.random() * 0.5);
+          else if (mix < 0.88) color = orangeColor.clone().lerp(goldColor, Math.random() * 0.4);
+          else color = purpleColor.clone().lerp(whiteColor, Math.random() * 0.3);
         }
 
         colors[idx * 3] = color.r;
         colors[idx * 3 + 1] = color.g;
         colors[idx * 3 + 2] = color.b;
 
-        sizes[idx] = 0.3 + Math.random() * 2.0;
+        // Smaller particles for inner streams (energy look)
+        sizes[idx] = isInner
+          ? 0.15 + Math.random() * 1.2
+          : 0.4 + Math.random() * 2.2;
       }
     }
 
@@ -85,15 +99,16 @@ JARVIS.Particles = (function () {
     geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
     geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
 
-    // Circular particle texture
+    // Soft glowing particle texture (radial gradient)
     const canvas = document.createElement('canvas');
     canvas.width = 32;
     canvas.height = 32;
     const ctx = canvas.getContext('2d');
     const gradient = ctx.createRadialGradient(16, 16, 0, 16, 16, 16);
     gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-    gradient.addColorStop(0.1, 'rgba(255, 255, 255, 0.9)');
-    gradient.addColorStop(0.3, 'rgba(150, 200, 255, 0.5)');
+    gradient.addColorStop(0.08, 'rgba(255, 255, 255, 0.95)');
+    gradient.addColorStop(0.25, 'rgba(150, 210, 255, 0.55)');
+    gradient.addColorStop(0.6, 'rgba(59, 130, 246, 0.1)');
     gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 32, 32);
@@ -101,13 +116,13 @@ JARVIS.Particles = (function () {
     const texture = new THREE.CanvasTexture(canvas);
 
     material = new THREE.PointsMaterial({
-      size: 0.07,
+      size: 0.06,
       map: texture,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
       vertexColors: true,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.75,
     });
 
     particles = new THREE.Points(geometry, material);
@@ -127,40 +142,42 @@ JARVIS.Particles = (function () {
     if (!particles) return;
 
     // Smooth mouse follow
-    mouseX += (targetMouseX - mouseX) * 0.02;
-    mouseY += (targetMouseY - mouseY) * 0.02;
+    mouseX += (targetMouseX - mouseX) * 0.025;
+    mouseY += (targetMouseY - mouseY) * 0.025;
 
-    // Rotate entire particle field
-    particles.rotation.y += delta * 0.04;
-    particles.rotation.x += delta * 0.02;
-    particles.rotation.y += mouseX * delta * 0.08;
-    particles.rotation.x += mouseY * delta * 0.04;
+    // Gentle rotation of field
+    particles.rotation.y += delta * 0.03;
+    particles.rotation.x += delta * 0.015;
+    particles.rotation.y += mouseX * delta * 0.06;
+    particles.rotation.x += mouseY * delta * 0.03;
 
-    // Update individual particle positions (data stream flow)
     const positions = geometry.attributes.position.array;
+    const coreIntensity = JARVIS.Scene && JARVIS.Scene.getCoreIntensity
+      ? JARVIS.Scene.getCoreIntensity() : 0.3;
     const streamHeight = 14;
 
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       const idx = i * 3;
 
-      // Apply velocity (upward drift)
-      positions[idx] += velocities[idx] * delta;
-      positions[idx + 1] += velocities[idx + 1] * delta;
-      positions[idx + 2] += velocities[idx + 2] * delta;
+      // Apply velocity with core intensity influence
+      const speedMult = 0.8 + coreIntensity * 1.5;
+      positions[idx] += velocities[idx] * delta * speedMult;
+      positions[idx + 1] += velocities[idx + 1] * delta * speedMult;
+      positions[idx + 2] += velocities[idx + 2] * delta * speedMult;
 
-      // Burst offset: particles pushed outward from center
+      // Burst: particles pushed outward from center
       if (burstIntensity > 0.001) {
         const dx = positions[idx];
         const dy = positions[idx + 1];
         const dz = positions[idx + 2];
         const dist = Math.sqrt(dx * dx + dy * dy + dz * dz) + 0.01;
-        const force = burstIntensity * 3.0;
+        const force = burstIntensity * 4.5;
         positions[idx] += (dx / dist) * force * delta;
         positions[idx + 1] += (dy / dist) * force * delta;
         positions[idx + 2] += (dz / dist) * force * delta;
       }
 
-      // Wrap: if particle drifts too high, reset to bottom
+      // Wrap vertically
       if (positions[idx + 1] > streamHeight / 2) {
         positions[idx + 1] = -streamHeight / 2;
       }
@@ -168,34 +185,34 @@ JARVIS.Particles = (function () {
         positions[idx + 1] = streamHeight / 2;
       }
 
-      // Drift back toward initial position (elastic)
+      // Elastic drift back
       const ix = initialPositions[idx];
       const iy = initialPositions[idx + 1];
       const iz = initialPositions[idx + 2];
-      positions[idx] += (ix - positions[idx]) * 0.005;
-      positions[idx + 2] += (iz - positions[idx + 2]) * 0.005;
+      const elastic = 0.006;
+      positions[idx] += (ix - positions[idx]) * elastic;
+      positions[idx + 2] += (iz - positions[idx + 2]) * elastic;
     }
 
     geometry.attributes.position.needsUpdate = true;
 
     // Decay burst
     if (burstIntensity > 0.001) {
-      burstIntensity *= 0.92;
+      burstIntensity *= 0.9;
     } else {
       burstIntensity = 0;
     }
 
-    // Breathing opacity
-    const breath = 0.55 + Math.sin(elapsed * 0.4) * 0.12;
-    material.opacity = breath + burstIntensity * 0.4;
-    material.size = 0.07 + burstIntensity * 0.04;
+    // Breathing opacity + core intensity influence
+    const breath = 0.55 + Math.sin(elapsed * 0.35) * 0.1;
+    material.opacity = breath + burstIntensity * 0.5 + coreIntensity * 0.15;
+    material.size = 0.06 + burstIntensity * 0.05 + coreIntensity * 0.02;
   }
 
   function burst(strength = 0.6) {
     burstIntensity = Math.min(1, burstIntensity + strength);
-    // Also trigger core pulse
     if (JARVIS.Scene && JARVIS.Scene.pulseCore) {
-      JARVIS.Scene.pulseCore(strength * 0.6);
+      JARVIS.Scene.pulseCore(strength * 0.5);
     }
   }
 

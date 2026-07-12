@@ -1,0 +1,494 @@
+/* ==========================================
+   🦾 IRON MAN HELMET POV — First-Person HUD
+   ========================================== */
+
+/* ── Desktop View Mode ── */
+body.desktop-view {
+  background: transparent !important;
+}
+body.desktop-view .hex-bg-pattern {
+  display: none;
+}
+body.desktop-view #three-bg {
+  opacity: 0.35;
+}
+body.desktop-view #vignette {
+  opacity: 0.5;
+}
+body.desktop-view #holo-scanlines {
+  opacity: 0.6;
+}
+
+/* Screen capture background layer */
+#desktop-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: none;
+  background: #000;
+}
+#desktop-bg.active {
+  display: block;
+  animation: desktopFadeIn 0.5s ease-out;
+}
+@keyframes desktopFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+#desktop-bg img,
+#desktop-bg video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.9;
+  filter: brightness(0.95) saturate(0.85) contrast(1.05);
+}
+
+/* ── Iron Man Helmet Frame ── */
+#helmet-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0.85;
+}
+#helmet-frame svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Helmet interior mechanical details */
+.helmet-mech {
+  position: fixed;
+  pointer-events: none;
+  z-index: 19;
+}
+/* Top arc — the curved brow of the helmet */
+.helmet-mech.top {
+  top: 0; left: 0; right: 0;
+  height: 80px;
+  background: linear-gradient(180deg,
+    rgba(20,25,35,0.95) 0%,
+    rgba(20,25,35,0.8) 40%,
+    rgba(15,20,30,0.4) 75%,
+    transparent 100%
+  );
+  border-bottom: 1px solid rgba(59,130,246,0.15);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+/* Bottom jaw — the chin of the helmet */
+.helmet-mech.bottom {
+  bottom: 0; left: 0; right: 0;
+  height: 70px;
+  background: linear-gradient(0deg,
+    rgba(20,25,35,0.95) 0%,
+    rgba(20,25,35,0.7) 50%,
+    transparent 100%
+  );
+  border-top: 1px solid rgba(249,115,22,0.12);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+}
+/* Left cheek mechanical accent */
+.helmet-mech.left {
+  top: 0; bottom: 0; left: 0;
+  width: 40px;
+  background: linear-gradient(90deg,
+    rgba(15,20,30,0.8) 0%,
+    rgba(15,20,30,0.35) 60%,
+    transparent 100%
+  );
+  border-right: 1px solid rgba(59,130,246,0.08);
+}
+/* Right cheek mechanical accent */
+.helmet-mech.right {
+  top: 0; bottom: 0; right: 0;
+  width: 40px;
+  background: linear-gradient(270deg,
+    rgba(15,20,30,0.8) 0%,
+    rgba(15,20,30,0.35) 60%,
+    transparent 100%
+  );
+  border-left: 1px solid rgba(249,115,22,0.08);
+}
+
+/* ── Helmet Corner Joints ── */
+.helmet-joint {
+  position: fixed;
+  pointer-events: none;
+  z-index: 21;
+  width: 24px; height: 24px;
+  opacity: 0.6;
+}
+.helmet-joint::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(59,130,246,0.3);
+  border-radius: 50%;
+  animation: jointPulse 3s ease-in-out infinite;
+}
+.helmet-joint::after {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  background: rgba(59,130,246,0.15);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(59,130,246,0.2);
+}
+.joint-tl { top: 60px; left: 16px; }
+.joint-tr { top: 60px; right: 16px; }
+.joint-bl { bottom: 74px; left: 16px; }
+.joint-br { bottom: 74px; right: 16px; }
+@keyframes jointPulse {
+  0%, 100% { transform: scale(1); opacity: 0.4; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+/* ── Helmet Edge Honeycomb (subtle hex pattern at periphery) ── */
+#helmet-honeycomb {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.06;
+  background:
+    radial-gradient(ellipse at 50% 40%,
+      transparent 30%,
+      rgba(59,130,246,0.3) 65%,
+      rgba(59,130,246,0.15) 80%,
+      rgba(6,182,212,0.1) 90%,
+      transparent 100%
+    );
+  mask-image: radial-gradient(ellipse at 50% 40%,
+    transparent 28%,
+    black 65%,
+    black 80%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(ellipse at 50% 40%,
+    transparent 28%,
+    black 65%,
+    black 80%,
+    transparent 100%
+  );
+}
+
+/* ── Heading Tape (left side vertical scrolling compass) ── */
+#heading-tape {
+  position: fixed;
+  top: 50%; left: 14px;
+  transform: translateY(-50%);
+  z-index: 13;
+  pointer-events: none;
+  width: 28px;
+  height: 300px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(59,130,246,0.7);
+  letter-spacing: 0.05em;
+  text-align: right;
+  overflow: hidden;
+}
+#heading-tape .tape-track {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+  animation: tapeScroll 10s linear infinite;
+}
+#heading-tape .tape-marker {
+  width: 18px; height: 1px;
+  background: rgba(59,130,246,0.5);
+}
+#heading-tape .tape-marker.major {
+  width: 24px;
+  background: rgba(59,130,246,0.8);
+  box-shadow: 0 0 4px var(--jarvis-blue-glow);
+}
+#heading-tape .tape-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(96,165,250,0.9);
+}
+/* Current heading indicator (center of tape) */
+#heading-tape::before {
+  content: '';
+  position: absolute;
+  right: -4px; top: 50%;
+  width: 0; height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 6px solid rgba(59,130,246,0.7);
+  transform: translateY(-50%);
+  filter: drop-shadow(0 0 3px rgba(59,130,246,0.5));
+}
+#heading-tape::after {
+  content: 'HDG';
+  position: absolute;
+  top: 8px; left: 0; right: 4px;
+  font-size: 7px;
+  text-align: center;
+  color: rgba(59,130,246,0.4);
+  letter-spacing: 0.08em;
+}
+@keyframes tapeScroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+/* ── Altitude Tape (right side vertical scrolling) ── */
+#altitude-tape {
+  position: fixed;
+  top: 50%; right: 14px;
+  transform: translateY(-50%);
+  z-index: 13;
+  pointer-events: none;
+  width: 28px;
+  height: 300px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(249,115,22,0.7);
+  letter-spacing: 0.05em;
+  text-align: left;
+  overflow: hidden;
+}
+#altitude-tape .tape-track {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  animation: tapeScroll 8s linear infinite reverse;
+}
+#altitude-tape .tape-marker {
+  width: 18px; height: 1px;
+  background: rgba(249,115,22,0.5);
+}
+#altitude-tape .tape-marker.major {
+  width: 24px;
+  background: rgba(249,115,22,0.8);
+  box-shadow: 0 0 4px var(--jarvis-orange-glow);
+}
+#altitude-tape .tape-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(251,146,60,0.9);
+}
+#altitude-tape::before {
+  content: '';
+  position: absolute;
+  left: -4px; top: 50%;
+  width: 0; height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 6px solid rgba(249,115,22,0.7);
+  transform: translateY(-50%);
+  filter: drop-shadow(0 0 3px rgba(249,115,22,0.5));
+}
+#altitude-tape::after {
+  content: 'ALT';
+  position: absolute;
+  top: 8px; left: 4px; right: 0;
+  font-size: 7px;
+  text-align: center;
+  color: rgba(249,115,22,0.4);
+  letter-spacing: 0.08em;
+}
+
+/* ── Iron Man Target Acquisition Brackets ── */
+.target-acquire {
+  position: fixed;
+  pointer-events: none;
+  z-index: 14;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.target-acquire.active {
+  opacity: 0.9;
+  animation: targetFlash 0.3s ease-out;
+}
+@keyframes targetFlash {
+  0% { opacity: 0; transform: scale(1.3); }
+  60% { opacity: 1; transform: scale(0.95); }
+  100% { opacity: 0.9; transform: scale(1); }
+}
+
+/* ── Arc Reactor Power Ring (around the core, always visible) ── */
+#power-ring {
+  position: fixed;
+  pointer-events: none;
+  z-index: 12;
+  top: 50%; left: 50%;
+  width: 120px; height: 120px;
+  margin-left: -60px; margin-top: -60px;
+  border-radius: 50%;
+  border: 2px solid rgba(59,130,246,0.2);
+  box-shadow:
+    0 0 20px rgba(59,130,246,0.1),
+    0 0 60px rgba(59,130,246,0.05);
+  animation: reactorOrbit 10s linear infinite;
+  display: none; /* Hidden when 3D scene is active */
+}
+#power-ring::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255,215,0,0.12);
+  animation: reactorOrbit 15s linear infinite reverse;
+}
+body.desktop-view #power-ring {
+  display: block;
+  border-color: rgba(59,130,246,0.3);
+  box-shadow:
+    0 0 20px rgba(59,130,246,0.15),
+    0 0 60px rgba(59,130,246,0.08);
+}
+@keyframes reactorOrbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── Unified Control Bar (REACTOR · DESKTOP · ARMOR · SKINS · SCAN · FLIGHT) ── */
+#unified-control-bar {
+  position: fixed;
+  top: 54px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 3px 5px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+#unified-control-bar .ctrl-btn {
+  padding: 5px 12px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--fg-tertiary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+#unified-control-bar .ctrl-btn:hover {
+  color: var(--fg-secondary);
+  background: rgba(255,255,255,0.03);
+}
+#unified-control-bar .ctrl-btn.active {
+  background: rgba(59,130,246,0.15);
+  color: var(--jarvis-blue-light);
+  box-shadow: 0 0 8px rgba(59,130,246,0.15);
+}
+#unified-control-bar .icon-btn {
+  width: 28px; height: 28px;
+  padding: 0;
+  justify-content: center;
+  font-size: 13px;
+  border-radius: 50%;
+}
+#unified-control-bar .ctrl-sep {
+  width: 1px; height: 18px;
+  background: rgba(255,255,255,0.06);
+  margin: 0 4px;
+}
+#unified-control-bar .armor-skin-dots {
+  gap: 4px;
+}
+#unified-control-bar .armor-btn .armor-icon-large {
+  font-size: 13px;
+}
+
+/* ── Desktop View: Glass panel transparency ── */
+body.desktop-view #status-bar {
+  background: rgba(10,18,32,0.45);
+  backdrop-filter: blur(12px);
+}
+body.desktop-view #input-bar {
+  background: rgba(10,18,32,0.45);
+  backdrop-filter: blur(12px);
+}
+body.desktop-view #side-panel {
+  background: rgba(10,18,32,0.35);
+}
+body.desktop-view .message.assistant .message-bubble {
+  background: rgba(12,20,35,0.5);
+  backdrop-filter: blur(8px);
+}
+body.desktop-view .message.user .message-bubble {
+  background: rgba(255,215,0,0.04);
+  backdrop-filter: blur(8px);
+}
+body.desktop-view .diag-panel {
+  background: rgba(5,8,12,0.35);
+  backdrop-filter: blur(6px);
+}
+
+/* ── 3D Mouse Parallax (helmet tracking simulation) ── */
+body.parallax-active #jarvis-app {
+  transition: transform 0.15s ease-out;
+}
+
+/* ── Helmet Boot Sequence Enhancement ── */
+.boot-screen .boot-reactor {
+  filter: drop-shadow(0 0 30px rgba(59,130,246,0.4));
+}
+
+/* ── System Alert Panel ── */
+#system-alert {
+  position: fixed;
+  top: 25%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 25;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-family: var(--font-mono);
+  text-align: center;
+}
+#system-alert.show {
+  opacity: 1;
+  animation: alertPulse 0.5s ease-out;
+}
+#system-alert .alert-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--jarvis-blue-light);
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 20px rgba(59,130,246,0.5);
+  margin-bottom: 4px;
+}
+#system-alert .alert-detail {
+  font-size: 9px;
+  color: var(--fg-tertiary);
+  letter-spacing: 0.06em;
+}
+@keyframes alertPulse {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+  60% { opacity: 1; transform: translate(-50%, -50%) scale(0.95); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  #heading-tape, #altitude-tape, #power-ring { display: none; }
+  .helmet-mech { display: none; }
+  .helmet-joint { display: none; }
+  #helmet-honeycomb { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #heading-tape .tape-track,
+  #altitude-tape .tape-track { animation: none; }
+  #power-ring { animation: none; }
+  #power-ring::before { animation: none; }
+}

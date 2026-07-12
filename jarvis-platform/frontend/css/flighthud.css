@@ -1,0 +1,32 @@
+/* ==========================================
+   J.A.R.V.I.S. — Flight HUD Mode Styles
+   ========================================== */
+
+/* Canvas overlay */
+#flight-hud-canvas {
+  transition: opacity 0.4s ease;
+}
+
+/* Hide existing tapes when flight HUD is active */
+body.flight-hud-active #heading-tape,
+body.flight-hud-active #altitude-tape {
+  display: none !important;
+}
+
+/* Dim background elements */
+body.flight-hud-active #three-bg {
+  opacity: 0.3;
+}
+body.flight-hud-active #holo-scanlines {
+  opacity: 0.3;
+}
+body.flight-hud-active .hud-sector-ring {
+  opacity: 0.15 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  #flight-hud-canvas {
+    transform: scale(0.8);
+  }
+}

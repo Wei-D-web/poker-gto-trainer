@@ -1,0 +1,68 @@
+/* ═══════════════════════════════════════
+   J.A.R.V.I.S. — Weapons Panel CSS
+   ═══════════════════════════════════════ */
+
+#weapons-panel {
+  position: fixed; right: 20px; top: 50%; z-index: 160;
+  transform: translateY(-50%) translateX(110%);
+  transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+  width: 220px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: 0 0 30px rgba(0,0,0,0.4);
+  font-family: var(--font-mono);
+}
+body.weapons-active #weapons-panel {
+  transform: translateY(-50%) translateX(0);
+}
+#weapons-panel h3 {
+  font-size: 10px; font-weight: 700;
+  color: var(--jarvis-blue-light);
+  letter-spacing: 0.12em;
+  margin: 0 0 14px 0;
+  text-align: center;
+}
+
+.weapon-slot {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 10px;
+}
+.weapon-slot .wp-icon { font-size: 18px; flex-shrink: 0; }
+.weapon-slot .wp-info { flex: 1; }
+.weapon-slot .wp-name {
+  font-size: 9px; font-weight: 600;
+  color: var(--fg-secondary);
+  letter-spacing: 0.06em;
+}
+.weapon-slot .wp-stat {
+  font-size: 8px; color: var(--fg-tertiary);
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+.weapon-slot .wp-charge {
+  width: 50px; height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.weapon-slot .wp-charge-fill {
+  height: 100%; border-radius: 2px;
+  background: var(--jarvis-blue-light);
+  box-shadow: 0 0 4px var(--jarvis-blue-glow);
+  transition: width 0.3s;
+}
+.weapon-slot .wp-count {
+  font-size: 14px; font-weight: 700;
+  color: var(--fg-secondary);
+  flex-shrink: 0;
+  min-width: 20px; text-align: right;
+}
+.weapon-slot .wp-count.depleted { color: var(--fg-dim); }

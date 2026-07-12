@@ -1,0 +1,72 @@
+/* ═══════════════════════════════════════
+   J.A.R.V.I.S. — Countdown Sequence CSS
+   ═══════════════════════════════════════ */
+
+#countdown-overlay {
+  position: fixed; inset: 0; z-index: 170;
+  pointer-events: none; display: none;
+  align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+}
+body.countdown-active #countdown-overlay { display: flex; }
+
+#countdown-digits {
+  font-size: 120px; font-weight: 900;
+  color: #EF4444;
+  text-shadow: 0 0 40px rgba(239,68,68,0.5), 0 0 80px rgba(239,68,68,0.2);
+  letter-spacing: 0.05em;
+  animation: cdPulse 1s ease-in-out infinite;
+}
+@keyframes cdPulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+#countdown-digits.warning { color: #F59E0B; text-shadow: 0 0 40px rgba(245,158,11,0.5); }
+#countdown-digits.critical { color: #EF4444; text-shadow: 0 0 60px rgba(239,68,68,0.7); animation: cdUrgent 0.3s ease-in-out infinite; }
+@keyframes cdUrgent {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+#countdown-label {
+  font-size: 14px; font-weight: 700;
+  color: rgba(239,68,68,0.7);
+  letter-spacing: 0.2em;
+  margin-top: 10px;
+  text-align: center;
+}
+
+#countdown-flash {
+  position: fixed; inset: 0; z-index: 169;
+  pointer-events: none; display: none;
+  background: rgba(239,68,68,0.3);
+  animation: cdFlash 0.5s ease-out forwards;
+}
+@keyframes cdFlash {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+#countdown-border {
+  position: fixed; inset: 10px; z-index: 168;
+  pointer-events: none; display: none;
+  border: 2px solid rgba(239,68,68,0.4);
+  border-radius: 4px;
+  animation: cdBorderPulse 1s ease-in-out infinite;
+}
+body.countdown-active #countdown-border { display: block; }
+@keyframes cdBorderPulse {
+  0%, 100% { border-color: rgba(239,68,68,0.2); }
+  50% { border-color: rgba(239,68,68,0.6); }
+}
+
+#countdown-hint {
+  position: fixed; bottom: 140px; left: 50%; z-index: 171;
+  pointer-events: none; display: none;
+  transform: translateX(-50%);
+  font-family: var(--font-mono); font-size: 9px;
+  color: var(--fg-dim);
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+body.countdown-active #countdown-hint { display: block; }

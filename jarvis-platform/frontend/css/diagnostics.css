@@ -1,0 +1,145 @@
+/* ═══════════════════════════════════════
+   J.A.R.V.I.S. — System Diagnostics Panel
+   ═══════════════════════════════════════ */
+
+#diag-panel-overlay {
+  position: fixed; inset: 0; z-index: 150;
+  background: rgba(3, 6, 9, 0.85);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center; justify-content: center;
+  font-family: var(--font-mono);
+}
+body.diagnostics-active #diag-panel-overlay { display: flex; }
+
+#diag-panel {
+  width: 680px; max-width: 90vw;
+  background: var(--glass-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 28px 32px;
+  box-shadow: 0 0 40px rgba(0,0,0,0.4), var(--shadow-glow);
+}
+
+.diag-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.diag-header h2 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px; font-weight: 700;
+  color: var(--jarvis-blue-light);
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+.diag-header .diag-time {
+  font-size: 10px; color: var(--fg-tertiary);
+  letter-spacing: 0.05em;
+}
+.diag-close {
+  width: 28px; height: 28px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--fg-tertiary);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.diag-close:hover { color: var(--fg-primary); border-color: var(--fg-secondary); }
+
+/* ── Subsystem Grid ── */
+.diag-subsystems {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.diag-subsystem {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex; align-items: center; gap: 12px;
+}
+.diag-subsystem .sub-status-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.diag-subsystem .sub-status-dot.nominal {
+  background: var(--jarvis-green);
+  box-shadow: 0 0 8px rgba(16,185,129,0.5);
+  animation: diagPulse 2s ease-in-out infinite;
+}
+.diag-subsystem .sub-status-dot.warning {
+  background: var(--jarvis-orange);
+  box-shadow: 0 0 8px rgba(249,115,22,0.5);
+  animation: diagPulse 1s ease-in-out infinite;
+}
+@keyframes diagPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+.diag-subsystem .sub-info { flex: 1; }
+.diag-subsystem .sub-name {
+  font-size: 10px; font-weight: 600;
+  color: var(--fg-secondary);
+  letter-spacing: 0.06em;
+  margin-bottom: 3px;
+}
+.diag-subsystem .sub-stat {
+  font-size: 9px; color: var(--fg-tertiary);
+  letter-spacing: 0.04em;
+}
+.diag-subsystem .sub-value {
+  font-size: 14px; font-weight: 700;
+  color: var(--jarvis-blue-light);
+  text-align: right;
+  letter-spacing: 0.04em;
+}
+
+/* ── Diagnostic Log ── */
+.diag-log {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  height: 120px;
+  overflow-y: auto;
+  font-size: 9px;
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+}
+.diag-log-entry {
+  color: var(--fg-tertiary);
+  display: flex; gap: 10px;
+}
+.diag-log-entry .log-time { color: rgba(96,165,250,0.5); flex-shrink: 0; }
+.diag-log-entry .log-module { color: rgba(6,182,212,0.6); flex-shrink: 0; width: 70px; }
+.diag-log-entry .log-msg { color: var(--fg-tertiary); }
+.diag-log-entry.warn .log-msg { color: var(--jarvis-orange); }
+.diag-log-entry.err .log-msg { color: var(--jarvis-red); }
+.diag-log-entry.ok .log-msg { color: var(--jarvis-green); }
+
+.diag-footer {
+  margin-top: 14px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.diag-footer .diag-status {
+  font-size: 9px; color: var(--jarvis-green);
+  letter-spacing: 0.06em;
+}
+.diag-footer .diag-status span { animation: diagPulse 2s ease-in-out infinite; }
+.diag-footer .diag-uptime {
+  font-size: 9px; color: var(--fg-tertiary);
+  letter-spacing: 0.05em;
+}
+
+/* Scrollbar for log */
+.diag-log::-webkit-scrollbar { width: 4px; }
+.diag-log::-webkit-scrollbar-track { background: transparent; }
+.diag-log::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.2); border-radius: 2px; }

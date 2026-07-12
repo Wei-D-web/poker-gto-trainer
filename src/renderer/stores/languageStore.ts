@@ -14,7 +14,7 @@ interface LanguageStore {
 }
 
 export const useLanguageStore = create<LanguageStore>((set) => ({
-  lang: 'zh',
+  lang: 'en',
   setLang: (lang) => set({ lang }),
   t: null, // null = use English keys as fallback
 }))

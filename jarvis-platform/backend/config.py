@@ -33,9 +33,26 @@ class Settings(BaseSettings):
     fast_model: str = "deepseek-chat"
 
     # ── Speech ──
-    whisper_model: str = "base"  # tiny, base, small, medium, large-v3
-    whisper_device: str = "cpu"  # cpu, cuda, mps
-    tts_voice: str = "Daniel"  # macOS say voice (Daniel = British butler)
+    # STT
+    groq_api_key: Optional[str] = None
+    stt_provider: str = "groq"  # groq, local
+    whisper_model: str = "base"  # tiny, base, small, medium, large-v3 (local fallback)
+    whisper_device: str = "cpu"  # cpu, cuda, mps (local fallback)
+    groq_whisper_model: str = "whisper-large-v3-turbo"  # turbo = faster + cheaper
+
+    # TTS
+    tts_provider: str = "edge"  # edge, macos_say
+    tts_voice: str = "Daniel"  # macOS say fallback voice
+    tts_voice_map: dict = {
+        "zh": "zh-CN-XiaoxiaoNeural",      # Chinese — cheerful female
+        "en": "en-GB-RyanNeural",            # English — Male British butler (JARVIS style, Paul Bettany)
+        "ja": "ja-JP-NanamiNeural",         # Japanese
+        "ko": "ko-KR-SunHiNeural",          # Korean
+        "fr": "fr-FR-DeniseNeural",         # French
+        "de": "de-DE-KatjaNeural",          # German
+        "es": "es-ES-ElviraNeural",         # Spanish
+    }
+    tts_speed: str = "+10%"  # Slightly faster than default for snappy responses
 
     # ── Vision ──
     vision_provider: str = "anthropic"  # anthropic or openai

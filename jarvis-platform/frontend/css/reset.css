@@ -54,15 +54,19 @@ html, body {
   --jarvis-purple: #8B5CF6;
   --jarvis-purple-glow: rgba(139, 92, 246, 0.4);
 
-  /* ── JARVIS Warm Accents (Orange/Amber) ── */
+  /* ── JARVIS Warm Accents (Orange/Amber/Gold) ── */
   --jarvis-orange: #F97316;
   --jarvis-orange-light: #FB923C;
   --jarvis-orange-glow: rgba(249, 115, 22, 0.4);
   --jarvis-amber: #F59E0B;
   --jarvis-amber-glow: rgba(245, 158, 11, 0.35);
+  --jarvis-gold: #FFD700;
+  --jarvis-gold-light: #FFE44D;
+  --jarvis-gold-glow: rgba(255, 215, 0, 0.28);
+  --jarvis-warm-white: #FFF8E7;
 
   /* ── Status ── */
-  --jarvis-gold: #F59E0B;
+  --jarvis-status-gold: #F59E0B;
   --jarvis-green: #10B981;
   --jarvis-red: #EF4444;
 
@@ -72,7 +76,8 @@ html, body {
   --border-strong: rgba(255, 255, 255, 0.12);
   --border-accent: rgba(59, 130, 246, 0.25);
   --border-glow: rgba(59, 130, 246, 0.4);
-  --border-orange: rgba(249, 115, 22, 0.25);
+  --border-gold: rgba(255, 215, 0, 0.25);
+  --border-gold-glow: rgba(255, 215, 0, 0.35);
 
   /* ── Glass Effects ── */
   --glass-bg: rgba(10, 18, 32, 0.6);
@@ -84,8 +89,10 @@ html, body {
   --shadow-glow-cyan: 0 0 20px rgba(6, 182, 212, 0.15);
   --shadow-glow-purple: 0 0 20px rgba(139, 92, 246, 0.15);
   --shadow-glow-orange: 0 0 20px rgba(249, 115, 22, 0.15);
+  --shadow-glow-gold: 0 0 20px rgba(255, 215, 0, 0.12);
   --shadow-panel: 0 8px 32px rgba(0, 0, 0, 0.4);
   --shadow-chromatic: 0 0 12px rgba(59, 130, 246, 0.2), 0 0 4px rgba(6, 182, 212, 0.15);
+  --shadow-core: 0 0 24px rgba(59, 130, 246, 0.2), 0 0 48px rgba(255, 215, 0, 0.08);
 
   /* ── Spacing ── */
   --space-xs: 4px;
@@ -152,12 +159,23 @@ canvas {
   pointer-events: none;
 }
 
-/* ── Hex Grid Background Pattern (CSS fallback) ── */
+/* ── Hex Grid Background Pattern (Iron Man HUD) ── */
 .hex-bg-pattern {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background-image:
-    linear-gradient(60deg, rgba(59,130,246,0.03) 1px, transparent 1px),
-    linear-gradient(-60deg, rgba(59,130,246,0.03) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(249,115,22,0.02) 1px, transparent 1px);
-  background-size: 24px 41px, 24px 41px, 24px 24px;
-  background-position: 0 0, 0 0, 0 0;
+    linear-gradient(60deg, rgba(59,130,246,0.06) 1px, transparent 1px),
+    linear-gradient(-60deg, rgba(59,130,246,0.06) 1px, transparent 1px),
+    linear-gradient(0deg, rgba(255,215,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(6,182,212,0.03) 1px, transparent 1px);
+  background-size: 28px 48px, 28px 48px, 28px 28px, 28px 28px;
+  background-position: 0 0, 0 0, 0 0, 0 0;
+  animation: hexDrift 80s linear infinite;
+}
+
+@keyframes hexDrift {
+  0% { background-position: 0 0, 0 0, 0 0, 0 0; }
+  100% { background-position: 56px 96px, -56px 96px, 0 -28px, -28px 0; }
 }

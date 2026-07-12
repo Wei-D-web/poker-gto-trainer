@@ -1,0 +1,22 @@
+/* ==========================================
+   J.A.R.V.I.S. — Gesture Control Styles
+   ========================================== */
+
+/* Gesture trail SVG */
+#gesture-trail-svg {
+  display: none;
+}
+#gesture-trail-svg path {
+  transition: stroke 0.3s ease;
+}
+
+/* Gesture feedback label */
+#gesture-feedback {
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Disabled state */
+body.gestures-disabled #gesture-trail-svg {
+  display: none !important;
+}

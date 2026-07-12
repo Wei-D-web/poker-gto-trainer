@@ -16,10 +16,11 @@ openai>=1.55.0         # DeepSeek (OpenAI-compatible) + GPT-4V fallback
 anthropic>=0.45.0      # Claude Vision + Claude Agent
 
 # Speech
-faster-whisper>=1.1.0  # Local Whisper STT
+groq>=0.18.0            # Groq Whisper API (fast cloud STT)
+faster-whisper>=1.1.0  # Local Whisper STT (fallback)
 soundfile>=0.12.1
 numpy>=1.26.4
-edge-tts>=6.1.0        # Cross-platform TTS fallback
+edge-tts>=6.1.0        # Cross-platform neural TTS (primary)
 
 # Vision
 Pillow>=11.0.0

@@ -1,0 +1,165 @@
+/* ==========================================
+   J.A.R.V.I.S. — Arc Reactor Heartbeat
+   Pulse rhythm synced to system events.
+   ========================================== */
+
+/* ── Reactor Pulse Variables ── */
+:root {
+  --heartbeat-phase: 0deg;
+  --heartbeat-intensity: 0.3;
+  --heartbeat-bpm: 60;
+  --heartbeat-glow: 0px;
+  --pulse-timing: 3s;
+}
+
+/* ── Core Glow Pulse ── */
+body.heartbeat-active #vignette {
+  animation: heartbeatVignette var(--pulse-timing) ease-in-out infinite;
+}
+
+@keyframes heartbeatVignette {
+  0%, 100% { background: radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(5,8,12,0.18) 60%, rgba(5,8,12,0.35) 80%, rgba(5,8,12,0.50) 100%); }
+  2%  { background: radial-gradient(ellipse at 50% 40%, transparent 42%, rgba(6,182,212,0.08) 58%, rgba(5,8,12,0.30) 78%, rgba(5,8,12,0.48) 100%); }
+  4%  { background: radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(5,8,12,0.18) 60%, rgba(5,8,12,0.35) 80%, rgba(5,8,12,0.50) 100%); }
+}
+
+/* ── Status Bar Pulse ── */
+body.heartbeat-active #status-bar {
+  transition: background 0.3s ease;
+}
+body.heartbeat-pulse #status-bar {
+  background: linear-gradient(180deg,
+    rgba(6, 182, 212, 0.08) 0%,
+    var(--glass-bg) 100%
+  );
+}
+
+/* ── HUD Glow Pulse ── */
+body.heartbeat-active .hud-sector-ring {
+  animation: heartbeatRing var(--pulse-timing) ease-in-out infinite;
+}
+
+@keyframes heartbeatRing {
+  0%, 100% { opacity: 0.15; }
+  3%  { opacity: 0.35; }
+  6%  { opacity: 0.15; }
+}
+
+body.heartbeat-active .hud-angular-frame {
+  animation: heartbeatFrame var(--pulse-timing) ease-in-out infinite;
+}
+
+@keyframes heartbeatFrame {
+  0%, 100% { opacity: 0.6; }
+  3%  { opacity: 1; }
+  6%  { opacity: 0.6; }
+}
+
+/* ── Data Labels Pulse ── */
+body.heartbeat-active .hud-data-label .dot {
+  animation: heartbeatDot var(--pulse-timing) ease-in-out infinite;
+}
+
+@keyframes heartbeatDot {
+  0%, 100% { opacity: 0.5; box-shadow: 0 0 2px currentColor; }
+  3%  { opacity: 1; box-shadow: 0 0 8px currentColor; }
+  6%  { opacity: 0.5; box-shadow: 0 0 2px currentColor; }
+}
+
+/* ── CSS Arc Reactor Pulse ── */
+body.heartbeat-active #css-arc-reactor .arc-core {
+  animation: reactorCorePulse var(--pulse-timing) ease-in-out infinite;
+}
+
+@keyframes reactorCorePulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), 0 0 30px rgba(6, 182, 212, 0.2);
+    transform: scale(1);
+  }
+  2% {
+    box-shadow: 0 0 25px rgba(6, 182, 212, 0.7), 0 0 50px rgba(6, 182, 212, 0.4), 0 0 80px rgba(6, 182, 212, 0.2);
+    transform: scale(1.04);
+  }
+  4% {
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4), 0 0 30px rgba(6, 182, 212, 0.2);
+    transform: scale(1);
+  }
+}
+
+body.heartbeat-active #css-arc-reactor .arc-ring {
+  animation: reactorRingPulse var(--pulse-timing) ease-in-out infinite;
+}
+
+@keyframes reactorRingPulse {
+  0%, 100% { opacity: 0.3; }
+  2%  { opacity: 0.6; }
+  4%  { opacity: 0.3; }
+}
+
+/* ── Energy Surge (triggered by burst events) ── */
+body.heartbeat-burst #vignette {
+  animation: heartbeatBurst 1.5s ease-out forwards !important;
+}
+
+@keyframes heartbeatBurst {
+  0% { background: radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(6,182,212,0.15) 55%, rgba(6,182,212,0.25) 78%, rgba(5,8,12,0.50) 100%); }
+  100% { background: radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(5,8,12,0.18) 60%, rgba(5,8,12,0.35) 80%, rgba(5,8,12,0.50) 100%); }
+}
+
+body.heartbeat-burst .hud-sector-ring {
+  animation: ringBurst 1.5s ease-out forwards !important;
+}
+
+@keyframes ringBurst {
+  0% { opacity: 0.5; transform: scale(1.05); }
+  100% { opacity: 0.15; transform: scale(1); }
+}
+
+/* ── Alert Mode (red pulse) ── */
+body.heartbeat-alert #vignette {
+  animation: heartbeatAlert 1s ease-in-out infinite !important;
+}
+
+@keyframes heartbeatAlert {
+  0%, 100% { background: radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(5,8,12,0.18) 60%, rgba(5,8,12,0.35) 80%, rgba(5,8,12,0.50) 100%); }
+  15% { background: radial-gradient(ellipse at 50% 40%, transparent 42%, rgba(239,68,68,0.15) 58%, rgba(5,8,12,0.30) 78%, rgba(5,8,12,0.48) 100%); }
+  30% { background: radial-gradient(ellipse at 50% 40%, transparent 45%, rgba(5,8,12,0.18) 60%, rgba(5,8,12,0.35) 80%, rgba(5,8,12,0.50) 100%); }
+}
+
+/* ── Power Ring Heartbeat ── */
+body.heartbeat-active #power-ring {
+  animation: powerRingHB var(--pulse-timing) ease-in-out infinite;
+}
+
+@keyframes powerRingHB {
+  0%, 100% { opacity: 0.4; }
+  2%  { opacity: 0.8; }
+  4%  { opacity: 0.4; }
+}
+
+/* ── Corner Diag Pulse ── */
+body.heartbeat-active .diag-panel .diag-val.ok {
+  animation: diagOkPulse var(--pulse-timing) ease-in-out infinite;
+}
+
+@keyframes diagOkPulse {
+  0%, 100% { color: var(--jarvis-green); }
+  3%  { color: #4ade80; text-shadow: 0 0 6px #4ade80; }
+  6%  { color: var(--jarvis-green); }
+}
+
+/* ── Thinking Mode (fast pulse) ── */
+body.heartbeat-thinking .hud-sector-ring {
+  animation: thinkFastPulse 0.6s ease-in-out infinite !important;
+}
+
+@keyframes thinkFastPulse {
+  0%, 100% { opacity: 0.15; }
+  50% { opacity: 0.45; }
+}
+
+/* ── Intensity override classes ── */
+body.heartbeat-idle    { --pulse-timing: 3s; }
+body.heartbeat-active  { --pulse-timing: 2s; }
+body.heartbeat-busy    { --pulse-timing: 0.8s; }
+body.heartbeat-max     { --pulse-timing: 0.4s; }

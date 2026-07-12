@@ -1,0 +1,72 @@
+/* ═══════════════════════════════════════
+   J.A.R.V.I.S. — Extra Theme Presets
+   ═══════════════════════════════════════ */
+
+/* Stealth Black */
+body[data-theme="stealth"] {
+  --jarvis-blue: #6B7280;
+  --jarvis-blue-light: #9CA3AF;
+  --jarvis-blue-glow: rgba(107,114,128,0.3);
+  --jarvis-cyan: #6B7280;
+  --jarvis-cyan-light: #9CA3AF;
+  --jarvis-purple: #4B5563;
+  --border-subtle: rgba(107,114,128,0.12);
+  --border-glow: rgba(107,114,128,0.2);
+  --shadow-glow: 0 0 20px rgba(107,114,128,0.08);
+}
+body[data-theme="stealth"] #unified-control-bar {
+  border-color: rgba(107,114,128,0.2);
+}
+body[data-theme="stealth"] .ctrl-btn.active {
+  background: rgba(107,114,128,0.15);
+  color: #9CA3AF;
+  box-shadow: 0 0 8px rgba(107,114,128,0.1);
+}
+
+/* Stark Red-Gold */
+body[data-theme="stark"] {
+  --jarvis-blue: #DC2626;
+  --jarvis-blue-light: #F87171;
+  --jarvis-blue-glow: rgba(220,38,38,0.3);
+  --jarvis-cyan: #FFD700;
+  --jarvis-cyan-light: #FDE047;
+  --jarvis-purple: #991B1B;
+  --border-subtle: rgba(220,38,38,0.12);
+  --border-glow: rgba(255,215,0,0.2);
+  --shadow-glow: 0 0 20px rgba(220,38,38,0.1);
+}
+body[data-theme="stark"] #unified-control-bar {
+  border-color: rgba(220,38,38,0.25);
+}
+body[data-theme="stark"] .ctrl-btn.active {
+  background: rgba(220,38,38,0.15);
+  color: #FFD700;
+  box-shadow: 0 0 10px rgba(220,38,38,0.15);
+}
+
+/* Cryo Ice */
+body[data-theme="cryo"] {
+  --jarvis-blue: #06B6D4;
+  --jarvis-blue-light: #67E8F9;
+  --jarvis-blue-glow: rgba(6,182,212,0.35);
+  --jarvis-cyan: #A5F3FC;
+  --jarvis-cyan-light: #CFFAFE;
+  --jarvis-purple: #0891B2;
+  --jarvis-orange: #22D3EE;
+  --border-subtle: rgba(6,182,212,0.12);
+  --border-glow: rgba(6,182,212,0.25);
+  --shadow-glow: 0 0 25px rgba(6,182,212,0.12);
+}
+body[data-theme="cryo"] #unified-control-bar {
+  border-color: rgba(6,182,212,0.25);
+}
+body[data-theme="cryo"] .ctrl-btn.active {
+  background: rgba(6,182,212,0.15);
+  color: #67E8F9;
+  box-shadow: 0 0 10px rgba(6,182,212,0.2);
+}
+
+/* Transition */
+body {
+  transition: --jarvis-blue 0.5s ease, --jarvis-blue-light 0.5s ease;
+}

@@ -1,0 +1,501 @@
+/* ═══════════════════════════════════════
+   J.A.R.V.I.S. BOOT SEQUENCE — Enhanced
+   ═══════════════════════════════════════ */
+
+/* ── Boot Container ── */
+.boot-screen {
+  position: fixed; inset: 0; z-index: 2000;
+  background: #030609;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+  overflow: hidden;
+}
+.boot-screen.fade-out {
+  animation: bootFadeOut 0.6s cubic-bezier(0.4,0,0.2,1) forwards;
+  pointer-events: none;
+}
+
+/* ── Hex Grid Background ── */
+.boot-hex-grid {
+  position: absolute; inset: 0;
+  opacity: 0;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='52'%3E%3Cpath d='M30 0l30 17.3v34.6L30 69.3 0 52V17.3z' fill='none' stroke='rgba(59,130,246,0.06)' stroke-width='0.5'/%3E%3C/svg%3E");
+  background-size: 60px 52px;
+  animation: hexGridFadeIn 1.5s ease-out 0.3s forwards;
+}
+@keyframes hexGridFadeIn {
+  0% { opacity: 0; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ── Circuit Traces ── */
+.boot-circuit {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0;
+}
+.boot-circuit.left {
+  left: 0; top: 15%; width: 30%; height: 70%;
+  background:
+    linear-gradient(180deg, transparent, rgba(59,130,246,0.15) 20%, rgba(6,182,212,0.1) 50%, transparent 80%);
+  animation: circuitSlideIn 1s ease-out 0.5s forwards;
+}
+.boot-circuit.right {
+  right: 0; top: 15%; width: 30%; height: 70%;
+  background:
+    linear-gradient(180deg, transparent, rgba(59,130,246,0.15) 20%, rgba(6,182,212,0.1) 50%, transparent 80%);
+  animation: circuitSlideIn 1s ease-out 0.7s forwards;
+}
+.boot-circuit::before {
+  content: '';
+  position: absolute;
+  left: 20%; right: 20%; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(96,165,250,0.4), transparent);
+}
+.boot-circuit::after {
+  content: '';
+  position: absolute;
+  top: 10%; bottom: 10%; width: 1px;
+  background: linear-gradient(180deg, transparent, rgba(6,182,212,0.3), transparent);
+}
+.boot-circuit.left::after { left: 30%; }
+.boot-circuit.right::after { right: 30%; }
+
+@keyframes circuitSlideIn {
+  0% { opacity: 0; transform: translateX(-20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+.boot-circuit.right {
+  animation-name: circuitSlideInRight;
+}
+@keyframes circuitSlideInRight {
+  0% { opacity: 0; transform: translateX(20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Circuit Nodes ── */
+.boot-circuit-node {
+  position: absolute;
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--jarvis-blue-light);
+  box-shadow: 0 0 6px rgba(96,165,250,0.6), 0 0 12px rgba(59,130,246,0.3);
+  pointer-events: none;
+  opacity: 0;
+  animation: nodeBlink 2s ease-in-out infinite;
+}
+.boot-circuit-node.n1 { left: 15%; top: 20%; animation-delay: 0.8s; }
+.boot-circuit-node.n2 { left: 22%; top: 45%; animation-delay: 1.0s; }
+.boot-circuit-node.n3 { left: 18%; top: 70%; animation-delay: 1.2s; }
+.boot-circuit-node.n4 { right: 15%; top: 25%; animation-delay: 1.0s; }
+.boot-circuit-node.n5 { right: 22%; top: 55%; animation-delay: 1.2s; }
+.boot-circuit-node.n6 { right: 18%; top: 65%; animation-delay: 1.4s; }
+
+@keyframes nodeBlink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* ── Energy Particles ── */
+.boot-particles {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  animation: particlesAppear 0.8s ease-out 0.2s forwards;
+}
+.boot-particle {
+  position: absolute;
+  width: 2px; height: 2px;
+  border-radius: 50%;
+  background: var(--jarvis-blue-light);
+  box-shadow: 0 0 4px rgba(96,165,250,0.8);
+  animation: particleConverge 1.5s ease-out forwards;
+}
+.boot-particle:nth-child(1) { left: 10%; top: 20%; animation-delay: 0.3s; }
+.boot-particle:nth-child(2) { left: 85%; top: 15%; animation-delay: 0.35s; }
+.boot-particle:nth-child(3) { left: 20%; top: 80%; animation-delay: 0.4s; }
+.boot-particle:nth-child(4) { left: 75%; top: 85%; animation-delay: 0.45s; }
+.boot-particle:nth-child(5) { left: 5%; top: 50%; animation-delay: 0.5s; }
+.boot-particle:nth-child(6) { left: 90%; top: 55%; animation-delay: 0.55s; }
+.boot-particle:nth-child(7) { left: 40%; top: 10%; animation-delay: 0.6s; }
+.boot-particle:nth-child(8) { left: 60%; top: 90%; animation-delay: 0.65s; }
+.boot-particle:nth-child(9) { left: 30%; top: 85%; animation-delay: 0.7s; }
+.boot-particle:nth-child(10) { left: 70%; top: 12%; animation-delay: 0.75s; }
+
+@keyframes particlesAppear {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes particleConverge {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  60% { opacity: 0.8; }
+  100% { transform: translate(
+      calc(50vw - 50%), calc(50vh - 50%)
+    ) scale(0); opacity: 0; }
+}
+
+/* ── Enhanced Arc Reactor ── */
+.boot-reactor {
+  width: 120px; height: 120px;
+  position: relative;
+  margin-bottom: 28px;
+  z-index: 1;
+}
+
+.boot-reactor-core {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%,
+    rgba(255,255,255,1),
+    rgba(147,197,253,0.95) 15%,
+    rgba(96,165,250,0.85) 35%,
+    rgba(59,130,246,0.5) 55%,
+    rgba(37,99,235,0.2) 75%,
+    transparent 100%
+  );
+  animation: bootIgnition 1.4s cubic-bezier(0.16,1,0.3,1) forwards;
+  box-shadow:
+    0 0 20px rgba(96,165,250,0.7),
+    0 0 60px rgba(59,130,246,0.4),
+    0 0 100px rgba(37,99,235,0.2);
+}
+
+/* Arc reactor energy beam */
+.boot-reactor-beam {
+  position: absolute;
+  top: -60px; left: 50%;
+  transform: translateX(-50%);
+  width: 3px; height: 0;
+  background: linear-gradient(180deg,
+    transparent,
+    rgba(147,197,253,0.8) 30%,
+    rgba(96,165,250,0.95) 70%,
+    rgba(59,130,246,0.6) 100%
+  );
+  border-radius: 2px;
+  opacity: 0;
+  animation: bootBeamIgnite 1s ease-out 0.8s forwards;
+}
+@keyframes bootBeamIgnite {
+  0% { height: 0; opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { height: 80px; opacity: 0.6; }
+}
+
+/* More rings with better animation */
+.boot-reactor-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  border-radius: 50%;
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  transform: translate(-50%, -50%);
+  animation: bootPulseRing 2s ease-out forwards;
+}
+.boot-reactor-ring:nth-child(3) { animation-delay: 0.12s; border-color: rgba(96,165,250,0.4); }
+.boot-reactor-ring:nth-child(4) { animation-delay: 0.24s; border-color: rgba(6,182,212,0.35); }
+.boot-reactor-ring:nth-child(5) { animation-delay: 0.36s; border-color: rgba(139,92,246,0.3); }
+.boot-reactor-ring:nth-child(6) { animation-delay: 0.48s; border-color: rgba(249,115,22,0.25); }
+.boot-reactor-ring:nth-child(7) { animation-delay: 0.60s; border-color: rgba(59,130,246,0.2); }
+.boot-reactor-ring:nth-child(8) { animation-delay: 0.72s; border-color: rgba(96,165,250,0.15); }
+
+/* Inner triangular ring */
+.boot-reactor-triangle {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 50px; height: 50px;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: bootTriangleSpin 2s linear 0.6s forwards;
+}
+.boot-reactor-triangle::before {
+  content: '';
+  position: absolute; inset: 0;
+  border: 1px solid rgba(59,130,246,0.25);
+  clip-path: polygon(50% 5%, 95% 85%, 5% 85%);
+  animation: bootTrianglePulse 1.5s ease-in-out infinite;
+}
+@keyframes bootTriangleSpin {
+  0% { opacity: 0; transform: translate(-50%, -50%) rotate(0deg) scale(0); }
+  50% { opacity: 0.6; }
+  100% { opacity: 0.4; transform: translate(-50%, -50%) rotate(360deg) scale(1.4); }
+}
+@keyframes bootTrianglePulse {
+  0%, 100% { border-color: rgba(59,130,246,0.15); }
+  50% { border-color: rgba(96,165,250,0.4); }
+}
+
+/* ── Holographic Title ── */
+.boot-title {
+  font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  background: linear-gradient(135deg, #60A5FA 0%, #06B6D4 40%, #8B5CF6 70%, #60A5FA 100%);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: bootTextReveal 1.6s cubic-bezier(0.16,1,0.3,1) forwards,
+             bootTextShimmer 3s ease-in-out 1.6s infinite;
+  opacity: 0;
+  text-shadow: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* Glitch overlay for title */
+.boot-title-glitch {
+  position: absolute;
+  top: 0; left: 0;
+  font-family: inherit; font-size: inherit; font-weight: inherit;
+  letter-spacing: inherit;
+  color: rgba(96,165,250,0.3);
+  animation: bootGlitch 0.3s ease-out 1.2s;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes bootTextShimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@keyframes bootGlitch {
+  0% { transform: translate(0); opacity: 0; }
+  10% { transform: translate(-3px, 1px); opacity: 0.6; }
+  20% { transform: translate(2px, -1px); opacity: 0.3; }
+  30% { transform: translate(0); opacity: 0; }
+  50% { transform: translate(4px, 0); opacity: 0.4; }
+  60% { transform: translate(0); opacity: 0; }
+  100% { transform: translate(0); opacity: 0; }
+}
+
+@keyframes bootTextReveal {
+  0% { opacity: 0; letter-spacing: 0.6em; filter: blur(8px); }
+  40% { opacity: 0.4; filter: blur(4px); }
+  70% { opacity: 0.8; filter: blur(1px); }
+  100% { opacity: 1; letter-spacing: 0.1em; filter: blur(0); }
+}
+
+.boot-subtitle {
+  font-size: 12px;
+  color: var(--fg-tertiary);
+  letter-spacing: 0.18em;
+  margin-top: 8px;
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out 0.5s forwards;
+  z-index: 1;
+}
+
+/* Version badge */
+.boot-version {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(96,165,250,0.4);
+  letter-spacing: 0.1em;
+  margin-top: 4px;
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out 0.7s forwards;
+}
+
+/* ── Enhanced Subsystem Checks ── */
+.boot-checks {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  z-index: 1;
+  width: 260px;
+}
+
+.boot-check {
+  opacity: 0;
+  animation: bootSubsystemCheck 0.6s ease-out forwards;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--fg-tertiary);
+}
+
+.boot-check-label {
+  width: 80px;
+  text-align: right;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--fg-tertiary);
+}
+
+/* Progress bar for each check */
+.boot-check-bar {
+  flex: 1;
+  height: 2px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 1px;
+  position: relative;
+  overflow: hidden;
+}
+.boot-check-bar-fill {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: linear-gradient(90deg, rgba(59,130,246,0.6), rgba(96,165,250,0.9), rgba(6,182,212,0.7));
+  border-radius: 1px;
+  box-shadow: 0 0 6px rgba(59,130,246,0.4);
+  transition: width 0.3s ease-out;
+}
+.boot-check-bar-fill.done {
+  background: linear-gradient(90deg, rgba(16,185,129,0.6), rgba(16,185,129,0.9));
+  box-shadow: 0 0 6px rgba(16,185,129,0.4);
+}
+
+.boot-check-status {
+  font-size: 8px;
+  letter-spacing: 0.05em;
+  width: 28px;
+  text-align: left;
+  color: var(--fg-tertiary);
+}
+.boot-check-status.ok { color: var(--jarvis-green); }
+
+.boot-check .check-dot {
+  display: none; /* replaced by progress bar */
+}
+
+/* ── Scan Line (enhanced) ── */
+.boot-scan-line {
+  position: absolute;
+  left: 2%; right: 2%; height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(59,130,246,0.15) 20%,
+    rgba(96,165,250,0.5) 50%,
+    rgba(59,130,246,0.15) 80%,
+    transparent
+  );
+  box-shadow: 0 0 8px rgba(96,165,250,0.3);
+  animation: bootScanLine 2s ease-in forwards;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Second scan line going bottom-up */
+.boot-scan-line-reverse {
+  position: absolute;
+  left: 5%; right: 5%; height: 1px;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(6,182,212,0.1) 20%,
+    rgba(6,182,212,0.35) 50%,
+    rgba(6,182,212,0.1) 80%,
+    transparent
+  );
+  box-shadow: 0 0 6px rgba(6,182,212,0.2);
+  animation: bootScanLineReverse 2.2s ease-in 0.3s forwards;
+  pointer-events: none;
+  z-index: 2;
+}
+@keyframes bootScanLineReverse {
+  0% { bottom: -10%; opacity: 1; }
+  100% { bottom: 110%; opacity: 0.2; }
+}
+
+/* ── Energy Wave (final sweep before fadeout) ── */
+.boot-energy-wave {
+  position: absolute;
+  left: 0; right: 0; height: 120px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: radial-gradient(ellipse at 50% 50%,
+    rgba(96,165,250,0.2) 0%,
+    rgba(59,130,246,0.08) 30%,
+    transparent 70%
+  );
+  opacity: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.boot-energy-wave.fire {
+  animation: energyWaveBurst 0.8s ease-out forwards;
+}
+@keyframes energyWaveBurst {
+  0% { opacity: 0; transform: translateY(-50%) scaleX(0.3); }
+  30% { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(-50%) scaleX(1.5); }
+}
+
+/* ── Inner Glow Ring ── */
+.boot-glow-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 200px; height: 200px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(59,130,246,0.06) 0%,
+    rgba(59,130,246,0.03) 40%,
+    transparent 70%
+  );
+  opacity: 0;
+  animation: glowRingBreath 2.5s ease-in-out 1s infinite;
+  pointer-events: none;
+}
+@keyframes glowRingBreath {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.3); }
+}
+
+/* ── Boot Complete Flash ── */
+.boot-flash {
+  position: fixed; inset: 0;
+  z-index: 2001;
+  background: rgba(96,165,250,0.15);
+  opacity: 0;
+  pointer-events: none;
+}
+.boot-flash.fire {
+  animation: bootFlash 0.5s ease-out forwards;
+}
+@keyframes bootFlash {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ── Boot Keyframes (enhanced) ── */
+@keyframes bootIgnition {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; filter: blur(12px); }
+  25% { transform: translate(-50%, -50%) scale(0.2); opacity: 0.2; }
+  45% { transform: translate(-50%, -50%) scale(0.4); opacity: 0.5; filter: blur(4px); }
+  65% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; filter: blur(0); }
+  80% { transform: translate(-50%, -50%) scale(0.9); }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+@keyframes bootPulseRing {
+  0% { width: 0; height: 0; opacity: 0; }
+  40% { opacity: 0.7; }
+  100% { width: 200px; height: 200px; opacity: 0; }
+}
+
+@keyframes bootScanLine {
+  0% { top: -10%; opacity: 1; }
+  70% { opacity: 0.6; }
+  100% { top: 110%; opacity: 0.2; }
+}
+
+@keyframes bootSubsystemCheck {
+  0% { opacity: 0; transform: translateX(-8px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes bootFadeOut {
+  0% { opacity: 1; backdrop-filter: blur(0); }
+  100% { opacity: 0; backdrop-filter: blur(10px); }
+}

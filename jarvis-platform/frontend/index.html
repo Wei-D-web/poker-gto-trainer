@@ -3,57 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <meta name="theme-color" content="#05080C">
   <meta name="description" content="J.A.R.V.I.S. — Holographic AI Butler">
   <title>J.A.R.V.I.S.</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>🧠</text></svg>">
 
   <!-- Styles -->
-  <link rel="stylesheet" href="css/reset.css?v=2">
-  <link rel="stylesheet" href="css/hud.css?v=2">
-  <link rel="stylesheet" href="css/animations.css?v=2">
-  <link rel="stylesheet" href="css/components.css?v=2">
+  <link rel="stylesheet" href="css/reset.css?v=3">
+  <link rel="stylesheet" href="css/hud.css?v=6">
+  <link rel="stylesheet" href="css/animations.css?v=3">
+  <link rel="stylesheet" href="css/components.css?v=4">
+  <link rel="stylesheet" href="css/boot-sequence.css?v=1">
+  <link rel="stylesheet" href="css/ironman-helmet.css?v=3">
+  <link rel="stylesheet" href="css/helmet-close.css?v=2">
+  <link rel="stylesheet" href="css/themes.css?v=2">
+  <link rel="stylesheet" href="css/nanoparticles.css?v=2">
+  <link rel="stylesheet" href="css/gestures.css?v=2">
+  <link rel="stylesheet" href="css/flighthud.css?v=2">
+  <link rel="stylesheet" href="css/vision-modes.css?v=1">
+  <link rel="stylesheet" href="css/diagnostics.css?v=1">
+  <link rel="stylesheet" href="css/weapons.css?v=1">
+  <link rel="stylesheet" href="css/radar.css?v=1">
+  <link rel="stylesheet" href="css/themes-extra.css?v=1">
+  <link rel="stylesheet" href="css/photomode.css?v=1">
+  <link rel="stylesheet" href="css/countdown.css?v=1">
+  <link rel="stylesheet" href="css/heartbeat.css?v=1">
+  <link rel="stylesheet" href="css/parallax.css?v=1">
+  <link rel="stylesheet" href="css/kinetic.css?v=1">
+  <link rel="stylesheet" href="css/helmet-interior.css?v=1">
 
   <style>
-    /* Inline critical styles for instant paint */
+    /* Critical inline styles for instant paint */
     #three-bg { position: fixed; inset: 0; z-index: 1; }
-    #jarvis-app { opacity: 0; animation: fadeIn 0.6s ease-out 0.3s forwards; }
+    #jarvis-app { opacity: 0; animation: fadeIn 0.6s ease-out 0.2s forwards; }
     #vignette {
       position: fixed; inset: 0; pointer-events: none; z-index: 4;
-      background: radial-gradient(ellipse at center, transparent 60%, rgba(5,8,12,0.5) 100%);
-    }
-    #loading-screen {
-      position: fixed; inset: 0; z-index: 1000; background: #05080C;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
-      transition: opacity 0.5s ease-out;
-    }
-    #loading-screen.hidden { opacity: 0; pointer-events: none; }
-    #loading-screen .logo-text {
-      font-family: 'JetBrains Mono', 'SF Mono', monospace;
-      font-size: 36px; font-weight: 900; letter-spacing: 0.15em;
-      background: linear-gradient(135deg, #60A5FA, #06B6D4, #8B5CF6);
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-      margin-bottom: 8px;
-    }
-    #loading-screen .sub-text { font-size: 12px; color: #556278; letter-spacing: 0.08em; }
-    #loading-screen .loader-bar {
-      width: 120px; height: 2px; background: #1C2A3D; border-radius: 1px;
-      margin-top: 16px; overflow: hidden;
-    }
-    #loading-screen .loader-bar-fill {
-      height: 100%; background: #3B82F6; border-radius: 1px;
-      animation: loaderProgress 2s ease-in-out infinite;
-    }
-    @keyframes loaderProgress {
-      0% { width: 0%; margin-left: 0; }
-      50% { width: 60%; margin-left: 0; }
-      100% { width: 0%; margin-left: 100%; }
-    }
+              background: radial-gradient(ellipse at 50% 40%,
+              transparent 45%,
+              rgba(5,8,12,0.18) 60%,
+              rgba(5,8,12,0.35) 80%,
+              rgba(5,8,12,0.50) 100%
+            ); }
     .fallback-bg { position: fixed; inset: 0; z-index: 0; background: #05080C; }
   </style>
 </head>
-<body>
+<body class="hex-bg-pattern">
 <script>
 window.__errors = [];
 window.onerror = function(msg, url, line, col, err) {
@@ -62,16 +59,44 @@ window.onerror = function(msg, url, line, col, err) {
   el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#EF4444;color:#fff;padding:10px;font:13px monospace;white-space:pre-wrap;';
   el.textContent = 'JS ERROR: ' + msg + ' (line ' + line + ')';
   (document.body || document.documentElement).appendChild(el);
-  // Also hide the loading screen so we can SEE the error
-  var ld = document.getElementById('loading-screen');
-  if (ld) ld.style.display = 'none';
 };
 </script>
-  <!-- Loading Screen -->
-  <div id="loading-screen">
-    <div class="logo-text">J.A.R.V.I.S.</div>
-    <div class="sub-text">INITIALIZING HOLOGRAPHIC INTERFACE</div>
-    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+
+  <!-- ═══════════════════════════════════════
+       IRON MAN BOOT SEQUENCE (visual only — pointer-events: none)
+       ═══════════════════════════════════════ -->
+  <div id="loading-screen" class="boot-screen" style="pointer-events: none;">
+    <div class="boot-hex-grid"></div>
+    <div class="boot-circuit left">
+      <div class="boot-circuit-node n1"></div><div class="boot-circuit-node n2"></div><div class="boot-circuit-node n3"></div>
+    </div>
+    <div class="boot-circuit right">
+      <div class="boot-circuit-node n4"></div><div class="boot-circuit-node n5"></div><div class="boot-circuit-node n6"></div>
+    </div>
+    <div class="boot-particles">
+      <div class="boot-particle"></div><div class="boot-particle"></div><div class="boot-particle"></div><div class="boot-particle"></div><div class="boot-particle"></div><div class="boot-particle"></div><div class="boot-particle"></div><div class="boot-particle"></div><div class="boot-particle"></div><div class="boot-particle"></div>
+    </div>
+    <div class="boot-glow-ring"></div>
+    <div class="boot-scan-line"></div>
+    <div class="boot-scan-line-reverse"></div>
+    <div class="boot-reactor">
+      <div class="boot-reactor-core"></div><div class="boot-reactor-beam"></div>
+      <div class="boot-reactor-triangle"></div>
+      <div class="boot-reactor-ring"></div><div class="boot-reactor-ring"></div><div class="boot-reactor-ring"></div><div class="boot-reactor-ring"></div><div class="boot-reactor-ring"></div><div class="boot-reactor-ring"></div><div class="boot-reactor-ring"></div><div class="boot-reactor-ring"></div>
+    </div>
+    <div class="boot-energy-wave" id="boot-energy-wave"></div>
+    <div class="boot-flash" id="boot-flash"></div>
+    <div class="boot-title">J.A.R.V.I.S.</div>
+    <div class="boot-subtitle">HOLOGRAPHIC INTERFACE v2.0</div>
+    <div class="boot-version">NEURAL CORE · QUANTUM PROCESSOR · ARC REACTOR</div>
+    <div class="boot-checks" id="boot-checks">
+      <div class="boot-check" data-delay="0.4"><span class="boot-check-label">HUD CORE</span><span class="boot-check-bar"><span class="boot-check-bar-fill"></span></span><span class="boot-check-status">····</span></div>
+      <div class="boot-check" data-delay="0.7"><span class="boot-check-label">3D ENGINE</span><span class="boot-check-bar"><span class="boot-check-bar-fill"></span></span><span class="boot-check-status">····</span></div>
+      <div class="boot-check" data-delay="1.0"><span class="boot-check-label">VOICE MOD</span><span class="boot-check-bar"><span class="boot-check-bar-fill"></span></span><span class="boot-check-status">····</span></div>
+      <div class="boot-check" data-delay="1.3"><span class="boot-check-label">VISION SYS</span><span class="boot-check-bar"><span class="boot-check-bar-fill"></span></span><span class="boot-check-status">····</span></div>
+      <div class="boot-check" data-delay="1.6"><span class="boot-check-label">AGENT SWARM</span><span class="boot-check-bar"><span class="boot-check-bar-fill"></span></span><span class="boot-check-status">····</span></div>
+      <div class="boot-check" data-delay="1.9"><span class="boot-check-label">NEURAL LINK</span><span class="boot-check-bar"><span class="boot-check-bar-fill"></span></span><span class="boot-check-status">····</span></div>
+    </div>
   </div>
 
   <!-- Three.js Background -->
@@ -83,15 +108,186 @@ window.onerror = function(msg, url, line, col, err) {
   <!-- Vignette -->
   <div id="vignette"></div>
 
+  <!-- Desktop Background (screen capture layer) -->
+  <div id="desktop-bg"><img id="desktop-bg-img" src="" alt=""></div>
+
+  <!-- Iron Man Helmet Mechanical Frame -->
+  <div class="helmet-mech top"></div>
+  <div class="helmet-mech bottom"></div>
+  <div class="helmet-mech left"></div>
+  <div class="helmet-mech right"></div>
+
+  <!-- Helmet Corner Joints -->
+  <div class="helmet-joint joint-tl"></div>
+  <div class="helmet-joint joint-tr"></div>
+  <div class="helmet-joint joint-bl"></div>
+  <div class="helmet-joint joint-br"></div>
+
+  <!-- Helmet Edge Honeycomb -->
+  <div id="helmet-honeycomb"></div>
+
+  <!-- Power Ring (shows in desktop view) -->
+  <div id="power-ring"></div>
+
+  <!-- Heading Tape (left side) -->
+  <div id="heading-tape">
+    <div class="tape-track" id="heading-track"></div>
+  </div>
+
+  <!-- Altitude Tape (right side) -->
+  <div id="altitude-tape">
+    <div class="tape-track" id="altitude-track"></div>
+  </div>
+
+  <!-- Unified Control Bar -->
+  <div id="unified-control-bar">
+    <button id="view-reactor" class="ctrl-btn mode-btn active" title="Arc Reactor 3D View" style="pointer-events:auto;position:relative;z-index:999999" onclick="alert('REACTOR CLICKED!');window._jarvisSwitchMode('reactor')">⚡ REACTOR</button>
+    <button id="view-desktop" class="ctrl-btn mode-btn" title="Desktop View" style="pointer-events:auto;position:relative;z-index:999999" onclick="alert('DESKTOP CLICKED!');window._jarvisSwitchMode('desktop')">🖥 DESKTOP</button>
+    <span class="ctrl-sep"></span>
+    <button id="armor-main-btn" class="ctrl-btn armor-btn" title="Activate Nanoparticle Armor" style="pointer-events:auto;position:relative;z-index:999999" onclick="alert('ARMOR CLICKED!');window._jarvisSwitchMode('armor')">
+      <span class="armor-icon-large">🦾</span> ARMOR
+    </button>
+    <span class="ctrl-sep"></span>
+    <span class="armor-skin-dots">
+      <span class="skin-dot mk50 active" data-skin="mk50" title="Mark 50 · Nano Blue"></span>
+      <span class="skin-dot mk3" data-skin="mk3" title="Mark III · Red & Gold"></span>
+      <span class="skin-dot war-machine" data-skin="war-machine" title="War Machine · Black & Silver"></span>
+      <span class="skin-dot hulkbuster" data-skin="hulkbuster" title="Hulkbuster · Crimson & Gold"></span>
+    </span>
+    <span class="ctrl-sep"></span>
+    <button id="armor-scan-btn" class="ctrl-btn icon-btn" title="Scan Mode (S)">🎯</button>
+    <button id="armor-flight-btn" class="ctrl-btn icon-btn" title="Flight HUD (F)">✈️</button>
+    <span class="ctrl-sep"></span>
+    <button id="night-vision-btn" class="ctrl-btn icon-btn" title="Night Vision (N)">🌙</button>
+    <button id="thermal-vision-btn" class="ctrl-btn icon-btn" title="Thermal Vision (T)">🔥</button>
+    <button id="weapons-btn" class="ctrl-btn icon-btn" title="Weapons Panel (W)">💥</button>
+    <button id="radar-btn" class="ctrl-btn icon-btn" title="Threat Radar (R)">🛡️</button>
+    <button id="diag-toggle-btn" class="ctrl-btn icon-btn" title="System Diagnostics (D)">🩺</button>
+    <button id="countdown-btn" class="ctrl-btn icon-btn" title="Countdown (K)">⏱️</button>
+    <span class="ctrl-sep"></span>
+    <button id="theme-cycle-btn" class="ctrl-btn mode-btn" title="Cycle HUD Theme">🎨</button>
+    <button id="soundfx-toggle-btn" class="ctrl-btn icon-btn active" title="Sound FX">🔊</button>
+    <button id="quote-btn" class="ctrl-btn icon-btn" title="JARVIS Quote (Q)">💬</button>
+    <button id="photo-mode-btn" class="ctrl-btn icon-btn" title="Photo Mode (\)">📸</button>
+    <button id="ironman-holo-btn" class="ctrl-btn icon-btn active" title="Iron Man Hologram (I)">🤖</button>
+    <span class="ctrl-sep"></span>
+    <button id="jarvis-voice-btn" class="ctrl-btn icon-btn active" title="JARVIS Voice Output — British AI butler speaks back">🗣️</button>
+  </div>
+
+  <!-- System Alert -->
+  <div id="system-alert">
+    <div class="alert-title"></div>
+    <div class="alert-detail"></div>
+  </div>
+
+  <!-- Diagnostic Flash Overlay -->
+  <div id="diag-flash"></div>
+
+  <!-- Toast Notifications -->
+  <div id="toast-container"></div>
+
+  <!-- File Drop Zone -->
+  <div id="drop-zone">
+    <div class="drop-hint">⬆ Drop file to analyze with J.A.R.V.I.S.</div>
+  </div>
+
   <!-- Holographic Scanlines -->
   <div id="holo-scanlines"></div>
 
-  <!-- CSS Holographic Core (independent of Three.js) -->
-  <div id="css-holo-core">
-    <div class="core-orb"></div>
-    <div class="core-ring"></div>
-    <div class="core-ring"></div>
-    <div class="core-ring"></div>
+  <!-- Iron Man HUD Angular Frame Accents -->
+  <div class="hud-angular-frame tl"></div>
+  <div class="hud-angular-frame tr"></div>
+  <div class="hud-angular-frame bl"></div>
+  <div class="hud-angular-frame br"></div>
+
+  <!-- HUD Sector Rings (Iron Man targeting circles) -->
+  <div class="hud-sector-ring hud-sector-ring-1"></div>
+  <div class="hud-sector-ring hud-sector-ring-2"></div>
+  <div class="hud-sector-ring hud-sector-ring-3"></div>
+
+  <!-- HUD Focus Sweep -->
+  <div class="hud-focus-sweep"></div>
+
+  <!-- HUD Data Labels (floating status readouts) -->
+  <div class="hud-data-label label-top-left">
+    <span class="dot blue"></span>SYS.NOMINAL
+  </div>
+  <div class="hud-data-label label-top-right">
+    <span class="dot green"></span>LINK.ACTIVE
+  </div>
+  <div class="hud-data-label label-bot-left">
+    <span class="dot gold"></span>PWR.STABLE
+  </div>
+  <div class="hud-data-label label-bot-right">
+    <span class="dot orange"></span>SIG.97%
+  </div>
+
+  <!-- Holographic Data Rings -->
+  <div class="holo-data-rings">
+    <div class="holo-ring holo-ring-1"><span class="holo-ring-label r1">CORE</span></div>
+    <div class="holo-ring holo-ring-2"><span class="holo-ring-label r2">AUX</span></div>
+    <div class="holo-ring holo-ring-3"><span class="holo-ring-label r3">SWARM</span></div>
+  </div>
+
+  <!-- CSS Arc Reactor (fallback / overlay) -->
+  <div id="css-arc-reactor">
+    <div class="arc-core"></div>
+    <div class="arc-ring"></div>
+    <div class="arc-ring"></div>
+    <div class="arc-ring"></div>
+    <div class="arc-ring"></div>
+    <div class="arc-ring"></div>
+    <div class="arc-ring"></div>
+  </div>
+
+  <!-- Audio Spectrum Canvas -->
+  <canvas id="audio-spectrum" width="200" height="200"></canvas>
+
+  <!-- Target Reticle -->
+  <div id="target-reticle">
+    <div id="reticle-inner"></div>
+    <div class="reticle-corner tl"></div>
+    <div class="reticle-corner tr"></div>
+    <div class="reticle-corner bl"></div>
+    <div class="reticle-corner br"></div>
+  </div>
+
+  <!-- Corner Diagnostic Panels -->
+  <div class="diag-panel" id="diag-tl">
+    <div class="diag-title">System Status</div>
+    <div class="diag-row"><span class="diag-label">CORE</span><span class="diag-val ok">NOMINAL</span></div>
+    <div class="diag-row"><span class="diag-label">TEMP</span><span class="diag-val ok" id="diag-temp">37.2°C</span></div>
+    <div class="diag-row"><span class="diag-label">LOAD</span><span class="diag-val" id="diag-load">24%</span></div>
+    <div class="diag-row"><span class="diag-label">UPTIME</span><span class="diag-val" id="diag-uptime">00:00</span></div>
+  </div>
+
+  <div class="diag-panel" id="diag-tr">
+    <div class="diag-title">Network</div>
+    <div class="diag-row"><span class="diag-label">LINK</span><span class="diag-val ok" id="diag-link">ACTIVE</span></div>
+    <div class="diag-row"><span class="diag-label">LAT</span><span class="diag-val" id="diag-lat">12ms</span></div>
+    <div class="diag-row"><span class="diag-label">PKT</span><span class="diag-val" id="diag-pkt">1.2K/s</span></div>
+  </div>
+
+  <div class="diag-panel" id="diag-bl">
+    <div class="diag-title">Power</div>
+    <div class="diag-row"><span class="diag-label">ARC</span><span class="diag-val ok">STABLE</span></div>
+    <div class="diag-row"><span class="diag-label">DRAW</span><span class="diag-val" id="diag-draw">1.8GW</span></div>
+    <div class="diag-row"><span class="diag-label">EFF</span><span class="diag-val ok" id="diag-eff">97.4%</span></div>
+  </div>
+
+  <div class="diag-panel" id="diag-br">
+    <div class="diag-title">Sensors</div>
+    <div class="diag-row"><span class="diag-label">CAM</span><span class="diag-val" id="diag-cam">RDY</span></div>
+    <div class="diag-row"><span class="diag-label">MIC</span><span class="diag-val" id="diag-mic">RDY</span></div>
+    <div class="diag-row"><span class="diag-label">IR</span><span class="diag-val" id="diag-ir">CAL</span></div>
+  </div>
+
+  <!-- Edge Data Tickers -->
+  <div class="data-ticker" id="ticker-top">
+    <span class="ticker-content" id="ticker-top-content"></span>
+  </div>
+  <div class="data-ticker" id="ticker-bottom">
+    <span class="ticker-content" id="ticker-bottom-content"></span>
   </div>
 
   <!-- Data Stream Gutters -->
@@ -151,7 +347,6 @@ window.onerror = function(msg, url, line, col, err) {
       <div id="chat-container">
         <!-- Welcome message rendered by JS -->
       </div>
-      <!-- Bottom-left corner bracket -->
       <div class="panel-bracket-bl"></div>
     </main>
 
@@ -165,29 +360,10 @@ window.onerror = function(msg, url, line, col, err) {
         <button class="panel-tab" data-panel="agents">Agents</button>
         <button class="panel-tab" data-panel="vision">Vision</button>
         <button class="panel-tab" data-panel="research">Research</button>
+        <button class="panel-tab" data-panel="armor">🦾 Armor</button>
       </div>
       <div id="side-panel-content" class="side-panel-content">
-        <!-- Viz tab widgets -->
-        <div class="mini-widget">
-          <div class="mini-orbit">
-            <div class="ring"><div class="dot"></div></div>
-            <div class="ring"><div class="dot"></div></div>
-            <div class="ring"><div class="dot"></div></div>
-          </div>
-          <div class="widget-title">Holographic Core</div>
-          <div class="widget-value" id="widget-core-status">NOMINAL</div>
-          <div class="widget-sub">3D engine active · 60 FPS</div>
-        </div>
-        <div class="mini-widget">
-          <div class="widget-title">Particle Field</div>
-          <div class="widget-value" id="widget-particles">2,000</div>
-          <div class="widget-sub">active nodes in field</div>
-        </div>
-        <div class="mini-widget">
-          <div class="widget-title">Session</div>
-          <div class="widget-value" id="widget-session-time">00:00</div>
-          <div class="widget-sub">since initialization</div>
-        </div>
+        <!-- Filled dynamically by updateSidePanel() -->
       </div>
     </aside>
 
@@ -229,69 +405,309 @@ window.onerror = function(msg, url, line, col, err) {
 
   <!-- Load Three.js as regular script (non-blocking) with timeout fallback -->
   <script>
-    // Load Three.js with a timeout — if it doesn't load in 8s, skip it
     window.__threeReady = false;
     var threeScript = document.createElement('script');
-    threeScript.src = 'assets/three.min.js?v=2';
+    threeScript.src = 'assets/three.min.js?v=3';
     threeScript.onload = function() { window.__threeReady = true; };
     threeScript.onerror = function() { console.warn('Three.js CDN unreachable'); };
     document.head.appendChild(threeScript);
-    // Timeout: mark as "tried" after 8 seconds even if not loaded
     setTimeout(function() { if (!window.__threeReady) window.__threeTimeout = true; }, 8000);
   </script>
 
-  <!-- Three.js Modules (regular scripts, no import/export) -->
-  <script src="three/scene.js?v=3"></script>
-  <script src="three/particles.js?v=3"></script>
-  <script src="three/rings.js?v=3"></script>
+  <!-- Three.js Modules -->
+  <script src="three/scene.js?v=5"></script>
+  <script src="three/particles.js?v=4"></script>
+  <script src="three/rings.js?v=4"></script>
   <script src="three/scanlines.js?v=2"></script>
-  <script src="three/globe.js?v=2"></script>
-  <script src="three/network.js?v=2"></script>
+  <script src="three/globe.js?v=3"></script>
+  <script src="three/network.js?v=3"></script>
+  <script src="three/charts.js?v=1"></script>
+  <script src="three/datatower.js?v=1"></script>
+  <script src="three/particletext.js?v=1"></script>
+
+  <!-- Audio Analysis & 3D Avatar -->
+  <script src="js/audioanalyzer.js?v=2"></script>
+  <script src="three/avatar.js?v=2"></script>
+  <script src="three/ironman-3d.js?v=11"></script>
 
   <!-- App Modules -->
-  <script src="js/chat.js?v=3"></script>
+  <script src="js/chat.js?v=4"></script>
   <script src="js/websocket.js?v=2"></script>
   <script src="js/speech.js?v=2"></script>
-  <script src="js/vision.js?v=2"></script>
-  <script src="js/agents.js?v=2"></script>
-  <script src="js/viz.js?v=2"></script>
-  <script src="js/app.js?v=5"></script>
+  <script src="js/vision.js?v=3"></script>
+  <script src="js/agents.js?v=3"></script>
+  <script src="js/viz.js?v=4"></script>
+  <script src="js/app.js?v=9"></script>
+  <script src="js/nanoparticles.js?v=2"></script>
+  <script src="js/targetlock.js?v=3"></script>
+  <script src="js/gestures.js?v=2"></script>
+  <script src="js/flighthud.js?v=2"></script>
+  <script src="js/holo-avatar.js?v=1"></script>
+  <script src="js/ironman-helmet.js?v=7"></script>
+  <script src="js/helmet-close.js?v=5"></script>
+  <script src="js/vision-modes.js?v=1"></script>
+  <script src="js/diagnostics.js?v=1"></script>
+  <script src="js/weapons.js?v=1"></script>
+  <script src="js/radar.js?v=1"></script>
+  <script src="js/themes.js?v=1"></script>
+  <script src="js/quotes.js?v=1"></script>
+  <script src="js/soundfx.js?v=1"></script>
+  <script src="js/photomode.js?v=1"></script>
+  <script src="js/countdown.js?v=1"></script>
+  <script src="js/heartbeat.js?v=1"></script>
+  <script src="js/parallax.js?v=1"></script>
+  <script src="js/kinetic.js?v=1"></script>
+  <script src="js/helmet-interior.js?v=1"></script>
 
   <!-- Bootstrap -->
   <script>
+    // ── ENHANCED BOOT SEQUENCE (visual only, non-blocking) ──
+    (function bootSequence() {
+      var bootScreen = document.getElementById('loading-screen');
+      if (!bootScreen) return;
+      var checks = bootScreen.querySelectorAll('.boot-check');
+      var energyWave = document.getElementById('boot-energy-wave');
+      var bootFlash = document.getElementById('boot-flash');
+      var totalDuration = 3200;
+
+      checks.forEach(function(check) {
+        var delay = parseFloat(check.dataset.delay) || 0;
+        check.style.animationDelay = delay + 's';
+        var bar = check.querySelector('.boot-check-bar-fill');
+        var statusEl = check.querySelector('.boot-check-status');
+        setTimeout(function() {
+          if (bar) bar.style.width = '100%';
+          if (statusEl) statusEl.textContent = 'OK';
+          if (statusEl) statusEl.classList.add('ok');
+          check.classList.add('done');
+        }, (delay + 0.9) * 1000);
+      });
+
+      setTimeout(function() {
+        if (energyWave) energyWave.classList.add('fire');
+        if (bootFlash) bootFlash.classList.add('fire');
+      }, totalDuration - 500);
+
+      setTimeout(function() {
+        bootScreen.classList.add('fade-out');
+        setTimeout(function() {
+          if (bootScreen.parentNode) bootScreen.parentNode.removeChild(bootScreen);
+        }, 600);
+      }, totalDuration);
+    })();
+
+    // ══════════════════════════════════════════════════
+    // GLOBAL MODE SWITCHER — direct onclick, no deps
+    // ══════════════════════════════════════════════════
+    window._jarvisSwitchMode = (function() {
+      var _desktopStream = null;
+      var _desktopInterval = null;
+      var _desktopVideo = null;
+      var _armorActive = false;
+
+      function _showAlert(title, detail) {
+        var el = document.getElementById('system-alert');
+        if (!el) return;
+        var t = el.querySelector('.alert-title');
+        var d = el.querySelector('.alert-detail');
+        if (t) t.textContent = title;
+        if (d) d.textContent = detail;
+        el.classList.add('show');
+        setTimeout(function() { el.classList.remove('show'); }, 2500);
+      }
+
+      function _updateButtons(active) {
+        var r = document.getElementById('view-reactor');
+        var d = document.getElementById('view-desktop');
+        var a = document.getElementById('armor-main-btn');
+        if (r) r.classList.toggle('active', active === 'reactor');
+        if (d) d.classList.toggle('active', active === 'desktop');
+        if (a) a.classList.toggle('active', active === 'armor');
+      }
+
+      function _stopDesktop() {
+        if (_desktopInterval) { clearInterval(_desktopInterval); _desktopInterval = null; }
+        if (_desktopStream) { _desktopStream.getTracks().forEach(function(t) { t.stop(); }); _desktopStream = null; }
+        _desktopVideo = null;
+        var bg = document.getElementById('desktop-bg');
+        if (bg) bg.classList.remove('active');
+        var img = document.getElementById('desktop-bg-img');
+        if (img) img.src = '';
+        document.body.classList.remove('desktop-view');
+      }
+
+      function _deactivateArmor() {
+        _armorActive = false;
+        document.body.classList.remove('armor-mode', 'armor-assembled');
+        var pr = document.getElementById('power-ring');
+        if (pr) pr.style.display = 'none';
+        // Disassemble nanoparticles
+        if (JARVIS.Nanoparticles && JARVIS.Nanoparticles.isAssembled && JARVIS.Nanoparticles.isAssembled()) {
+          JARVIS.Nanoparticles.disassemble();
+        }
+        // Deactivate target lock
+        if (JARVIS.TargetLock && JARVIS.TargetLock.isScanMode && JARVIS.TargetLock.isScanMode()) {
+          JARVIS.TargetLock.deactivate();
+        }
+        var sb = document.getElementById('armor-scan-btn');
+        if (sb) sb.classList.remove('active');
+        // Deactivate helmet interior
+        if (JARVIS.HelmetInterior && JARVIS.HelmetInterior.deactivate) JARVIS.HelmetInterior.deactivate();
+      }
+
+      function _activateArmor() {
+        _armorActive = true;
+        document.body.classList.add('armor-mode', 'armor-assembled');
+        var pr = document.getElementById('power-ring');
+        if (pr) pr.style.display = 'block';
+        // Assemble nanoparticles
+        if (JARVIS.Nanoparticles && JARVIS.Nanoparticles.assemble) {
+          JARVIS.Nanoparticles.assemble();
+        }
+        // Activate helmet interior HUD
+        if (JARVIS.HelmetInterior && JARVIS.HelmetInterior.activate) JARVIS.HelmetInterior.activate();
+        // Show float label
+        if (JARVIS.App && JARVIS.App.spawnFloatLabel) {
+          JARVIS.App.spawnFloatLabel('NANOPARTICLES ENGAGED');
+        }
+      }
+
+      async function _startDesktop() {
+        try {
+          var stream = await navigator.mediaDevices.getDisplayMedia({
+            video: { cursor: 'always' },
+            audio: false
+          });
+          _desktopStream = stream;
+          _desktopVideo = document.createElement('video');
+          _desktopVideo.srcObject = stream;
+          _desktopVideo.play();
+
+          var bg = document.getElementById('desktop-bg');
+          var img = document.getElementById('desktop-bg-img');
+          if (bg) bg.classList.add('active');
+
+          var canvas = document.createElement('canvas');
+          var ctx = canvas.getContext('2d');
+
+          _desktopInterval = setInterval(function() {
+            if (!_desktopVideo || !document.body.classList.contains('desktop-view')) return;
+            canvas.width = _desktopVideo.videoWidth;
+            canvas.height = _desktopVideo.videoHeight;
+            ctx.drawImage(_desktopVideo, 0, 0);
+            if (img) img.src = canvas.toDataURL('image/jpeg', 0.75);
+          }, 100); // 10 fps
+
+          stream.getVideoTracks()[0].onended = function() {
+            window._jarvisSwitchMode('reactor');
+          };
+
+          document.body.classList.add('desktop-view');
+          return true;
+        } catch (err) {
+          console.error('Desktop capture failed:', err);
+          return false;
+        }
+      }
+
+      async function switchMode(mode) {
+        console.log('[JARVIS MODE] Switching to:', mode);
+
+        // REACTOR: always works, full reset
+        if (mode === 'reactor') {
+          _stopDesktop();
+          _deactivateArmor();
+          _updateButtons('reactor');
+          _showAlert('ARC REACTOR MODE', '3D holographic core engaged — all systems nominal');
+          if (JARVIS.App && JARVIS.App.spawnFloatLabel) {
+            JARVIS.App.spawnFloatLabel('REACTOR ACTIVE');
+          }
+          return;
+        }
+
+        // DESKTOP: screen monitoring
+        if (mode === 'desktop') {
+          _deactivateArmor();
+          _stopDesktop();
+          var ok = await _startDesktop();
+          if (!ok) {
+            _showAlert('CAPTURE DENIED', 'Screen sharing permission required');
+            _updateButtons('reactor');
+            return;
+          }
+          _updateButtons('desktop');
+          _showAlert('DESKTOP VIEW ACTIVE', 'HUD overlaying live screen feed');
+          return;
+        }
+
+        // ARMOR: Iron Man first-person HUD
+        if (mode === 'armor') {
+          if (_armorActive) {
+            // Toggle off
+            _deactivateArmor();
+            _updateButtons('reactor');
+            _showAlert('ARMOR DISENGAGED', 'Returning to standard interface');
+            return;
+          }
+          _stopDesktop();
+          _activateArmor();
+          _updateButtons('armor');
+          _showAlert('ARMOR ACTIVE', 'Nanoparticle armor engaged — first-person HUD online');
+          return;
+        }
+      }
+
+      return switchMode;
+    })();
+
     // ── STEP 1: Init UI IMMEDIATELY ──
-    function hideLoader() {
-      const loader = document.getElementById('loading-screen');
-      if (loader) { loader.classList.add('hidden'); setTimeout(() => loader.remove(), 600); }
-    }
-
-    let scene, camera, renderer, clock;
-    let threeLoaded = false;
-
-    // Init app UI right now
     JARVIS.Chat.init();
     JARVIS.Agents.init('side-panel-content');
     JARVIS.App.init();
-    hideLoader();
+    JARVIS.App.updateSidePanel('viz');
 
+    // Init NEW Iron Man movie upgrades
+    if (JARVIS.Heartbeat && JARVIS.Heartbeat.init) JARVIS.Heartbeat.init();
+    if (JARVIS.Parallax && JARVIS.Parallax.init) JARVIS.Parallax.init();
+    if (JARVIS.Kinetic && JARVIS.Kinetic.init) JARVIS.Kinetic.init();
+    if (JARVIS.HelmetInterior && JARVIS.HelmetInterior.init) JARVIS.HelmetInterior.init();
+
+    // Init armor modules
+    if (JARVIS.Nanoparticles && JARVIS.Nanoparticles.init) JARVIS.Nanoparticles.init();
+    if (JARVIS.TargetLock && JARVIS.TargetLock.init) JARVIS.TargetLock.init();
+    if (JARVIS.FlightHUD && JARVIS.FlightHUD.init) JARVIS.FlightHUD.init();
+    if (JARVIS.Gestures && JARVIS.Gestures.init) JARVIS.Gestures.init();
+    if (JARVIS.HoloAvatar && JARVIS.HoloAvatar.init) JARVIS.HoloAvatar.init();
+    if (JARVIS.Helmet && JARVIS.Helmet.init) JARVIS.Helmet.init();
+    if (JARVIS.HelmetClose && JARVIS.HelmetClose.init) JARVIS.HelmetClose.init();
+    if (JARVIS.VisionModes && JARVIS.VisionModes.init) JARVIS.VisionModes.init();
+    if (JARVIS.Diagnostics && JARVIS.Diagnostics.init) JARVIS.Diagnostics.init();
+    if (JARVIS.Weapons && JARVIS.Weapons.init) JARVIS.Weapons.init();
+    if (JARVIS.Radar && JARVIS.Radar.init) JARVIS.Radar.init();
+    if (JARVIS.Themes && JARVIS.Themes.init) JARVIS.Themes.init();
+    if (JARVIS.Quotes && JARVIS.Quotes.init) JARVIS.Quotes.init();
+    if (JARVIS.SoundFX && JARVIS.SoundFX.init) JARVIS.SoundFX.init();
+    if (JARVIS.PhotoMode && JARVIS.PhotoMode.init) JARVIS.PhotoMode.init();
+    if (JARVIS.Countdown && JARVIS.Countdown.init) JARVIS.Countdown.init();
+    if (JARVIS.IronMan3D && JARVIS.IronMan3D.setActive) JARVIS.IronMan3D.setActive(true); // Auto-show on boot
     // Set up fallback starfield canvas immediately
     initFallbackBackground();
 
-    console.log('%c[J.A.R.V.I.S.] %cHUD online. %cLoading 3D engine...',
+    console.log('%c[J.A.R.V.I.S.] %cArc reactor online. %cInitializing 3D engine...',
       'color: #60A5FA; font-weight: bold;',
       'color: #10B981;',
       'color: #F59E0B;');
 
     // ── Fallback Background ──
     function initFallbackBackground() {
-      const canvas = document.getElementById('fallback-bg');
+      var canvas = document.getElementById('fallback-bg');
       if (!canvas) return;
       canvas.style.display = 'block';
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-      const ctx = canvas.getContext('2d');
-      const stars = [];
-      for (let i = 0; i < 200; i++) {
+      var ctx = canvas.getContext('2d');
+      var stars = [];
+      for (var i = 0; i < 220; i++) {
         stars.push({
           x: Math.random() * canvas.width, y: Math.random() * canvas.height,
           r: Math.random() * 1.5 + 0.3, opacity: Math.random(), speed: Math.random() * 0.3 + 0.1,
@@ -299,35 +715,58 @@ window.onerror = function(msg, url, line, col, err) {
       }
       function drawStars() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        stars.forEach(s => {
+        stars.forEach(function(s) {
           s.opacity += s.speed * 0.01;
           if (s.opacity > 1 || s.opacity < 0.1) s.speed *= -1;
-          ctx.fillStyle = `rgba(96, 165, 250, ${s.opacity * 0.6})`;
+          ctx.fillStyle = 'rgba(96, 165, 250, ' + (s.opacity * 0.6) + ')';
           ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
         });
         requestAnimationFrame(drawStars);
       }
       drawStars();
-      window.addEventListener('resize', () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
+      window.addEventListener('resize', function() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; });
     }
 
-    // ── STEP 2: Wait for Three.js (loaded as regular script, non-blocking) ──
+    // ── STEP 2: Wait for Three.js ──
     function tryInitThreeJS() {
       if (window.THREE) {
-        const THREE = window.THREE;
-        const result = JARVIS.Scene.init('three-bg');
+        var THREE = window.THREE;
+
+        // r150+ compatibility: old encoding constants for GLTFLoader
+        if (!THREE.sRGBEncoding) {
+          THREE.sRGBEncoding = 3000;
+          THREE.LinearEncoding = 3001;
+          THREE.GammaEncoding = 3002;
+        }
+
+        // Load GLTFLoader dynamically (needs THREE to exist first)
+        if (!THREE.GLTFLoader) {
+          var gltfScript = document.createElement('script');
+          gltfScript.src = 'assets/GLTFLoader.js?v=1';
+          gltfScript.onload = function() { console.log('[J.A.R.V.I.S.] GLTFLoader loaded.'); };
+          document.head.appendChild(gltfScript);
+        }
+
+        var result = JARVIS.Scene.init('three-bg');
         if (result) {
-          ({ scene, camera, renderer, clock } = result);
+          var scene = result.scene, camera = result.camera, renderer = result.renderer, clock = result.clock;
           JARVIS.Particles.init(scene);
           JARVIS.Rings.init(scene);
           JARVIS.Scanlines.init();
           JARVIS.Viz.init(scene);
-          threeLoaded = true;
+          JARVIS.Avatar.init(scene);
+          JARVIS.IronMan3D.init(scene, renderer);
+          // Init audio analyzer (lazy — requires user gesture)
+          JARVIS.AudioAnalyzer.init();
           document.getElementById('fallback-bg').style.display = 'none';
-          JARVIS.Scene.start((delta, elapsed) => {
+          document.body.classList.add('three-loaded');
+          JARVIS.Scene.start(function(delta, elapsed) {
             JARVIS.Particles.update(delta, elapsed);
             JARVIS.Rings.update(delta, elapsed);
             JARVIS.Viz.update(delta, elapsed);
+            JARVIS.AudioAnalyzer.tick();
+            JARVIS.Avatar.update(delta, elapsed);
+            JARVIS.IronMan3D.update(delta, elapsed);
           });
           console.log('%c[J.A.R.V.I.S.] %cThree.js engine online.',
             'color: #60A5FA;', 'color: #10B981;');
@@ -337,7 +776,6 @@ window.onerror = function(msg, url, line, col, err) {
       return false;
     }
 
-    // Poll for THREE every 500ms, give up after 15 seconds
     if (window.__threeReady) {
       tryInitThreeJS();
     } else {
@@ -355,47 +793,104 @@ window.onerror = function(msg, url, line, col, err) {
     // ── Connect WebSocket ──
     JARVIS.WS.connect();
 
-    // Handle incoming responses
-    JARVIS.WS.on('response', (data) => {
+    // ── Target Reticle ──
+    var reticle = document.getElementById('target-reticle');
+    document.addEventListener('mousemove', function(e) {
+      if (reticle) {
+        reticle.style.left = e.clientX + 'px';
+        reticle.style.top = e.clientY + 'px';
+      }
+    });
+    // Hide reticle when mouse leaves window
+    document.addEventListener('mouseleave', function() {
+      if (reticle) reticle.style.opacity = '0';
+    });
+    document.addEventListener('mouseenter', function() {
+      if (reticle) reticle.style.opacity = '0.5';
+    });
+
+    // ── Target Lock: click-to-scan in scan mode ──
+    document.addEventListener('click', function(e) {
+      if (JARVIS.TargetLock && JARVIS.TargetLock.handleClick) {
+        JARVIS.TargetLock.handleClick(e);
+      }
+    }, true);
+
+    // Handle streaming responses
+    JARVIS.WS.on('stream_token', function(data) {
+      if (data.token) {
+        JARVIS.Chat.appendStreamToken(data.text);
+      }
+    });
+
+    JARVIS.WS.on('stream_end', function(data) {
+      JARVIS.Chat.finalizeStreaming(data.text);
+      if (JARVIS.Particles && JARVIS.Particles.burst) JARVIS.Particles.burst(0.7);
+      JARVIS.App.setMode('idle');
+      if (JARVIS.Scene && JARVIS.Scene.setCoreIntensity) JARVIS.Scene.setCoreIntensity(0.3);
+      JARVIS.App.triggerCoreBurst();
+      JARVIS.App.spawnFloatLabel('RESPONSE RECEIVED');
+      // Heartbeat: energy burst on response
+      if (JARVIS.Heartbeat) { JARVIS.Heartbeat.burst(); JARVIS.Heartbeat.setMode('idle'); }
+      // Kinetic: animate final message
+      var lastBubble = document.querySelector('#chat-container .message.assistant:last-child .message-bubble');
+      if (lastBubble && JARVIS.Kinetic) JARVIS.Kinetic.animateEntry(lastBubble);
+    });
+
+    // Handle incoming responses (non-streaming fallback)
+    JARVIS.WS.on('response', function(data) {
       if (data.transcription) {
-        // Show what was heard in chat
-        JARVIS.Chat.addMessage('user', data.text + ' 🎤');
+        // Show transcribed text with detected language flag
+        var langTag = data.language && data.language !== 'en' ? ' [' + data.language + ']' : '';
+        JARVIS.Chat.addMessage('user', data.text + ' 🎤' + langTag);
+        // Backend auto-triggers _handle_chat after transcription — show typing
+        JARVIS.Chat.showTyping();
+        JARVIS.App.setMode('thinking');
+        if (JARVIS.Heartbeat) JARVIS.Heartbeat.setMode('thinking');
       } else {
         JARVIS.Chat.hideTyping();
         JARVIS.Chat.addMessage('assistant', data.text, { typewriter: true });
         if (JARVIS.Particles && JARVIS.Particles.burst) JARVIS.Particles.burst(0.7);
         JARVIS.App.setMode('idle');
-        // Reset core intensity
         if (JARVIS.Scene && JARVIS.Scene.setCoreIntensity) JARVIS.Scene.setCoreIntensity(0.3);
         JARVIS.App.triggerCoreBurst();
+        JARVIS.App.spawnFloatLabel('RESPONSE RECEIVED');
+        if (JARVIS.Heartbeat) { JARVIS.Heartbeat.burst(); JARVIS.Heartbeat.setMode('idle'); }
       }
     });
 
-    JARVIS.WS.on('voice_response', (data) => {
-      // Play TTS audio
+    JARVIS.WS.on('voice_response', function(data) {
       if (data.audio) {
-        const audio = new Audio('data:audio/aiff;base64,' + data.audio);
-        audio.play().catch(() => {});
+        var mimeType = data.format === 'mp3' ? 'audio/mpeg' : 'audio/aiff';
+        var audio = new Audio('data:' + mimeType + ';base64,' + data.audio);
+        // Attach to audio analyzer for avatar reaction
+        JARVIS.AudioAnalyzer.attachTTS(audio);
+        JARVIS.Avatar.setActive(true);
+        audio.onended = function() {
+          JARVIS.Avatar.setActive(false);
+          JARVIS.AudioAnalyzer.detachTTS();
+        };
+        audio.play().catch(function() {});
       }
     });
 
-    JARVIS.WS.on('error', (data) => {
+    JARVIS.WS.on('error', function(data) {
       JARVIS.Chat.hideTyping();
       JARVIS.Chat.addMessage('assistant', '⚠️ ' + (data.message || 'An error occurred.'));
       JARVIS.App.setMode('idle');
       if (JARVIS.Scene && JARVIS.Scene.setCoreIntensity) JARVIS.Scene.setCoreIntensity(0.3);
+      if (JARVIS.Heartbeat) JARVIS.Heartbeat.alert(true);
     });
 
-    // ── Vision Results ──
-    JARVIS.WS.on('vision_result', (data) => {
+    JARVIS.WS.on('vision_result', function(data) {
       JARVIS.Chat.hideTyping();
       JARVIS.Chat.addMessage('assistant', '👁️ **Screen Analysis:**\n\n' + data.analysis);
       JARVIS.App.setMode('idle');
       if (JARVIS.Scene && JARVIS.Scene.setCoreIntensity) JARVIS.Scene.setCoreIntensity(0.3);
+      JARVIS.App.spawnFloatLabel('VISION COMPLETE');
     });
 
-    // ── Agent Swarm Updates ──
-    JARVIS.WS.on('agent_update', (data) => {
+    JARVIS.WS.on('agent_update', function(data) {
       if (data.agents) {
         JARVIS.Agents.renderSwarm(data.agents);
       }
@@ -404,35 +899,38 @@ window.onerror = function(msg, url, line, col, err) {
       }
     });
 
-    JARVIS.WS.on('agent_complete', (data) => {
+    JARVIS.WS.on('agent_complete', function(data) {
       JARVIS.Chat.hideTyping();
       JARVIS.Agents.renderReport(data.report);
-      JARVIS.Chat.addMessage('assistant', '✅ Research complete. See the data panel for the full report.');
+      JARVIS.Chat.addMessage('assistant', '✅ Swarm complete. See the data panel for the full report.');
       JARVIS.App.setMode('idle');
       if (JARVIS.Scene && JARVIS.Scene.setCoreIntensity) JARVIS.Scene.setCoreIntensity(0.3);
       JARVIS.App.triggerCoreBurst();
+      JARVIS.App.spawnFloatLabel('SWARM COMPLETE');
+      if (JARVIS.Heartbeat) { JARVIS.Heartbeat.burst(); JARVIS.Heartbeat.setMode('idle'); }
     });
 
-    // ── System Alerts ──
-    JARVIS.WS.on('system_alert', (data) => {
+    JARVIS.WS.on('system_alert', function(data) {
       JARVIS.Chat.addMessage('assistant', '⚠️ **Alert:** ' + data.message);
+      JARVIS.App.triggerDiagFlash();
+      if (JARVIS.Heartbeat) JARVIS.Heartbeat.alert(true);
     });
 
-    JARVIS.WS.on('connected', () => {
+    JARVIS.WS.on('connected', function() {
       console.log('%c[J.A.R.V.I.S.] %cWebSocket link established.',
         'color: #60A5FA;', 'color: #10B981;');
     });
 
-    JARVIS.WS.on('disconnected', () => {
+    JARVIS.WS.on('disconnected', function() {
       console.log('%c[J.A.R.V.I.S.] %cWebSocket link lost.',
         'color: #60A5FA;', 'color: #F59E0B;');
     });
 
-    // ── Wire up voice mode with WebSocket ──
-    const voiceOrb = document.getElementById('voice-orb');
-    let isVoiceActive = false;
+    // ── Voice Mode ──
+    var voiceOrb = document.getElementById('voice-orb');
+    var isVoiceActive = false;
 
-    voiceOrb?.addEventListener('click', () => {
+    voiceOrb && voiceOrb.addEventListener('click', function() {
       if (!JARVIS.Speech.isAvailable()) {
         JARVIS.Chat.addMessage('assistant', '⚠️ Speech recognition is not available in this browser. Please type your command instead.');
         return;
@@ -444,37 +942,397 @@ window.onerror = function(msg, url, line, col, err) {
         voiceOrb.classList.add('listening');
         JARVIS.App.setMode('listening');
         JARVIS.Speech.start(
-          // Final result callback
-          (text) => {
+          // onResult — receives transcribed text + detected language
+          function(text, lang) {
             JARVIS.Chat.addMessage('user', text + ' 🎤');
             JARVIS.Chat.showTyping();
             JARVIS.App.setMode('thinking');
-            // Send via WebSocket if connected, else use local
-            if (JARVIS.WS.isConnected()) {
-              JARVIS.WS.send('chat', { text, mode: 'voice' });
+            // Only send chat for Web Speech fallback path.
+            // Raw audio path is handled by backend _handle_voice → _handle_chat automatically.
+            if (JARVIS.WS.isConnected() && !window._jarvisUsingRawAudio) {
+              JARVIS.WS.send('chat', { text: text, mode: 'voice', language: lang || 'en', tts_enabled: true });
             }
           },
-          // Interim result callback
-          (interim) => {
-            // Could show interim in UI
+          // onInterim — shows listening feedback
+          function(interim, info) {
+            if (info && info.rms !== undefined) {
+              // Voice activity detected — pulse the orb
+              var orb = document.getElementById('voice-orb');
+              if (orb && info.rms > 0.02) {
+                orb.style.boxShadow = '0 0 ' + Math.min(30, 10 + info.rms * 400) + 'px ' +
+                  Math.min(15, 3 + info.rms * 300) + 'px var(--jarvis-blue)';
+              }
+            }
+          },
+          // onError
+          function(err) {
+            console.warn('[JARVIS] Speech error:', err);
           }
         );
+        // Track that raw audio path is being used (backend handles chat)
+        window._jarvisUsingRawAudio = !!window.MediaRecorder;
       } else {
         voiceOrb.classList.remove('listening');
+        voiceOrb.style.boxShadow = '';
         JARVIS.App.setMode('idle');
         JARVIS.Speech.stop();
+        window._jarvisUsingRawAudio = false;
       }
     });
 
-    // Focus input on load
-    setTimeout(() => {
-      document.getElementById('user-input')?.focus();
-    }, 500);
+    // ── Research pipeline responses ──
+    JARVIS.WS.on('research_status', function(data) {
+      JARVIS.Chat.addMessage('assistant', '🔍 **' + data.phase + '**: ' + data.message);
+    });
 
-    console.log('%c[J.A.R.V.I.S.] %cAll systems initialized. %cHolographic HUD active.',
+    JARVIS.WS.on('research_complete', function(data) {
+      JARVIS.Chat.hideTyping();
+      JARVIS.Chat.addMessage('assistant', data.report);
+      JARVIS.App.setMode('idle');
+      if (JARVIS.Scene && JARVIS.Scene.setCoreIntensity) JARVIS.Scene.setCoreIntensity(0.3);
+      JARVIS.App.spawnFloatLabel('RESEARCH COMPLETE');
+      if (JARVIS.Heartbeat) { JARVIS.Heartbeat.burst(); JARVIS.Heartbeat.setMode('idle'); }
+      // Update side panel if on research tab
+      JARVIS.Agents.renderReport && JARVIS.Agents.renderReport(data.report);
+    });
+
+    // ── File Drop Zone ──
+    (function setupDropZone() {
+      var dropZone = document.getElementById('drop-zone');
+      if (!dropZone) return;
+      var dragCounter = 0;
+
+      document.addEventListener('dragenter', function(e) {
+        e.preventDefault();
+        dragCounter++;
+        if (dragCounter === 1) dropZone.classList.add('active');
+      });
+      document.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        dragCounter--;
+        if (dragCounter === 0) dropZone.classList.remove('active');
+      });
+      document.addEventListener('dragover', function(e) { e.preventDefault(); });
+      document.addEventListener('drop', function(e) {
+        e.preventDefault();
+        dragCounter = 0;
+        dropZone.classList.remove('active');
+        var file = e.dataTransfer.files[0];
+        if (!file) return;
+        // Read and send
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          var base64 = ev.target.result.split(',')[1];
+          JARVIS.Chat.addMessage('user', '📎 ' + file.name + ' (' + (file.size / 1024).toFixed(1) + ' KB)');
+          JARVIS.Chat.showTyping();
+          JARVIS.App.setMode('thinking');
+          if (JARVIS.WS && JARVIS.WS.isConnected()) {
+            JARVIS.WS.send('file_upload', {
+              filename: file.name,
+              mime_type: file.type,
+              size: file.size,
+              data: base64,
+            });
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    })();
+
+    // Focus input
+    setTimeout(function() {
+      document.getElementById('user-input') && document.getElementById('user-input').focus();
+    }, 3200);
+
+    // ── 🦾 ARMOR Control Bar ──
+    (function setupArmorControlBar() {
+      var armorBtn = document.getElementById('armor-main-btn');
+      var skinDots = document.querySelectorAll('.skin-dot');
+      var scanBtn = document.getElementById('armor-scan-btn');
+      var flightBtn = document.getElementById('armor-flight-btn');
+
+      // ARMOR toggle is handled by JARVIS.App.setupArmorControlBar() — no duplicate handler here
+
+      // Skin dots
+      skinDots.forEach(function(dot) {
+        dot.addEventListener('click', function() {
+          var skin = this.dataset.skin;
+          skinDots.forEach(function(d) { d.classList.remove('active'); });
+          this.classList.add('active');
+          JARVIS.App.switchArmorSkin(skin);
+        });
+      });
+
+      // Scan mode toggle
+      if (scanBtn) {
+        scanBtn.addEventListener('click', function() {
+          if (JARVIS.TargetLock) {
+            if (JARVIS.TargetLock.isScanMode()) {
+              JARVIS.TargetLock.deactivate();
+              this.classList.remove('active');
+            } else {
+              JARVIS.TargetLock.activate();
+              this.classList.add('active');
+            }
+          }
+        });
+      }
+
+      // Flight HUD toggle
+      if (flightBtn) {
+        flightBtn.addEventListener('click', function() {
+          if (JARVIS.FlightHUD) {
+            JARVIS.FlightHUD.toggle();
+            if (JARVIS.FlightHUD.isActive()) {
+              this.classList.add('active');
+            } else {
+              this.classList.remove('active');
+            }
+          }
+        });
+      }
+
+      // ── NEW FEATURE BUTTONS ──
+
+      // Night Vision toggle
+      var nvBtn = document.getElementById('night-vision-btn');
+      if (nvBtn) {
+        nvBtn.addEventListener('click', function() {
+          if (JARVIS.VisionModes) {
+            JARVIS.VisionModes.toggleNight();
+            this.classList.toggle('active', JARVIS.VisionModes.getMode() === 'night');
+          }
+        });
+      }
+
+      // Thermal Vision toggle
+      var tvBtn = document.getElementById('thermal-vision-btn');
+      if (tvBtn) {
+        tvBtn.addEventListener('click', function() {
+          if (JARVIS.VisionModes) {
+            JARVIS.VisionModes.toggleThermal();
+            this.classList.toggle('active', JARVIS.VisionModes.getMode() === 'thermal');
+          }
+        });
+      }
+
+      // Weapons toggle
+      var wpBtn = document.getElementById('weapons-btn');
+      if (wpBtn) {
+        wpBtn.addEventListener('click', function() {
+          if (JARVIS.Weapons) { JARVIS.Weapons.toggle(); this.classList.toggle('active'); }
+        });
+      }
+
+      // Radar toggle
+      var raBtn = document.getElementById('radar-btn');
+      if (raBtn) {
+        raBtn.addEventListener('click', function() {
+          if (JARVIS.Radar) { JARVIS.Radar.toggle(); this.classList.toggle('active'); }
+        });
+      }
+
+      // Diagnostics toggle
+      var diagBtn = document.getElementById('diag-toggle-btn');
+      if (diagBtn) {
+        diagBtn.addEventListener('click', function() {
+          if (JARVIS.Diagnostics) JARVIS.Diagnostics.toggle();
+        });
+      }
+
+      // Countdown toggle
+      var cdBtn = document.getElementById('countdown-btn');
+      if (cdBtn) {
+        cdBtn.addEventListener('click', function() {
+          if (JARVIS.Countdown) JARVIS.Countdown.toggle();
+        });
+      }
+
+      // Theme cycle
+      var themeBtn = document.getElementById('theme-cycle-btn');
+      if (themeBtn) {
+        themeBtn.addEventListener('click', function() {
+          if (JARVIS.Themes) JARVIS.Themes.cycle();
+        });
+      }
+
+      // Sound FX toggle
+      var sfxBtn = document.getElementById('soundfx-toggle-btn');
+      if (sfxBtn) {
+        sfxBtn.addEventListener('click', function() {
+          if (JARVIS.SoundFX) { JARVIS.SoundFX.toggle(); this.classList.toggle('active'); }
+        });
+      }
+
+      // Quote button
+      var qBtn = document.getElementById('quote-btn');
+      if (qBtn) {
+        qBtn.addEventListener('click', function() {
+          if (JARVIS.Quotes) JARVIS.Quotes.show();
+        });
+      }
+
+      // Photo mode toggle
+      var pmBtn = document.getElementById('photo-mode-btn');
+      if (pmBtn) {
+        pmBtn.addEventListener('click', function() {
+          if (JARVIS.PhotoMode) JARVIS.PhotoMode.toggle();
+        });
+      }
+
+      // Iron Man Hologram toggle
+      var imBtn = document.getElementById('ironman-holo-btn');
+      if (imBtn) {
+        imBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (JARVIS.IronMan3D && JARVIS.IronMan3D.toggle) {
+            var nowActive = JARVIS.IronMan3D.toggle();
+            imBtn.classList.toggle('active', nowActive);
+            var label = nowActive ? 'HOLOGRAM ENGAGED' : 'HOLOGRAM DISENGAGED';
+            if (JARVIS.App && JARVIS.App.spawnFloatLabel) JARVIS.App.spawnFloatLabel(label);
+            if (JARVIS.Heartbeat) JARVIS.Heartbeat.pulse(0.6);
+            console.log('[JARVIS] I pressed — IronMan3D toggle: ' + nowActive);
+          } else {
+            console.warn('[JARVIS] IronMan3D not available:', !!JARVIS.IronMan3D, typeof (JARVIS.IronMan3D || {}).toggle);
+          }
+        });
+      }
+
+      // JARVIS Voice Output toggle — British butler speaks back
+      var voiceBtn = document.getElementById('jarvis-voice-btn');
+      window._jarvisVoiceEnabled = true; // default ON
+      if (voiceBtn) {
+        voiceBtn.addEventListener('click', function() {
+          window._jarvisVoiceEnabled = !window._jarvisVoiceEnabled;
+          this.classList.toggle('active', window._jarvisVoiceEnabled);
+          var label = window._jarvisVoiceEnabled ? 'JARVIS VOICE: ON' : 'JARVIS VOICE: MUTED';
+          if (JARVIS.App && JARVIS.App.spawnFloatLabel) JARVIS.App.spawnFloatLabel(label);
+          if (JARVIS.Heartbeat) JARVIS.Heartbeat.pulse(0.5);
+        });
+      }
+    })();
+
+    // ── Activate audio analyzer on first interaction (for avatar) ──
+    (function setupAudioAnalyzer() {
+      var started = false;
+      function tryStart() {
+        if (started) return;
+        started = true;
+        JARVIS.AudioAnalyzer.start().then(function(ok) {
+          if (ok) console.log('%c[J.A.R.V.I.S.] %cAudio analyzer online.',
+            'color: #60A5FA;', 'color: #10B981;');
+        });
+      }
+      document.addEventListener('click', tryStart, { once: true });
+      document.addEventListener('keydown', tryStart, { once: true });
+    })();
+
+    console.log('%c[J.A.R.V.I.S.] %cAll systems initialized. %cAt your service, sir.',
       'color: #60A5FA; font-weight: bold;',
       'color: #10B981;',
       'color: #556278;');
+
+    // ── Keyboard Shortcuts for Armor Features ──
+    document.addEventListener('keydown', function(e) {
+      // Don't trigger when typing in input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      switch (e.key.toLowerCase()) {
+        case 'f':
+          if (JARVIS.FlightHUD) JARVIS.FlightHUD.toggle();
+          break;
+        case 's':
+          if (JARVIS.TargetLock) {
+            JARVIS.TargetLock.isScanMode() ? JARVIS.TargetLock.deactivate() : JARVIS.TargetLock.activate();
+          }
+          break;
+        case 'g':
+          if (JARVIS.Gestures) {
+            // Toggle gesture mode — visual feedback only
+            var label = 'GESTURES ' + (document.body.classList.contains('gestures-disabled') ? 'ENABLED' : 'DISABLED');
+            document.body.classList.toggle('gestures-disabled');
+            if (JARVIS.App && JARVIS.App.spawnFloatLabel) JARVIS.App.spawnFloatLabel(label);
+          }
+          break;
+        case 'n':
+          if (JARVIS.VisionModes) JARVIS.VisionModes.toggleNight();
+          var nvBtn = document.getElementById('night-vision-btn');
+          if (nvBtn) nvBtn.classList.toggle('active', JARVIS.VisionModes && JARVIS.VisionModes.getMode() === 'night');
+          break;
+        case 't':
+          if (JARVIS.VisionModes) JARVIS.VisionModes.toggleThermal();
+          var tvBtn = document.getElementById('thermal-vision-btn');
+          if (tvBtn) tvBtn.classList.toggle('active', JARVIS.VisionModes && JARVIS.VisionModes.getMode() === 'thermal');
+          break;
+        case 'd':
+          if (JARVIS.Diagnostics) JARVIS.Diagnostics.toggle();
+          break;
+        case 'w':
+          if (JARVIS.Weapons) JARVIS.Weapons.toggle();
+          var wpBtn = document.getElementById('weapons-btn');
+          if (wpBtn) wpBtn.classList.toggle('active', JARVIS.Weapons && JARVIS.Weapons.isActive());
+          break;
+        case 'r':
+          if (JARVIS.Radar) JARVIS.Radar.toggle();
+          var raBtn = document.getElementById('radar-btn');
+          if (raBtn) raBtn.classList.toggle('active', JARVIS.Radar && JARVIS.Radar.isActive());
+          break;
+        case 'q':
+          if (JARVIS.Quotes) JARVIS.Quotes.show();
+          break;
+        case 'k':
+          if (JARVIS.Countdown) JARVIS.Countdown.toggle();
+          break;
+        case '\\':
+          if (JARVIS.PhotoMode) JARVIS.PhotoMode.toggle();
+          break;
+        case 'i':
+          e.preventDefault();
+          if (JARVIS.IronMan3D && JARVIS.IronMan3D.toggle) {
+            var nowActive = JARVIS.IronMan3D.toggle();
+            var imBtn = document.getElementById('ironman-holo-btn');
+            if (imBtn) imBtn.classList.toggle('active', nowActive);
+            var label = nowActive ? 'HOLOGRAM ENGAGED' : 'HOLOGRAM DISENGAGED';
+            if (JARVIS.App && JARVIS.App.spawnFloatLabel) JARVIS.App.spawnFloatLabel(label);
+            if (JARVIS.Heartbeat) JARVIS.Heartbeat.pulse(0.6);
+          }
+          break;
+        case '=':
+        case '+':
+          if (JARVIS.Countdown && JARVIS.Countdown.isActive()) {
+            e.preventDefault();
+            JARVIS.Countdown.addTime(5);
+          }
+          break;
+        case '-':
+          if (JARVIS.Countdown && JARVIS.Countdown.isActive()) {
+            e.preventDefault();
+            JARVIS.Countdown.addTime(-5);
+          }
+          break;
+        case 'enter':
+          if (JARVIS.Countdown && JARVIS.Countdown.isActive() && !JARVIS.Countdown.isRunning()) {
+            e.preventDefault();
+            JARVIS.Countdown.start();
+          }
+          break;
+        case 'escape':
+          if (JARVIS.Countdown && JARVIS.Countdown.isActive()) {
+            JARVIS.Countdown.hide();
+          } else if (JARVIS.Diagnostics && JARVIS.Diagnostics.isActive()) {
+            JARVIS.Diagnostics.deactivate();
+          } else if (JARVIS.Weapons && JARVIS.Weapons.isActive()) {
+            JARVIS.Weapons.deactivate();
+          } else if (JARVIS.Radar && JARVIS.Radar.isActive()) {
+            JARVIS.Radar.deactivate();
+          } else if (JARVIS.VisionModes && JARVIS.VisionModes.getMode()) {
+            JARVIS.VisionModes.deactivate();
+          } else if (JARVIS.PhotoMode && JARVIS.PhotoMode.isActive()) {
+            JARVIS.PhotoMode.deactivate();
+          }
+          break;
+      }
+    });
   </script>
 </body>
 </html>

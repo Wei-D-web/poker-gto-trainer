@@ -1,0 +1,75 @@
+/* ==========================================
+   J.A.R.V.I.S. — Holographic Parallax Depth
+   3D layered depth effect driven by mouse/gyro.
+   ========================================== */
+
+/* ── Enable 3D perspective on body ── */
+body.parallax-active {
+  perspective: 2000px;
+  perspective-origin: 50% 40%;
+  overflow: hidden;
+}
+
+/* ── Layer depths (translateZ + scale) ── */
+body.parallax-active #jarvis-app {
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out;
+}
+
+/* Background layer — deepest */
+body.parallax-active #three-bg,
+body.parallax-active #fallback-bg {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease-out;
+}
+
+/* Mid layer — HUD elements */
+body.parallax-active #holo-scanlines,
+body.parallax-active #vignette {
+  transition: transform 0.2s ease-out;
+}
+
+/* Foreground layer — diag panels, reticle */
+body.parallax-active .diag-panel {
+  transition: transform 0.12s ease-out;
+}
+
+body.parallax-active #target-reticle {
+  transition: transform 0.08s ease-out;
+}
+
+body.parallax-active .hud-data-label {
+  transition: transform 0.15s ease-out;
+}
+
+body.parallax-active #css-arc-reactor {
+  transition: transform 0.25s ease-out;
+}
+
+/* ── Float labels get extra depth ── */
+body.parallax-active .float-label {
+  transition: transform 0.1s ease-out;
+}
+
+/* ── Armor mode depth ── */
+body.parallax-active.armor-mode .helmet-mech {
+  transition: transform 0.12s ease-out;
+}
+
+body.parallax-active.armor-mode #unified-control-bar {
+  transition: transform 0.15s ease-out;
+}
+
+/* ── Gyro mode (mobile) ── */
+body.parallax-gyro #jarvis-app {
+  transition: transform 0.3s ease-out;
+}
+
+/* ── Depth presets ── */
+:root {
+  --parallax-bg-z: -80px;
+  --parallax-mid-z: -20px;
+  --parallax-ui-z: 10px;
+  --parallax-fore-z: 30px;
+  --parallax-floating-z: 50px;
+}

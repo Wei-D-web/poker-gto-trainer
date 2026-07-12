@@ -194,6 +194,38 @@
   99.7% { opacity: 0.85; }
 }
 
+/* ── Holo Flicker Strong — Iron Man panel instability ── */
+@keyframes holoFlickerStrong {
+  0%, 98.5%, 100% { opacity: 1; transform: none; filter: none; }
+  98.6% { opacity: 0.55; filter: blur(0.5px); }
+  98.7% { opacity: 0.92; transform: translateX(1px); }
+  98.9% { opacity: 0.7; filter: blur(0.8px); }
+  99.1% { opacity: 0.95; transform: translateX(-0.5px); }
+  99.3% { opacity: 0.78; filter: blur(0.3px); }
+  99.5% { opacity: 0.9; }
+}
+
+/* ── Panel Float — subtle hover-like breathing for panels ── */
+@keyframes panelFloat {
+  0%, 100% { transform: perspective(1000px) rotateY(-2.5deg) rotateX(1deg) translateZ(0); }
+  25% { transform: perspective(1000px) rotateY(-2.3deg) rotateX(1.2deg) translateZ(2px); }
+  50% { transform: perspective(1000px) rotateY(-2.7deg) rotateX(0.8deg) translateZ(-1px); }
+  75% { transform: perspective(1000px) rotateY(-2.4deg) rotateX(1.1deg) translateZ(1px); }
+}
+
+/* ── Radar Sweep — rotating point highlight ── */
+@keyframes radarSweep {
+  0% { transform: rotate(0deg); opacity: 0.6; }
+  50% { opacity: 0.2; }
+  100% { transform: rotate(360deg); opacity: 0.6; }
+}
+
+/* ── Gauge Fill — conic gradient animation ── */
+@keyframes gaugePulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.3); }
+}
+
 /* ── Chromatic Drift ── */
 @keyframes chromaticDrift {
   0%, 100% { text-shadow: 0.5px 0 0.5px rgba(255,0,80,0.12), -0.5px 0 0.5px rgba(0,200,255,0.12); }
@@ -235,6 +267,206 @@
 
 .animate-holo-flicker {
   animation: holoFlicker 8s linear infinite;
+}
+
+/* ── Boot Sequence: Arc Reactor Ignition ── */
+@keyframes bootIgnition {
+  0% { transform: scale(0); opacity: 0; filter: blur(10px); }
+  30% { transform: scale(0.3); opacity: 0.3; }
+  50% { transform: scale(0.5); opacity: 0.6; filter: blur(2px); }
+  70% { transform: scale(1.15); opacity: 1; filter: blur(0); }
+  85% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes bootPulseRing {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  50% { opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+}
+
+@keyframes bootTextReveal {
+  0% { opacity: 0; letter-spacing: 0.5em; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; letter-spacing: 0.08em; }
+}
+
+@keyframes bootScanLine {
+  0% { top: -10%; opacity: 1; }
+  100% { top: 110%; opacity: 0.3; }
+}
+
+@keyframes bootSubsystemCheck {
+  0% { opacity: 0; color: var(--fg-tertiary); }
+  20% { opacity: 0.8; }
+  40% { color: var(--jarvis-gold); }
+  100% { opacity: 0.6; color: var(--jarvis-green); }
+}
+
+@keyframes bootFadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ── Boot Screen Container ── */
+.boot-screen {
+  position: fixed; inset: 0; z-index: 2000;
+  background: #05080C;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-sans);
+}
+.boot-screen.fade-out {
+  animation: bootFadeOut 0.8s ease-out forwards;
+  pointer-events: none;
+}
+
+.boot-reactor {
+  width: 80px; height: 80px;
+  position: relative;
+  margin-bottom: 32px;
+}
+
+.boot-reactor-core {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%,
+    rgba(255,255,255,1),
+    rgba(96,165,250,0.9) 30%,
+    rgba(59,130,246,0.4) 60%,
+    transparent 100%
+  );
+  animation: bootIgnition 1.2s var(--ease-spring) forwards;
+  box-shadow: 0 0 24px rgba(59,130,246,0.5), 0 0 64px rgba(59,130,246,0.15);
+}
+
+.boot-reactor-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  border-radius: 50%;
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  transform: translate(-50%, -50%);
+  animation: bootPulseRing 1.8s ease-out forwards;
+}
+.boot-reactor-ring:nth-child(2) { animation-delay: 0.15s; border-color: rgba(96,165,250,0.3); }
+.boot-reactor-ring:nth-child(3) { animation-delay: 0.3s; border-color: rgba(6,182,212,0.25); }
+.boot-reactor-ring:nth-child(4) { animation-delay: 0.45s; border-color: rgba(139,92,246,0.2); }
+.boot-reactor-ring:nth-child(5) { animation-delay: 0.6s; border-color: rgba(249,115,22,0.18); }
+.boot-reactor-ring:nth-child(6) { animation-delay: 0.75s; border-color: rgba(59,130,246,0.15); }
+
+.boot-title {
+  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-size: 38px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  background: linear-gradient(135deg, #60A5FA, #06B6D4, #8B5CF6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: bootTextReveal 1.8s ease-out forwards;
+  opacity: 0;
+}
+
+.boot-subtitle {
+  font-size: 13px;
+  color: var(--fg-tertiary);
+  letter-spacing: 0.12em;
+  margin-top: 8px;
+  opacity: 0;
+  animation: fadeInUp 0.6s ease-out 0.4s forwards;
+}
+
+.boot-checks {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.boot-check {
+  opacity: 0;
+  animation: bootSubsystemCheck 0.8s ease-out forwards;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg-tertiary);
+}
+.boot-check .check-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--fg-tertiary);
+  transition: all 0.3s ease;
+}
+.boot-check.done .check-dot {
+  background: var(--jarvis-green);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+.boot-check.done { color: var(--fg-secondary); }
+
+.boot-scan-line {
+  position: absolute;
+  left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(59,130,246,0.4), transparent);
+  animation: bootScanLine 1.5s ease-in forwards;
+  pointer-events: none;
+}
+
+/* ── Ripple Effect (button clicks) ── */
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.3);
+  transform: scale(0);
+  animation: ripple 0.7s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes ripple {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* ── Input Energy Injection ── */
+@keyframes energyInject {
+  0% { border-left-color: rgba(59,130,246,0.1); }
+  50% { border-left-color: rgba(59,130,246,0.5); border-right-color: rgba(249,115,22,0.3); }
+  100% { border-color: rgba(59,130,246,0.3); }
+}
+.input-energy-active {
+  animation: energyInject 0.8s var(--ease-out);
+}
+
+/* ── Message Shimmer Glow ── */
+@keyframes messageShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ── Typewriter Character Glow ── */
+.typing-char-glow {
+  color: #FFFFFF;
+  text-shadow: 0 0 4px rgba(96, 165, 250, 0.6);
+  display: inline;
+}
+
+/* ── Agent Card Progress Bar ── */
+@keyframes agentProgress {
+  0% { width: 0%; opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { width: 100%; opacity: 0.6; }
+}
+
+.agent-progress-bar {
+  height: 2px;
+  background: var(--jarvis-blue);
+  border-radius: 1px;
+  margin-top: 6px;
+  animation: agentProgress 3s var(--ease-out) infinite;
 }
 
 /* Stagger children */

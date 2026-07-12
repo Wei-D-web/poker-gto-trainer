@@ -1,0 +1,127 @@
+/* ═══════════════════════════════════════
+   J.A.R.V.I.S. — Vision Modes: Night Vision + Thermal
+   ═══════════════════════════════════════ */
+
+/* ── Night Vision Overlay ── */
+#night-vision-overlay {
+  position: fixed; inset: 0; z-index: 16;
+  pointer-events: none;
+  display: none;
+  background: rgba(0, 255, 65, 0.06);
+  mix-blend-mode: screen;
+}
+body.night-vision #night-vision-overlay { display: block; }
+body.night-vision #three-bg {
+  filter: brightness(1.5) contrast(1.3) saturate(0.1) sepia(0.5) hue-rotate(70deg);
+}
+body.night-vision #jarvis-app {
+  filter: brightness(1.3) contrast(1.1) saturate(0.2) sepia(0.4) hue-rotate(70deg);
+}
+body.night-vision #unified-control-bar {
+  border-color: rgba(0, 255, 65, 0.3) !important;
+}
+body.night-vision .ctrl-btn.active {
+  background: rgba(0, 255, 65, 0.15) !important;
+  color: #00ff41 !important;
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.2) !important;
+}
+/* Night vision noise canvas */
+#night-vision-noise {
+  position: fixed; inset: 0; z-index: 17;
+  pointer-events: none; display: none;
+  opacity: 0.15;
+}
+body.night-vision #night-vision-noise { display: block; }
+/* Night vision crosshair */
+#night-vision-cross {
+  position: fixed; top: 50%; left: 50%; z-index: 17;
+  pointer-events: none; display: none;
+  width: 120px; height: 120px;
+  transform: translate(-50%, -50%);
+}
+body.night-vision #night-vision-cross { display: block; }
+#night-vision-cross::before,
+#night-vision-cross::after {
+  content: ''; position: absolute;
+  background: rgba(0, 255, 65, 0.4);
+}
+#night-vision-cross::before {
+  top: 50%; left: 0; right: 0; height: 1px;
+  transform: translateY(-50%);
+}
+#night-vision-cross::after {
+  left: 50%; top: 0; bottom: 0; width: 1px;
+  transform: translateX(-50%);
+}
+/* NV status label */
+#night-vision-label {
+  position: fixed; top: 100px; right: 30px; z-index: 17;
+  pointer-events: none; display: none;
+  font-family: var(--font-mono); font-size: 10px;
+  color: rgba(0, 255, 65, 0.7);
+  letter-spacing: 0.1em;
+}
+body.night-vision #night-vision-label { display: block; }
+
+
+/* ── Thermal Vision Overlay ── */
+#thermal-overlay {
+  position: fixed; inset: 0; z-index: 16;
+  pointer-events: none; display: none;
+  background: radial-gradient(ellipse at 50% 50%,
+    rgba(255, 100, 0, 0.08) 0%,
+    rgba(255, 50, 0, 0.05) 40%,
+    rgba(0, 0, 50, 0.15) 100%
+  );
+  mix-blend-mode: overlay;
+}
+body.thermal-vision #thermal-overlay { display: block; }
+body.thermal-vision #three-bg {
+  filter: brightness(0.8) contrast(1.8) saturate(3) sepia(1) hue-rotate(-30deg);
+}
+body.thermal-vision #jarvis-app {
+  filter: brightness(0.9) contrast(1.4) saturate(2.5) sepia(0.8) hue-rotate(-20deg);
+}
+body.thermal-vision #unified-control-bar {
+  border-color: rgba(255, 100, 0, 0.4) !important;
+}
+body.thermal-vision .ctrl-btn.active {
+  background: rgba(255, 100, 0, 0.2) !important;
+  color: #ff6400 !important;
+  box-shadow: 0 0 8px rgba(255, 100, 0, 0.3) !important;
+}
+/* Thermal scanline effect */
+#thermal-scanline {
+  position: fixed; left: 0; right: 0; height: 2px; z-index: 17;
+  pointer-events: none; display: none;
+  background: linear-gradient(90deg, transparent, rgba(255,100,0,0.5), transparent);
+  animation: thermalSweep 2s ease-in-out infinite;
+}
+body.thermal-vision #thermal-scanline { display: block; }
+@keyframes thermalSweep {
+  0% { top: -2%; opacity: 0.8; }
+  50% { opacity: 0.3; }
+  100% { top: 102%; opacity: 0.8; }
+}
+/* Thermal HUD readout */
+#thermal-readout {
+  position: fixed; top: 100px; left: 30px; z-index: 17;
+  pointer-events: none; display: none;
+  font-family: var(--font-mono); font-size: 10px;
+  color: rgba(255, 100, 0, 0.8);
+  letter-spacing: 0.08em;
+  line-height: 1.6;
+}
+body.thermal-vision #thermal-readout { display: block; }
+#thermal-readout .thermal-temp { font-size: 18px; font-weight: bold; color: #ff4400; }
+#thermal-readout .thermal-range { color: rgba(255, 150, 50, 0.6); }
+
+
+/* ── Mutual exclusion: thermal overrides night ── */
+body.thermal-vision #night-vision-overlay,
+body.thermal-vision #night-vision-noise,
+body.thermal-vision #night-vision-cross,
+body.thermal-vision #night-vision-label { display: none !important; }
+body.night-vision #thermal-overlay,
+body.night-vision #thermal-scanline,
+body.night-vision #thermal-readout { display: none !important; }

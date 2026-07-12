@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PokerGTO — 动态壁纸</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #05080C; }
+  canvas { display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; }
+
+  #controls {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  #controls.visible { opacity: 1; }
+  #controls button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    background: rgba(15,20,31,0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #94A3B8;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+    white-space: nowrap;
+  }
+  #controls button:hover {
+    background: rgba(25,35,55,0.85);
+    border-color: rgba(59,130,246,0.3);
+    color: #EDF1F7;
+  }
+  #controls button.active {
+    background: rgba(59,130,246,0.15);
+    border-color: rgba(59,130,246,0.4);
+    color: #60A5FA;
+    box-shadow: 0 0 16px rgba(59,130,246,0.15);
+  }
+  #controls .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    transition: all 0.3s ease;
+  }
+  #controls button.active .dot {
+    background: #3B82F6;
+    box-shadow: 0 0 8px rgba(59,130,246,0.6);
+    animation: dotPulse 1.5s ease-in-out infinite;
+  }
+  @keyframes dotPulse {
+    0%, 100% { opacity: 0.4; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
+  }
+
+  #hint {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    font-size: 13px;
+    color: rgba(148,163,184,0.8);
+    z-index: 10;
+    pointer-events: none;
+    transition: opacity 1s ease;
+    letter-spacing: 0.02em;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg"></canvas>
+<canvas id="overlay"></canvas>
+
+<div id="hint">点击右下角 🎵 开启音乐律动</div>
+<div id="controls">
+  <button id="btn-audio" title="麦克风音乐律动">
+    <span class="dot"></span> 音乐律动
+  </button>
+  <button id="btn-mode" title="切换视觉风格">
+    <span class="dot"></span> 风格
+  </button>
+</div>
+
+<script>
+// ─────────────────────────────────────
+// PokerGTO Dynamic Wallpaper
+// MacBook desktop — dark, neon, music-reactive
+// ─────────────────────────────────────
+
+const bgCanvas = document.getElementById('bg');
+const ovCanvas = document.getElementById('overlay');
+const bgCtx = bgCanvas.getContext('2d');
+const ovCtx = ovCanvas.getContext('2d');
+const controls = document.getElementById('controls');
+const hint = document.getElementById('hint');
+const btnAudio = document.getElementById('btn-audio');
+const btnMode = document.getElementById('btn-mode');
+
+let W, H, dpr;
+
+// ─────────────────────────────────────
+// State
+// ─────────────────────────────────────
+let audioActive = false;
+let audioCtx = null;
+let analyser = null;
+let audioData = new Uint8Array(128);
+let bassEnergy = 0, midEnergy = 0, highEnergy = 0;
+let beatDetected = false;
+let beatStrength = 0;
+let beatDecay = 0;
+
+// Visual mode (0 = default blue/purple, 1 = emerald/gold, 2 = mixed)
+let visualMode = 0;
+
+// Energy history for beat detection
+const energyHistory = [];
+const ENERGY_HISTORY_SIZE = 40;
+
+// ─────────────────────────────────────
+// Colors per visual mode
+// ─────────────────────────────────────
+const palettes = [
+  { // Blue-Purple (default, GTO-style)
+    primary:   [ 59, 130, 246 ],   // #3B82F6
+    secondary: [139,  92, 246 ],   // #8B5CF6
+    accent:    [ 16, 185, 129 ],   // #10B981
+    glow:      [ 59, 130, 246 ],
+    suitAlpha: 0.06,
+  },
+  { // Emerald-Gold
+    primary:   [ 16, 185, 129 ],
+    secondary: [245, 158,  11 ],
+    accent:    [ 59, 130, 246 ],
+    glow:      [ 16, 185, 129 ],
+    suitAlpha: 0.05,
+  },
+  { // Mixed — cycles
+    primary:   [ 59, 130, 246 ],
+    secondary: [236,  72, 153 ],
+    accent:    [168,  85, 247 ],
+    glow:      [139,  92, 246 ],
+    suitAlpha: 0.06,
+  },
+];
+
+// ─────────────────────────────────────
+// Resize
+// ─────────────────────────────────────
+function resize() {
+  dpr = Math.min(window.devicePixelRatio || 1, 2); // cap for perf
+  W = window.innerWidth;
+  H = window.innerHeight;
+  [bgCanvas, ovCanvas].forEach(c => {
+    c.width = W * dpr;
+    c.height = H * dpr;
+    c.style.width = W + 'px';
+    c.style.height = H + 'px';
+  });
+  bgCtx.setTransform(1, 0, 0, 1, 0, 0);
+  bgCtx.scale(dpr, dpr);
+  ovCtx.setTransform(1, 0, 0, 1, 0, 0);
+  ovCtx.scale(dpr, dpr);
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ─────────────────────────────────────
+// Utilities
+// ─────────────────────────────────────
+function lerp(a, b, t) { return a + (b - a) * t; }
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function rand(min, max) { return Math.random() * (max - min) + min; }
+function dist(x1, y1, x2, y2) {
+  const dx = x1 - x2, dy = y1 - y2;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+// ─────────────────────────────────────
+// Particle System
+// ─────────────────────────────────────
+class Particle {
+  constructor() {
+    this.reset();
+    // randomize initial position so they're spread out
+    this.x = rand(0, W);
+    this.y = rand(0, H);
+    this.life = rand(0, 1);
+  }
+  reset() {
+    const pal = palettes[visualMode];
+    const colors = [pal.primary, pal.secondary, pal.accent];
+    const c = colors[Math.floor(Math.random() * colors.length)];
+    this.x = rand(-50, W + 50);
+    this.y = rand(-50, H + 50);
+    this.vx = rand(-0.3, 0.3);
+    this.vy = rand(-0.5, -0.1);
+    this.size = rand(0.5, 2.5);
+    this.opacity = rand(0.08, 0.35);
+    this.color = c;
+    this.life = 0;
+    this.maxLife = rand(300, 900);
+    this.phase = rand(0, Math.PI * 2);
+  }
+  update(speedMul = 1) {
+    this.life++;
+    if (this.life > this.maxLife) this.reset();
+
+    // Gentle sine drift
+    const driftX = Math.sin(this.life * 0.008 + this.phase) * 0.2;
+    const driftY = Math.cos(this.life * 0.006 + this.phase) * 0.15;
+
+    this.x += (this.vx + driftX) * speedMul;
+    this.y += (this.vy + driftY) * speedMul;
+
+    // Wrap around edges
+    if (this.x < -60) this.x = W + 60;
+    if (this.x > W + 60) this.x = -60;
+    if (this.y < -60) this.y = H + 60;
+    if (this.y > H + 60) this.y = -60;
+  }
+  draw(ctx) {
+    const alpha = this.opacity * (0.6 + 0.4 * Math.sin(this.life * 0.03 + this.phase));
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${this.color[0]},${this.color[1]},${this.color[2]},${alpha})`;
+    ctx.fill();
+
+    // Glow halo for larger particles
+    if (this.size > 1.5) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.color[0]},${this.color[1]},${this.color[2]},${alpha * 0.15})`;
+      ctx.fill();
+    }
+  }
+}
+
+// ─────────────────────────────────────
+// Sparkle (audio-reactive highlight particles)
+// ─────────────────────────────────────
+class Sparkle {
+  constructor(x, y, color) {
+    this.x = x;
+    this.y = y;
+    this.color = color;
+    this.life = 0;
+    this.maxLife = rand(20, 50);
+    this.vx = rand(-1.5, 1.5);
+    this.vy = rand(-1.5, 1.5);
+    this.size = rand(1, 3);
+  }
+  update() {
+    this.life++;
+    this.x += this.vx * 0.6;
+    this.y += this.vy * 0.6;
+    this.vx *= 0.96;
+    this.vy *= 0.96;
+    return this.life < this.maxLife;
+  }
+  draw(ctx) {
+    const progress = this.life / this.maxLife;
+    const alpha = (1 - progress) * 0.8;
+    const r = this.size * (1 - progress * 0.5);
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${this.color[0]},${this.color[1]},${this.color[2]},${alpha})`;
+    ctx.fill();
+    // Cross sparkle
+    ctx.strokeStyle = `rgba(${this.color[0]},${this.color[1]},${this.color[2]},${alpha * 0.4})`;
+    ctx.lineWidth = 0.5;
+    ctx.beginPath();
+    ctx.moveTo(this.x - r * 2, this.y);
+    ctx.lineTo(this.x + r * 2, this.y);
+    ctx.moveTo(this.x, this.y - r * 2);
+    ctx.lineTo(this.x, this.y + r * 2);
+    ctx.stroke();
+  }
+}
+
+// ─────────────────────────────────────
+// Wireframe Icosahedron
+// ─────────────────────────────────────
+class WireframeIcosahedron {
+  constructor() {
+    this.phi = (1 + Math.sqrt(5)) / 2;
+    this.vertices = [];
+    this.edges = [];
+    this.rotX = 0;
+    this.rotY = 0;
+    this.rotZ = 0;
+    this.scale = Math.min(W, H) * 0.18;
+    this.centerX = W * 0.5;
+    this.centerY = H * 0.5;
+    this.buildIcosahedron();
+  }
+
+  buildIcosahedron() {
+    const v = [];
+    // 12 vertices of regular icosahedron
+    const p = [
+      [-1,  this.phi, 0], [ 1,  this.phi, 0], [-1, -this.phi, 0], [ 1, -this.phi, 0],
+      [0, -1,  this.phi], [0,  1,  this.phi], [0, -1, -this.phi], [0,  1, -this.phi],
+      [ this.phi, 0, -1], [ this.phi, 0,  1], [-this.phi, 0, -1], [-this.phi, 0,  1],
+    ];
+    // Normalize
+    p.forEach(([x, y, z]) => {
+      const len = Math.sqrt(x * x + y * y + z * z);
+      v.push([x / len, y / len, z / len]);
+    });
+    this.rawVertices = v;
+    this.edges = [];
+    for (let i = 0; i < v.length; i++) {
+      for (let j = i + 1; j < v.length; j++) {
+        const d = dist(v[i][0], v[i][1], v[i][2], v[j][0], v[j][1], v[j][2]);
+        if (d < 1.1) this.edges.push([i, j]);
+      }
+    }
+  }
+
+  rotate(dt) {
+    this.rotY += dt * 0.08;
+    this.rotX += dt * 0.05;
+    this.rotZ += dt * 0.03;
+    this.centerX = W * 0.5;
+    this.centerY = H * 0.45;
+    this.scale = Math.min(W, H) * 0.18;
+  }
+
+  project(x, y, z) {
+    // Rotation around Y
+    let cosY = Math.cos(this.rotY), sinY = Math.sin(this.rotY);
+    let x1 = x * cosY - z * sinY;
+    let z1 = x * sinY + z * cosY;
+    // Rotation around X
+    let cosX = Math.cos(this.rotX), sinX = Math.sin(this.rotX);
+    let y1 = y * cosX - z1 * sinX;
+    let z2 = y * sinX + z1 * cosX;
+    // Rotation around Z
+    let cosZ = Math.cos(this.rotZ), sinZ = Math.sin(this.rotZ);
+    let x2 = x1 * cosZ - y1 * sinZ;
+    let y2 = x1 * sinZ + y1 * cosZ;
+    // Perspective projection
+    const dist = 3.5;
+    const f = 1 / (dist - z2);
+    return {
+      x: this.centerX + x2 * f * this.scale,
+      y: this.centerY + y2 * f * this.scale,
+      z: z2,
+    };
+  }
+
+  draw(ctx, alpha = 1) {
+    const pal = palettes[visualMode];
+    const projected = this.rawVertices.map(v => this.project(v[0], v[1], v[2]));
+
+    // Draw edges
+    ctx.lineWidth = 0.6;
+    for (const [i, j] of this.edges) {
+      const a = projected[i], b = projected[j];
+      const zAvg = (a.z + b.z) / 2;
+      const edgeAlpha = alpha * clamp(0.03 + (zAvg + 1) * 0.06, 0.02, 0.12);
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.strokeStyle = `rgba(${pal.primary[0]},${pal.primary[1]},${pal.primary[2]},${edgeAlpha})`;
+      ctx.stroke();
+    }
+
+    // Draw vertices
+    for (const p of projected) {
+      const vAlpha = alpha * clamp(0.08 + (p.z + 1) * 0.12, 0.05, 0.25);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${pal.secondary[0]},${pal.secondary[1]},${pal.secondary[2]},${vAlpha})`;
+      ctx.fill();
+      // Glow
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 6, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${pal.secondary[0]},${pal.secondary[1]},${pal.secondary[2]},${vAlpha * 0.2})`;
+      ctx.fill();
+    }
+  }
+}
+
+// ─────────────────────────────────────
+// Glow Orbs
+// ─────────────────────────────────────
+class GlowOrb {
+  constructor(index) {
+    this.index = index;
+    this.x = rand(W * 0.15, W * 0.85);
+    this.y = rand(H * 0.15, H * 0.85);
+    this.baseRadius = rand(Math.min(W, H) * 0.12, Math.min(W, H) * 0.25);
+    this.radius = this.baseRadius;
+    this.driftAngle = rand(0, Math.PI * 2);
+    this.driftSpeed = rand(0.0002, 0.0005);
+    this.driftRadius = rand(30, 80);
+    this.baseX = this.x;
+    this.baseY = this.y;
+    this.phase = rand(0, Math.PI * 2);
+  }
+
+  update(dt) {
+    this.driftAngle += this.driftSpeed * dt;
+    this.x = this.baseX + Math.cos(this.driftAngle) * this.driftRadius;
+    this.y = this.baseY + Math.sin(this.driftAngle * 0.7) * this.driftRadius * 0.6;
+    // Audio-reactive pulse
+    const pulse = 1 + bassEnergy * 0.8 + beatStrength * 1.5;
+    this.radius = this.baseRadius * lerp(this.radius / this.baseRadius, pulse, 0.05);
+  }
+
+  draw(ctx) {
+    const pal = palettes[visualMode];
+    // Use different color per orb
+    const colors = [pal.primary, pal.secondary, pal.accent, pal.glow];
+    const c = colors[this.index % colors.length];
+    const alpha = 0.025 + bassEnergy * 0.015 + beatStrength * 0.03;
+
+    const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+    grad.addColorStop(0, `rgba(${c[0]},${c[1]},${c[2]},${alpha * 3})`);
+    grad.addColorStop(0.4, `rgba(${c[0]},${c[1]},${c[2]},${alpha})`);
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, W, H);
+  }
+}
+
+// ─────────────────────────────────────
+// Floating Suit Symbols
+// ─────────────────────────────────────
+const SUITS = ['♠', '♥', '♦', '♣'];
+class FloatingSuit {
+  constructor() {
+    this.suit = SUITS[Math.floor(Math.random() * SUITS.length)];
+    this.x = rand(0, W);
+    this.y = rand(0, H);
+    this.size = rand(40, 120);
+    this.opacity = rand(0.02, 0.06);
+    this.vx = rand(-0.15, 0.15);
+    this.vy = rand(-0.1, -0.02);
+    this.rotSpeed = rand(-0.003, 0.003);
+    this.rotation = rand(0, Math.PI * 2);
+  }
+
+  update(speedMul = 1) {
+    this.x += this.vx * speedMul;
+    this.y += this.vy * speedMul;
+    this.rotation += this.rotSpeed * speedMul;
+    if (this.x < -150) this.x = W + 150;
+    if (this.x > W + 150) this.x = -150;
+    if (this.y < -150) this.y = H + 150;
+    if (this.y > H + 150) this.y = -150;
+  }
+
+  draw(ctx) {
+    const pal = palettes[visualMode];
+    const colors = [pal.primary, pal.secondary, pal.accent];
+    const hash = this.suit.charCodeAt(0) + Math.floor(this.x);
+    const ci = colors[hash % colors.length];
+    const alpha = this.opacity + beatStrength * 0.015;
+
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    ctx.font = `${this.size}px -apple-system, 'SF Pro Display', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Glow
+    ctx.fillStyle = `rgba(${ci[0]},${ci[1]},${ci[2]},${alpha * 0.4})`;
+    ctx.fillText(this.suit, 3, 3);
+    ctx.fillText(this.suit, -3, 3);
+    ctx.fillText(this.suit, 3, -3);
+    ctx.fillText(this.suit, -3, -3);
+
+    // Main
+    ctx.fillStyle = `rgba(${ci[0]},${ci[1]},${ci[2]},${alpha})`;
+    ctx.fillText(this.suit, 0, 0);
+    ctx.restore();
+  }
+}
+
+// ─────────────────────────────────────
+// Dot matrix grid (felt texture)
+// ─────────────────────────────────────
+function drawFeltTexture(ctx) {
+  const spacing = 4;
+  const alpha = 0.015;
+  ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+  const startX = 0;
+  const startY = 0;
+  for (let x = startX; x < W; x += spacing) {
+    for (let y = startY; y < H; y += spacing) {
+      // Only draw every other in a checker pattern for subtlety
+      if ((Math.floor(x / spacing) + Math.floor(y / spacing)) % 3 === 0) {
+        ctx.fillRect(x, y, 0.8, 0.8);
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────
+// Vignette
+// ─────────────────────────────────────
+function drawVignette(ctx) {
+  const grad = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.55, W / 2, H / 2, Math.max(W, H) * 0.75);
+  grad.addColorStop(0, 'rgba(0,0,0,0)');
+  grad.addColorStop(1, 'rgba(0,0,0,0.5)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+}
+
+// ─────────────────────────────────────
+// Audio Engine
+// ─────────────────────────────────────
+async function initAudio() {
+  if (audioCtx) return true;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false,
+      }
+    });
+    const source = audioCtx.createMediaStreamSource(stream);
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    analyser.smoothingTimeConstant = 0.7;
+    source.connect(analyser);
+    // Don't connect to destination — we don't want to play the mic audio
+    return true;
+  } catch (e) {
+    console.log('Audio capture not available:', e.message);
+    return false;
+  }
+}
+
+function updateAudioData() {
+  if (!analyser) return;
+  analyser.getByteFrequencyData(audioData);
+
+  // Frequency bands (rough, with 256 FFT = 128 bins)
+  // Bass: bins 0-3 (~0-86Hz), Mid: bins 4-30 (~86-650Hz), High: bins 31-127
+  let bass = 0, mid = 0, high = 0;
+  for (let i = 0; i < 4; i++) bass += audioData[i];
+  for (let i = 4; i < 31; i++) mid += audioData[i];
+  for (let i = 31; i < audioData.length; i++) high += audioData[i];
+  bass /= 4 * 255;
+  mid /= 27 * 255;
+  high /= (audioData.length - 31) * 255;
+
+  bassEnergy = lerp(bassEnergy, bass, 0.3);
+  midEnergy = lerp(midEnergy, mid, 0.25);
+  highEnergy = lerp(highEnergy, high, 0.2);
+
+  // Beat detection
+  const totalEnergy = bass * 0.6 + mid * 0.3 + high * 0.1;
+  energyHistory.push(totalEnergy);
+  if (energyHistory.length > ENERGY_HISTORY_SIZE) energyHistory.shift();
+
+  const avg = energyHistory.reduce((a, b) => a + b, 0) / energyHistory.length;
+  const threshold = avg * 1.4 + 0.05;
+  if (totalEnergy > threshold && energyHistory.length > 10) {
+    beatDetected = true;
+    beatStrength = clamp(totalEnergy / (threshold + 0.001), 1, 3);
+    beatDecay = 1;
+  } else {
+    beatDetected = false;
+    beatDecay *= 0.92;
+  }
+}
+
+// ─────────────────────────────────────
+// Scene Setup
+// ─────────────────────────────────────
+const NUM_PARTICLES = 130;
+const NUM_SUITS = 10;
+const NUM_ORBS = 4;
+
+const particles = [];
+const suits = [];
+const orbs = [];
+const sparkles = [];
+const wireframe = new WireframeIcosahedron();
+
+for (let i = 0; i < NUM_PARTICLES; i++) particles.push(new Particle());
+for (let i = 0; i < NUM_SUITS; i++) suits.push(new FloatingSuit());
+for (let i = 0; i < NUM_ORBS; i++) orbs.push(new GlowOrb(i));
+
+// ─────────────────────────────────────
+// Render Loop
+// ─────────────────────────────────────
+let lastTime = performance.now();
+let frameCount = 0;
+
+function render(time) {
+  requestAnimationFrame(render);
+
+  let dt = (time - lastTime) / 16.667; // normalized to 60fps
+  if (dt > 3) dt = 3; // cap to avoid jumps on tab switch
+  lastTime = time;
+  frameCount++;
+
+  // Resize check
+  if (W !== window.innerWidth || H !== window.innerHeight) resize();
+
+  // Update audio
+  if (audioActive) updateAudioData();
+
+  // Auto-decay beat
+  beatStrength *= 0.85;
+  beatDecay *= 0.9;
+
+  // Speed multipliers from audio
+  const speedMul = 1 + midEnergy * 2.5 + beatStrength * 1.2;
+  const suitSpeedMul = 1 + bassEnergy * 0.8;
+
+  // ── Clear ──
+  bgCtx.clearRect(0, 0, W, H);
+  ovCtx.clearRect(0, 0, W, H);
+
+  // ── Background ──
+  bgCtx.fillStyle = '#05080C';
+  bgCtx.fillRect(0, 0, W, H);
+
+  // Felt texture
+  drawFeltTexture(bgCtx);
+
+  // ── Glow Orbs ──
+  for (const orb of orbs) {
+    orb.update(dt);
+    orb.draw(bgCtx);
+  }
+
+  // ── Wireframe ──
+  wireframe.rotate(dt);
+  wireframe.draw(bgCtx, 1 + beatStrength * 0.5);
+
+  // ── Floating suits (bg layer) ──
+  for (const suit of suits) {
+    suit.update(suitSpeedMul);
+    suit.draw(bgCtx);
+  }
+
+  // ── Particles ──
+  for (const p of particles) {
+    p.update(speedMul);
+    p.draw(bgCtx);
+  }
+
+  // ── Constellation lines ──
+  const pal = palettes[visualMode];
+  const maxDist = Math.min(W, H) * 0.1;
+  for (let i = 0; i < particles.length; i++) {
+    for (let j = i + 1; j < particles.length; j++) {
+      const d = dist(particles[i].x, particles[i].y, particles[j].x, particles[j].y);
+      if (d < maxDist) {
+        const lineAlpha = (1 - d / maxDist) * 0.04 * (1 + beatStrength * 0.5);
+        bgCtx.beginPath();
+        bgCtx.moveTo(particles[i].x, particles[i].y);
+        bgCtx.lineTo(particles[j].x, particles[j].y);
+        bgCtx.strokeStyle = `rgba(${pal.primary[0]},${pal.primary[1]},${pal.primary[2]},${lineAlpha})`;
+        bgCtx.lineWidth = 0.3;
+        bgCtx.stroke();
+      }
+    }
+  }
+
+  // ── Beat flash ──
+  if (beatDetected && beatStrength > 0.5) {
+    const flashAlpha = beatStrength * 0.015;
+    const flashGrad = bgCtx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.1, W / 2, H / 2, Math.max(W, H) * 0.8);
+    flashGrad.addColorStop(0, `rgba(${pal.glow[0]},${pal.glow[1]},${pal.glow[2]},${flashAlpha * 3})`);
+    flashGrad.addColorStop(1, 'rgba(0,0,0,0)');
+    bgCtx.fillStyle = flashGrad;
+    bgCtx.fillRect(0, 0, W, H);
+  }
+
+  // ── Vignette ──
+  drawVignette(bgCtx);
+
+  // ── Overlay: Sparkles ──
+  ovCtx.clearRect(0, 0, W, H);
+
+  // Spawn sparkles on beat or high energy
+  if ((beatDetected && beatStrength > 0.6) || highEnergy > 0.25) {
+    const count = beatDetected ? Math.floor(beatStrength * 6) : 1;
+    const spColor = beatDetected ? pal.glow : pal.secondary;
+    for (let i = 0; i < count; i++) {
+      sparkles.push(new Sparkle(rand(W * 0.2, W * 0.8), rand(H * 0.2, H * 0.8), spColor));
+    }
+  }
+
+  // Update and draw sparkles
+  for (let i = sparkles.length - 1; i >= 0; i--) {
+    if (!sparkles[i].update()) {
+      sparkles.splice(i, 1);
+    } else {
+      sparkles[i].draw(ovCtx);
+    }
+  }
+
+  // ── Audio waveform bar (subtle, bottom edge) ──
+  if (audioActive && analyser) {
+    const barW = W / 64;
+    const barMaxH = 30;
+    const barY = H - 6;
+    ovCtx.lineWidth = 1;
+    for (let i = 0; i < 64; i++) {
+      const h = (audioData[i] || 0) / 255 * barMaxH;
+      const alpha = 0.06 + (h / barMaxH) * 0.12;
+      ovCtx.fillStyle = `rgba(${pal.primary[0]},${pal.primary[1]},${pal.primary[2]},${alpha})`;
+      ovCtx.fillRect(i * barW, barY - h, barW - 1, h);
+    }
+  }
+
+  // ── Subtle GTO label (bottom-left) ──
+  const labelAlpha = 0.12 + beatStrength * 0.04;
+  ovCtx.fillStyle = `rgba(${pal.primary[0]},${pal.primary[1]},${pal.primary[2]},${labelAlpha})`;
+  ovCtx.font = `500 11px -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif`;
+  ovCtx.textAlign = 'left';
+  ovCtx.fillText('POKER GTO', 24, H - 28);
+  ovCtx.fillStyle = `rgba(148,163,184,${labelAlpha * 0.6})`;
+  ovCtx.fillText('TRAINER', 24, H - 14);
+}
+
+// ─────────────────────────────────────
+// Generate internal rhythm (when no audio)
+// ─────────────────────────────────────
+let rhythmTimer = 0;
+function generateRhythm() {
+  if (audioActive) return;
+  rhythmTimer++;
+  // Simulate a beat pattern ~ every 60-90 frames (at 60fps)
+  const interval = 65 + Math.sin(rhythmTimer * 0.01) * 15;
+  if (rhythmTimer % Math.floor(interval) < 3) {
+    beatDetected = true;
+    beatStrength = 0.5 + Math.random() * 0.5;
+    beatDecay = 1;
+    bassEnergy = lerp(bassEnergy, 0.2 + Math.random() * 0.3, 0.15);
+    midEnergy = lerp(midEnergy, 0.1 + Math.random() * 0.15, 0.1);
+    highEnergy = lerp(highEnergy, 0.05 + Math.random() * 0.1, 0.08);
+  }
+}
+
+// Hook into the render loop — call generateRhythm before render
+const originalRender = render;
+// Wrap render to add rhythm generation
+function renderWithRhythm(time) {
+  generateRhythm();
+  originalRender(time);
+}
+
+// ─────────────────────────────────────
+// UI Handlers
+// ─────────────────────────────────────
+btnAudio.addEventListener('click', async () => {
+  if (!audioActive) {
+    const success = await initAudio();
+    if (success) {
+      audioActive = true;
+      btnAudio.classList.add('active');
+      btnAudio.querySelector('.dot').textContent = '';
+      hint.style.opacity = '0';
+      setTimeout(() => { hint.remove(); }, 1000);
+    }
+  } else {
+    audioActive = false;
+    btnAudio.classList.remove('active');
+    bassEnergy = midEnergy = highEnergy = 0;
+    beatStrength = 0;
+  }
+});
+
+btnMode.addEventListener('click', () => {
+  visualMode = (visualMode + 1) % palettes.length;
+  btnMode.classList.toggle('active', visualMode !== 0);
+  // Reset particle colors on mode switch
+  for (const p of particles) p.reset();
+});
+
+// Show controls on mouse move
+let controlsTimeout;
+document.addEventListener('mousemove', () => {
+  controls.classList.add('visible');
+  clearTimeout(controlsTimeout);
+  controlsTimeout = setTimeout(() => controls.classList.remove('visible'), 3000);
+});
+
+// Initial show
+setTimeout(() => controls.classList.add('visible'), 500);
+setTimeout(() => controls.classList.remove('visible'), 5000);
+
+// ─────────────────────────────────────
+// Start
+// ─────────────────────────────────────
+requestAnimationFrame(renderWithRhythm);
+</script>
+</body>
+</html>

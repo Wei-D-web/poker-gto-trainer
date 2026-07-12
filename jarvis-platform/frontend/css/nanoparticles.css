@@ -1,0 +1,56 @@
+/* ==========================================
+   J.A.R.V.I.S. — Nanoparticle Assembly
+   Helmet glow enhancement during armor mode
+   ========================================== */
+
+/* ── Canvas overlay ── */
+#nanoparticle-canvas {
+  transition: opacity 0.8s var(--ease-out);
+}
+
+/* ── Helmet elements glow during armor active ── */
+body.armor-assembled .helmet-mech.top {
+  border-bottom-color: var(--border-glow) !important;
+  box-shadow: 0 4px 24px var(--jarvis-blue-glow), 0 0 0 1px var(--border-accent);
+}
+body.armor-assembled .helmet-mech.bottom {
+  border-top-color: var(--border-gold-glow) !important;
+  box-shadow: 0 -4px 24px var(--jarvis-orange-glow);
+}
+body.armor-assembled .helmet-mech.left {
+  border-right-color: var(--border-accent) !important;
+  box-shadow: 4px 0 20px var(--jarvis-blue-glow);
+}
+body.armor-assembled .helmet-mech.right {
+  border-left-color: var(--border-gold-glow) !important;
+  box-shadow: -4px 0 20px var(--jarvis-orange-glow);
+}
+
+/* Corner joints brighten */
+body.armor-assembled .helmet-joint::before {
+  border-color: var(--border-glow);
+  box-shadow: 0 0 12px var(--jarvis-blue-glow);
+}
+body.armor-assembled .helmet-joint::after {
+  background: var(--jarvis-blue-glow);
+  box-shadow: 0 0 16px var(--jarvis-blue-glow);
+}
+
+/* Power ring intensifies */
+body.armor-assembled #power-ring {
+  border-color: var(--border-glow);
+  box-shadow:
+    0 0 30px var(--jarvis-blue-glow),
+    0 0 80px var(--jarvis-blue-glow);
+}
+
+/* HUD frames accentuate */
+body.armor-assembled .hud-angular-frame {
+  border-color: var(--border-accent);
+}
+
+/* Sector rings brighten */
+body.armor-assembled .hud-sector-ring {
+  border-color: var(--border-accent);
+  opacity: 0.6 !important;
+}

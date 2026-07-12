@@ -1,0 +1,36 @@
+/* ═══════════════════════════════════════
+   J.A.R.V.I.S. — Threat Radar CSS
+   ═══════════════════════════════════════ */
+
+#radar-canvas {
+  position: fixed; bottom: 20px; left: 20px; z-index: 160;
+  width: 200px; height: 120px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+body.radar-active #radar-canvas { opacity: 1; }
+
+#radar-label {
+  position: fixed; bottom: 148px; left: 20px; z-index: 161;
+  pointer-events: none; opacity: 0;
+  font-family: var(--font-mono); font-size: 9px;
+  color: var(--jarvis-blue-light);
+  letter-spacing: 0.1em;
+  transition: opacity 0.3s;
+}
+body.radar-active #radar-label { opacity: 1; }
+
+#radar-threat-info {
+  position: fixed; z-index: 161;
+  pointer-events: none; opacity: 0;
+  font-family: var(--font-mono); font-size: 8px;
+  color: var(--fg-tertiary);
+  letter-spacing: 0.05em;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 4px 8px;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
