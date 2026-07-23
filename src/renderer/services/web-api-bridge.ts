@@ -312,9 +312,9 @@ function createWebAPI() {
  * Install the web bridge if electronAPI is missing.
  */
 export function installWebBridge(): void {
-  if ((window as any).electronAPI) return
+  if (window.electronAPI) return
 
   const bridge = createWebAPI()
-  ;(window as any).electronAPI = bridge
+  ;window.electronAPI = bridge
   // Web API bridge installed — postflop analysis via Supabase
 }

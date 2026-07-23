@@ -12,7 +12,7 @@ import {
   Flame, Trophy, Target, RotateCcw, BarChart3, ArrowUp, AlertTriangle,
   GitCompare, Crosshair, Shield, User, UserX, Crown, CreditCard, RefreshCw,
   Check, ExternalLink, Mail, Clock,
-} from 'lucide-react'
+} from 'lucide-react'; import type { LucideIcon } from 'lucide-react'
 
 /* ================================================================
    TAB SWITCHER
@@ -824,7 +824,7 @@ function PricingView() {
   )
 }
 
-function ExportCard({ icon: Icon, label, desc, color, onClick }: { icon: any; label: string; desc: string; color: string; onClick: () => void }) {
+function ExportCard({ icon: Icon, label, desc, color, onClick }: { icon: LucideIcon; label: string; desc: string; color: string; onClick: () => void }) {
   return (
     <button onClick={onClick} className="w-full text-left bg-[#0B1019] hover:bg-[#0F141C] border border-[#1C2A3D] hover:border-[#2A3B52] rounded-xl p-4 transition-all group">
       <div className="flex items-center gap-3">

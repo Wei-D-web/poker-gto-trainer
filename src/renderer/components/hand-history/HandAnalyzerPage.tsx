@@ -4,7 +4,7 @@ import { POSITION_LABELS, RANK_CHARS, SUIT_SYMBOLS, ALL_RANKS, type Position, ty
 import type { HandInput, HandAction, HandAnalysisResult, DecisionAnalysis, GTOActionOption } from '../../../../src/main/solver/hand-analyzer'
 import { analyzeHand } from '../../../../src/main/solver/hand-analyzer'
 import { cn } from '../../lib/utils'
-import { Search, X, ChevronRight, Check, AlertTriangle, TrendingDown, Zap, Target } from 'lucide-react'
+import { Search, X, ChevronRight, Check, AlertTriangle, TrendingDown, Zap, Target } from 'lucide-react'; import type { LucideIcon } from 'lucide-react'
 
 const SUITS: Suit[] = ['s', 'h', 'd', 'c']
 const SUIT_COLORS: Record<string, string> = { s: '#aaa', h: '#DC2626', d: '#2563EB', c: '#16A34A' }
@@ -463,7 +463,7 @@ function DecisionCard({ decision, index }: { decision: DecisionAnalysis; index: 
   )
 }
 
-function StatBox({ icon: Icon, label, value, color, small }: { icon: any; label: string; value: string | number; color: string; small?: boolean }) {
+function StatBox({ icon: Icon, label, value, color, small }: { icon: LucideIcon; label: string; value: string | number; color: string; small?: boolean }) {
   return (
     <div className="bg-[#090D14] border border-[#152233] rounded-xl p-3.5 text-center">
       <Icon size={14} className={cn('mx-auto mb-1.5', color)} />

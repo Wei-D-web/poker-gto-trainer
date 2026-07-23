@@ -28,9 +28,9 @@ export function TurnRiverPage() {
   const analyze = async () => {
     setLoading(true)
     try {
-      const t = await (window as any).electronAPI.strategy.analyzeTurn({ flop, turn: turnCard })
+      const t = await window.electronAPI.strategy.analyzeTurn({ flop, turn: turnCard })
       setTurnResult(t)
-      const r = await (window as any).electronAPI.strategy.analyzeRiver({ turnBoard: [...flop, turnCard], river: riverCard })
+      const r = await window.electronAPI.strategy.analyzeRiver({ turnBoard: [...flop, turnCard], river: riverCard })
       setRiverResult(r)
     } catch(e) { console.error(e) }
     setLoading(false)

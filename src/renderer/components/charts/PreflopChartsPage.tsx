@@ -26,6 +26,7 @@ const CHART_INFO: Record<number, { name: string; desc: string; color: string }> 
 export function PreflopChartsPage() {
   const [charts, setCharts] = useState<ChartEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [selectedPos, setSelectedPos] = useState<Position>(3)
   const [selectedDepth, setSelectedDepth] = useState(100)
   const [viewMode, setViewMode] = useState<'grid' | 'detail'>('grid')
@@ -58,12 +59,17 @@ export function PreflopChartsPage() {
             })
           }
         } catch (e) {
-          // Skip unavailable combos
+          console.error('Failed to load preflop chart:', { pos, depth, error: e })
         }
       }
     }
     setCharts(all)
-    if (all.length > 0) setDetailChart(all[0])
+    if (all.length > 0) {
+      setDetailChart(all[0])
+      setError(null)
+    } else {
+      setError('未能加载翻前数据。请确保求解器引擎已初始化。')
+    }
     setLoading(false)
   }
 
@@ -122,7 +128,20 @@ export function PreflopChartsPage() {
         {loading ? (
           <div className="flex items-center justify-center h-64 text-neutral-500 gap-3">
             <div className="w-5 h-5 rounded-full border-2 border-neutral-600 border-t-blue-500 animate-spin" />
-            Loading {charts.length} charts...
+            Loading...
+          </div>
+        ) : error ? (
+          <div className="flex flex-col items-center justify-center h-64 text-neutral-500 gap-3">
+            <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center">
+              <span className="text-lg">⚠️</span>
+            </div>
+            <p className="text-sm">{error}</p>
+            <button
+              onClick={() => loadAllCharts()}
+              className="px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium hover:bg-blue-500/20 transition-colors"
+            >
+              重试
+            </button>
           </div>
         ) : viewMode === 'grid' ? (
           /* Grid view: one chart per stack depth */

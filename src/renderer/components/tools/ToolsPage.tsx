@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { cn } from '../../lib/utils'
-import { Calculator, Play, BookOpen, ChevronRight, DollarSign, Percent, TrendingUp, Target, Zap } from 'lucide-react'
+import { Calculator, Play, BookOpen, ChevronRight, DollarSign, Percent, TrendingUp, Target, Zap } from 'lucide-react'; import type { LucideIcon } from 'lucide-react'
 
 type ToolTab = 'potodds' | 'replayer' | 'reference'
 
@@ -160,7 +160,7 @@ function PotOddsCalculator() {
   )
 }
 
-function ResultCard({ icon: Icon, label, value, sub, color }: { icon: any; label: string; value: string; sub: string; color: string }) {
+function ResultCard({ icon: Icon, label, value, sub, color }: { icon: LucideIcon; label: string; value: string; sub: string; color: string }) {
   return (
     <div className="bg-[#090D14] border border-[#152233] rounded-xl p-4">
       <div className="flex items-center gap-2 mb-1.5">

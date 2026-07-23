@@ -177,8 +177,8 @@ async function getAuthHeader(): Promise<Record<string, string>> {
   } catch {}
 
   try {
-    if ((window as any).electronAPI?.auth?.getSession) {
-      const session = await (window as any).electronAPI.auth.getSession()
+    if (window.electronAPI?.auth?.getSession) {
+      const session = await window.electronAPI.auth.getSession()
       if (session?.session?.access_token) {
         headers['Authorization'] = `Bearer ${session.session.access_token}`
       }

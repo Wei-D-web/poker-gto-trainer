@@ -26,8 +26,12 @@ export function SpotLibraryPage() {
   const { gameType, heroPosition, villainPosition, stackDepth } = useScenarioStore()
 
   const loadSpots = async () => {
-    const r = await window.electronAPI.spotLibrary.list(filter ? { category: filter } : {})
-    setSpots(r.spots)
+    try {
+      const r = await window.electronAPI.spotLibrary.list(filter ? { category: filter } : {})
+      setSpots(r.spots)
+    } catch (e) {
+      addToast({ type: 'error', message: '加载收藏失败: ' + String(e) })
+    }
   }
 
   useEffect(() => { loadSpots() }, [filter])
@@ -35,21 +39,30 @@ export function SpotLibraryPage() {
   const handleSaveCurrent = async () => {
     if (!saveName.trim()) return
     setSaving(true)
-    await window.electronAPI.spotLibrary.save({
-      name: saveName, category: saveCat, gameType, heroPosition, villainPosition, stackDepth,
-      board: [], notes: '', tags: [saveCat],
-    })
-    addToast({ type: 'success', message: 'Spot saved!' })
-    setShowSaveDialog(false)
-    setSaveName('')
-    loadSpots()
-    setSaving(false)
+    try {
+      await window.electronAPI.spotLibrary.save({
+        name: saveName, category: saveCat, gameType, heroPosition, villainPosition, stackDepth,
+        board: [], notes: '', tags: [saveCat],
+      })
+      addToast({ type: 'success', message: 'Spot saved!' })
+      setShowSaveDialog(false)
+      setSaveName('')
+      loadSpots()
+    } catch (e) {
+      addToast({ type: 'error', message: '保存失败: ' + String(e) })
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleDelete = async (id: string) => {
-    await window.electronAPI.spotLibrary.delete(id)
-    addToast({ type: 'info', message: 'Deleted' })
-    loadSpots()
+    try {
+      await window.electronAPI.spotLibrary.delete(id)
+      addToast({ type: 'info', message: 'Deleted' })
+      loadSpots()
+    } catch (e) {
+      addToast({ type: 'error', message: '删除失败: ' + String(e) })
+    }
   }
 
   const formatDate = (d: string) => new Date(d).toLocaleDateString()

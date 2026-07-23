@@ -28,7 +28,7 @@ export function MultiwayPage() {
     setLoading(true)
     try {
       const otherPos = [0,1,2,4,5].filter(p => p !== aggressorPos).slice(0, numPlayers-1)
-      const r = await (window as any).electronAPI.strategy.analyzeMultiWay({
+      const r = await window.electronAPI.strategy.analyzeMultiWay({
         board, positions: [aggressorPos, ...otherPos], aggressor: aggressorPos,
       })
       setResult(r)

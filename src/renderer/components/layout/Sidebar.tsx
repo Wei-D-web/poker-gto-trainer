@@ -48,8 +48,8 @@ export function Sidebar() {
     {
       label: t('nav.sectionCore'),
       items: [
-        { id: 'premium', label: '🔥 Premium', icon: Flame, accent: 'text-amber-400' },
-        { id: 'playground', label: '实战模拟', icon: Play, accent: 'text-emerald-400' },
+        { id: 'premium', label: t('sidebar.premium'), icon: Flame, accent: 'text-amber-400' },
+        { id: 'playground', label: t('sidebar.playground'), icon: Play, accent: 'text-emerald-400' },
         { id: 'explore', label: t('nav.explore'), icon: Globe, shortcut: '1', accent: 'text-blue-400' },
         { id: 'training', label: t('nav.training'), icon: Target, shortcut: '2', accent: 'text-green-400' },
         { id: 'editor', label: t('nav.editor'), icon: Edit3, shortcut: '3', accent: 'text-yellow-400' },
@@ -60,13 +60,13 @@ export function Sidebar() {
     {
       label: t('nav.sectionAnalysis'),
       items: [
-        { id: 'analytics', label: '数据分析', icon: BarChart3, accent: 'text-purple-400' },
-        { id: 'equitytrainer', label: '胜率训练', icon: Target, accent: 'text-cyan-400' },
-        { id: 'bluffcatcher', label: 'Bluff Catcher', icon: Shield, accent: 'text-orange-400' },
-        { id: 'charts', label: '翻前图册', icon: Library, accent: 'text-blue-400' },
-        { id: 'battle', label: 'Range Battle', icon: Swords, accent: 'text-red-400' },
-        { id: 'cashmttcompare', label: 'Cash vs MTT', icon: GitCompare, accent: 'text-indigo-400' },
-        { id: 'exploitadvisor', label: '剥削顾问', icon: Crosshair, accent: 'text-orange-400' },
+        { id: 'analytics', label: t('sidebar.analytics'), icon: BarChart3, accent: 'text-purple-400' },
+        { id: 'equitytrainer', label: t('sidebar.equityTrainer'), icon: Target, accent: 'text-cyan-400' },
+        { id: 'bluffcatcher', label: t('sidebar.bluffCatcher'), icon: Shield, accent: 'text-orange-400' },
+        { id: 'charts', label: t('sidebar.preflopCharts'), icon: Library, accent: 'text-blue-400' },
+        { id: 'battle', label: t('sidebar.rangeBattle'), icon: Swords, accent: 'text-red-400' },
+        { id: 'cashmttcompare', label: t('sidebar.cashMttCompare'), icon: GitCompare, accent: 'text-indigo-400' },
+        { id: 'exploitadvisor', label: t('sidebar.exploitAdvisor'), icon: Crosshair, accent: 'text-orange-400' },
         { id: 'analyzer', label: t('nav.analyzer'), icon: Search, shortcut: '6', accent: 'text-cyan-400' },
         { id: 'advanced', label: t('nav.advanced'), icon: Lock, shortcut: '7', accent: 'text-purple-400' },
         { id: 'turnriver', label: t('nav.turnRiver'), icon: ArrowRight, shortcut: '9', accent: 'text-amber-400' },
@@ -76,12 +76,12 @@ export function Sidebar() {
     {
       label: t('nav.sectionTools'),
       items: [
-        { id: 'tools', label: '工具箱', icon: Calculator, accent: 'text-amber-400' },
-        { id: 'review', label: '复盘教练', icon: Zap, accent: 'text-cyan-400' },
-        { id: 'spots', label: '收藏夹', icon: Bookmark, accent: 'text-yellow-400' },
+        { id: 'tools', label: t('sidebar.tools'), icon: Calculator, accent: 'text-amber-400' },
+        { id: 'review', label: t('sidebar.sessionReview'), icon: Zap, accent: 'text-cyan-400' },
+        { id: 'spots', label: t('sidebar.spots'), icon: Bookmark, accent: 'text-yellow-400' },
         { id: 'icm', label: t('nav.icm'), icon: DollarSign, shortcut: '8', accent: 'text-emerald-400' },
         { id: 'guide', label: t('nav.guide'), icon: HelpCircle, accent: 'text-blue-400' },
-        { id: 'account', label: '账户', icon: Shield, accent: 'text-purple-400' },
+        { id: 'account', label: t('sidebar.account'), icon: Shield, accent: 'text-purple-400' },
         { id: 'settings', label: t('nav.settings'), icon: Settings },
       ],
     },
@@ -160,14 +160,14 @@ export function Sidebar() {
             ) : (
               <>
                 <span className="text-xs">👁</span>
-                <span className="font-medium text-amber-300/80 flex-1">演示模式</span>
+                <span className="font-medium text-amber-300/80 flex-1">{t('sidebar.demoMode')}</span>
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
               </>
             )
           ) : (
             <>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-              <span className="font-medium text-neutral-500 flex-1">离线就绪</span>
+              <span className="font-medium text-neutral-500 flex-1">{t('sidebar.offlineReady')}</span>
             </>
           )}
         </div>

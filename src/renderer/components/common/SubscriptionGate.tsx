@@ -47,10 +47,10 @@ export const DESKTOP_ONLY_FEATURES = new Set([
  */
 export function isRunningInElectron(): boolean {
   try {
-    return !!(window as any).electronAPI?.app?.getPlatform?.() !== 'browser'
+    return !!window.electronAPI?.app?.getPlatform?.() !== 'browser'
   } catch {
     // If electronAPI exists and is not the web bridge, we're in Electron
-    const api = (window as any).electronAPI
+    const api = window.electronAPI
     return api != null && typeof api.app?.quit === 'function'
   }
 }

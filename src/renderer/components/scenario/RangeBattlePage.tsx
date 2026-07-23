@@ -6,7 +6,7 @@ import { BoardSelector } from './BoardSelector'
 import { RangeMatrix } from '../matrix/RangeMatrix'
 import type { ComboStrategy } from '@shared/types/strategy'
 import { cn } from '../../lib/utils'
-import { Swords, Zap, Target, TrendingUp, Shield, BarChart3 } from 'lucide-react'
+import { Swords, Zap, Target, TrendingUp, Shield, BarChart3 } from 'lucide-react'; import type { LucideIcon } from 'lucide-react'
 
 export function RangeBattlePage() {
   const { gameType, stackDepth } = useScenarioStore()
@@ -257,7 +257,7 @@ export function RangeBattlePage() {
   )
 }
 
-function StatCard({ icon: Icon, label, value, sub, color }: { icon: any; label: string; value: number; sub: string; color: string }) {
+function StatCard({ icon: Icon, label, value, sub, color }: { icon: LucideIcon; label: string; value: number; sub: string; color: string }) {
   return (
     <div className="bg-[#090D14] border border-[#152233] rounded-xl p-4">
       <div className="flex items-center gap-2 mb-2">

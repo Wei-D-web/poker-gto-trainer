@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { cn } from '../../lib/utils'
-import { BarChart3, TrendingUp, TrendingDown, Target, AlertTriangle, Zap, Activity, PieChart, ArrowUp, ArrowDown } from 'lucide-react'
+import { BarChart3, TrendingUp, TrendingDown, Target, AlertTriangle, Zap, Activity, PieChart, ArrowUp, ArrowDown } from 'lucide-react'; import type { LucideIcon } from 'lucide-react'
 
 interface HandData {
   id: string; grade: string; totalMistakes: number; totalEVLost: number
@@ -11,16 +11,20 @@ interface HandData {
 export function AnalyticsPage() {
   const [hands, setHands] = useState<HandData[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [view, setView] = useState<'overview' | 'positions' | 'streets' | 'trends'>('overview')
 
   useEffect(() => { loadData() }, [])
 
   const loadData = async () => {
     setLoading(true)
+    setError(null)
     try {
       const r = await window.electronAPI.handHistory.list({ limit: 200 })
-      setHands(r.hands.filter((h: any) => h.analyzed))
-    } catch { /* empty */ }
+      setHands(r.hands.filter((h: HandData) => h.analyzed))
+    } catch (e) {
+      setError('加载数据失败: ' + String(e))
+    }
     setLoading(false)
   }
 
@@ -62,6 +66,22 @@ export function AnalyticsPage() {
       bestGrade: grades.sort()[0] || '-', worstGrade: grades.sort().reverse()[0] || '-',
     }
   }, [analyzed])
+
+  if (error) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto">
+            <AlertTriangle size={20} className="text-red-400" />
+          </div>
+          <p className="text-sm text-neutral-400">{error}</p>
+          <button onClick={loadData} className="px-4 py-2 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium hover:bg-blue-500/20 transition-colors">
+            重试
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   if (loading) {
     return (
@@ -269,7 +289,7 @@ export function AnalyticsPage() {
   )
 }
 
-function KPI({ icon: Icon, label, value, color }: { icon: any; label: string; value: string | number; color: string }) {
+function KPI({ icon: Icon, label, value, color }: { icon: LucideIcon; label: string; value: string | number; color: string }) {
   return (
     <div className="bg-[#090D14] border border-[#152233] rounded-xl p-4 text-center">
       <Icon size={14} className={cn('mx-auto mb-1.5', color)} />

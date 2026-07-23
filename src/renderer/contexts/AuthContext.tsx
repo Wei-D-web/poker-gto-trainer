@@ -70,7 +70,7 @@ function getDemoUser(): User | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const isWeb = (window as any).electronAPI === undefined
+  const isWeb = window.electronAPI === undefined
 
   // Desktop: dev build auto-unlocks as developer, customer build starts as free.
   const isDevBuild = import.meta.env.VITE_POKERGTO_DEV_BUILD === 'true'
@@ -140,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ── Desktop: load cached session ──
   const loadDesktopSession = async () => {
     try {
-      const api = (window as any).electronAPI
+      const api = window.electronAPI
       if (api?.auth?.getSession) {
         const cached = await api.auth.getSession()
         if (cached?.user) {
@@ -183,7 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ── Cache session/tier to electron-store (desktop) ──
   const cacheDesktopSession = async (sessionData: any) => {
     try {
-      const api = (window as any).electronAPI
+      const api = window.electronAPI
       if (api?.auth?.setSession) {
         await api.auth.setSession({
           user: sessionData.user,
@@ -196,7 +196,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const cacheDesktopData = async (data: any) => {
     try {
-      const api = (window as any).electronAPI
+      const api = window.electronAPI
       if (api?.auth?.setSession) {
         await api.auth.setSession({
           user,
@@ -263,7 +263,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else {
       // Desktop offline: check cached
       try {
-        const api = (window as any).electronAPI
+        const api = window.electronAPI
         if (api?.auth?.getSession) {
           const cached = await api.auth.getSession()
           if (cached?.tier) setTier(cached.tier)
@@ -286,7 +286,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         cacheDesktopData({ tier: newTier })
         // Also store in SQLite license table for reliable persistence
         try {
-          const api = (window as any).electronAPI
+          const api = window.electronAPI
           if (api?.license?.store) {
             await api.license.store({ key, tier: newTier })
           }
@@ -319,7 +319,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         cacheDesktopData({ tier: data.tier })
         // Also store in SQLite license table for reliable persistence
         try {
-          const api = (window as any).electronAPI
+          const api = window.electronAPI
           if (api?.license?.store) {
             await api.license.store({ key, tier: data.tier })
           }
@@ -348,7 +348,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setTier('free')
     // Clear desktop cache
     try {
-      const api = (window as any).electronAPI
+      const api = window.electronAPI
       if (api?.auth?.clearSession) {
         await api.auth.clearSession()
       }

@@ -79,13 +79,13 @@ export function AICoachPanel({ contextDescription, contextData, open, onClose }:
       // Try Electron IPC first, fall back to web API
       let response: { text: string; error?: string }
 
-      if ((window as any).electronAPI?.aiCoach?.send) {
-        response = await (window as any).electronAPI.aiCoach.send({
+      if (window.electronAPI?.aiCoach?.send) {
+        response = await window.electronAPI.aiCoach.send({
           message,
           history: messages.length > 0 ? messages : undefined,
         })
-      } else if ((window as any).electronAPI?.aiCoach?.sendWeb) {
-        response = await (window as any).electronAPI.aiCoach.sendWeb(message)
+      } else if (window.electronAPI?.aiCoach?.sendWeb) {
+        response = await window.electronAPI.aiCoach.sendWeb(message)
       } else {
         // Fallback: show a helpful message about desktop requirement
         const assistantMsg: CoachMessage = {

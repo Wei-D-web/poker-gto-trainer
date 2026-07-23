@@ -5,7 +5,7 @@ import type { HandHistorySummary, HandHistoryStats } from '../../../../src/share
 import {
   Upload, Zap, Trash2, TrendingDown, Target, BarChart3,
   CheckCircle, AlertTriangle, FileText, RefreshCw, BookOpen, Download,
-} from 'lucide-react'
+} from 'lucide-react'; import type { LucideIcon } from 'lucide-react'
 
 export function HandHistoryDashboard() {
   const addToast = useToastStore((s) => s.addToast)
@@ -29,7 +29,8 @@ export function HandHistoryDashboard() {
       setTotal(listResult.total)
       setStats(statsResult)
     } catch (e) {
-      console.error('Failed to load:', e)
+      console.error('Failed to load hand history:', e)
+      addToast({ type: 'error', message: '加载手牌历史失败，请重试' })
     } finally {
       setLoading(false)
     }
@@ -39,24 +40,32 @@ export function HandHistoryDashboard() {
 
   const handleImportText = async () => {
     if (!importText.trim()) return
-    const result = await window.electronAPI.handHistory.importFromText({ text: importText })
-    if (result.success) {
-      addToast({ type: 'success', message: `Imported ${result.count || 1} hand(s)` })
-      setImportText('')
-      setShowImportModal(false)
-      loadData()
-    } else {
-      addToast({ type: 'error', message: result.error || 'Import failed' })
+    try {
+      const result = await window.electronAPI.handHistory.importFromText({ text: importText })
+      if (result.success) {
+        addToast({ type: 'success', message: `Imported ${result.count || 1} hand(s)` })
+        setImportText('')
+        setShowImportModal(false)
+        loadData()
+      } else {
+        addToast({ type: 'error', message: result.error || 'Import failed' })
+      }
+    } catch (e) {
+      addToast({ type: 'error', message: '导入失败: ' + String(e) })
     }
   }
 
   const handleImportFile = async () => {
-    const result = await window.electronAPI.handHistory.importFromFile()
-    if (result.success) {
-      addToast({ type: 'success', message: `Imported ${result.count} hand(s)` })
-      loadData()
-    } else if (result.errors?.length > 0) {
-      addToast({ type: 'warning', message: result.errors[0] })
+    try {
+      const result = await window.electronAPI.handHistory.importFromFile()
+      if (result.success) {
+        addToast({ type: 'success', message: `Imported ${result.count} hand(s)` })
+        loadData()
+      } else if (result.errors?.length > 0) {
+        addToast({ type: 'warning', message: result.errors[0] })
+      }
+    } catch (e) {
+      addToast({ type: 'error', message: '文件导入失败: ' + String(e) })
     }
   }
 
@@ -80,19 +89,27 @@ export function HandHistoryDashboard() {
   const handleExportPDF = async () => {
     const ids = selectedIds.size > 0 ? [...selectedIds] : hands.map(h => h.id)
     if (ids.length === 0) return
-    const result = await window.electronAPI.report.exportPDF({ ids })
-    if (result.success) {
-      addToast({ type: 'success', message: `Report saved!` })
-    } else if (result.error !== 'Cancelled') {
-      addToast({ type: 'error', message: result.error || 'Export failed' })
+    try {
+      const result = await window.electronAPI.report.exportPDF({ ids })
+      if (result.success) {
+        addToast({ type: 'success', message: `Report saved!` })
+      } else if (result.error !== 'Cancelled') {
+        addToast({ type: 'error', message: result.error || 'Export failed' })
+      }
+    } catch (e) {
+      addToast({ type: 'error', message: '导出失败: ' + String(e) })
     }
   }
 
   const handleDelete = async (ids: string[]) => {
-    await window.electronAPI.handHistory.delete(ids)
-    setSelectedIds(new Set())
-    addToast({ type: 'info', message: `Deleted ${ids.length} hand(s)` })
-    loadData()
+    try {
+      await window.electronAPI.handHistory.delete(ids)
+      setSelectedIds(new Set())
+      addToast({ type: 'info', message: `Deleted ${ids.length} hand(s)` })
+      loadData()
+    } catch (e) {
+      addToast({ type: 'error', message: '删除失败: ' + String(e) })
+    }
   }
 
   const toggleSelect = (id: string) => {
@@ -327,7 +344,7 @@ export function HandHistoryDashboard() {
   )
 }
 
-function StatCard({ icon: Icon, label, value, color }: { icon: any; label: string; value: string | number; color: string }) {
+function StatCard({ icon: Icon, label, value, color }: { icon: LucideIcon; label: string; value: string | number; color: string }) {
   return (
     <div className="bg-[#090D14] border border-[#152233] rounded-xl p-4">
       <div className="flex items-center gap-2 mb-2">
