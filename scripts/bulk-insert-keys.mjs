@@ -32,13 +32,17 @@ if (existsSync(envPath)) {
 
 // ── Config ──
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || ''
-const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
+  || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY
+  || ''
 const LICENSE_SECRET = process.env.POKERGTO_LICENSE_SECRET
   || process.env.VITE_LICENSE_SECRET
   || 'pokergto-trainer-secret-key-2026'
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
-  console.error('❌ SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY required in .env')
+  console.error('❌ 缺少环境变量。请在 .env 中添加:')
+  if (!SUPABASE_URL) console.error('   SUPABASE_URL 或 VITE_SUPABASE_URL')
+  if (!SUPABASE_KEY) console.error('   SUPABASE_SERVICE_ROLE_KEY (在 Supabase Dashboard → Settings → API → service_role)')
   process.exit(1)
 }
 
