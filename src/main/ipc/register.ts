@@ -7,6 +7,7 @@ import { registerSessionReviewIpc } from './session-review.ipc'
 import { registerLicenseIpc } from './license.ipc'
 import { registerAiCoachIpc } from './ai-coach.ipc'
 import { registerTrainingIpc } from './training.ipc'
+import { registerTrialIpc } from './trial.ipc'
 
 export function registerAllIpcHandlers(): void {
   registerStrategyIpc()
@@ -18,4 +19,5 @@ export function registerAllIpcHandlers(): void {
   registerLicenseIpc()
   registerAiCoachIpc()
   registerTrainingIpc()
+  registerTrialIpc()
 }

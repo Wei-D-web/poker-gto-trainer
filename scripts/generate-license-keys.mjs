@@ -70,7 +70,7 @@ function fromBase32(s) {
 }
 
 // ── Tier encoding ──
-const TIER_CODES = { pro: 0, lifetime: 1, developer: 2 };
+const TIER_CODES = { pro: 0, lifetime: 1, developer: 2, starter: 3 };
 
 /**
  * Generate a single license key.
@@ -132,7 +132,7 @@ export function validateKey(key) {
   const tierCode = (payload >>> 30) & 0x3;
   const expiryBits = (payload >>> 20) & 0x3FF;
 
-  const tierNames = { 0: 'pro', 1: 'lifetime', 2: 'developer' };
+  const tierNames = { 0: 'pro', 1: 'lifetime', 2: 'developer', 3: 'starter' };
   const tier = tierNames[tierCode] || 'pro';
 
   // Calculate expiry date
@@ -150,7 +150,7 @@ export function validateKey(key) {
 
 // ── CLI ──
 const args = process.argv.slice(2);
-if (args.length < 2 || !['pro', 'lifetime', 'developer'].includes(args[0])) {
+if (args.length < 2 || !['starter', 'pro', 'lifetime', 'developer'].includes(args[0])) {
   console.log(`
 🔑 PokerGTO License Key Generator
 
@@ -158,14 +158,14 @@ Usage:
   node scripts/generate-license-keys.mjs <tier> <count> [expiryMonths]
 
 Arguments:
-  tier          pro | lifetime | developer
+  tier          starter | pro | lifetime | developer
   count         number of keys to generate
-  expiryMonths  months until expiry (0 = never, default: 0 for lifetime, 1 for pro)
+  expiryMonths  months until expiry (0 = never, default: 0 for lifetime, 1 for others)
 
 Examples:
-  node scripts/generate-license-keys.mjs pro 5           # 5 Pro keys, 1 month trial
+  node scripts/generate-license-keys.mjs starter 20      # 20 Starter keys
   node scripts/generate-license-keys.mjs pro 10 12       # 10 Pro keys, 12 months
-  node scripts/generate-license-keys.mjs lifetime 3      # 3 Lifetime keys
+  node scripts/generate-license-keys.mjs lifetime 5      # 5 Lifetime keys
   node scripts/generate-license-keys.mjs developer 1     # 1 Developer key
 
 Environment:

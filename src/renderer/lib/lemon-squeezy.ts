@@ -32,7 +32,7 @@ function getBaseUrl(): string {
  */
 export async function redirectToCheckout(
   variantId: string,
-  tier: 'pro' | 'lifetime',
+  tier: 'starter' | 'pro' | 'lifetime',
   customerEmail?: string,
 ): Promise<{ error?: string }> {
   if (!variantId) {
@@ -49,6 +49,9 @@ export async function redirectToCheckout(
             checkout_data: {
               email: customerEmail || undefined,
               custom: {},
+            },
+            product_options: {
+              redirect_url: `${window.location.origin}/app/?ls=success`,
             },
           },
           relationships: {
@@ -194,6 +197,8 @@ async function getAuthHeader(): Promise<Record<string, string>> {
  * Create these in Lemon Squeezy Dashboard → Products → Variants.
  */
 export const LS_PRICES = {
+  starterMonthly: import.meta.env.VITE_LS_STARTER_MONTHLY || '',
+  starterYearly: import.meta.env.VITE_LS_STARTER_YEARLY || '',
   proMonthly: import.meta.env.VITE_LS_PRO_MONTHLY || '',
   proYearly: import.meta.env.VITE_LS_PRO_YEARLY || '',
   lifetime: import.meta.env.VITE_LS_LIFETIME || '',

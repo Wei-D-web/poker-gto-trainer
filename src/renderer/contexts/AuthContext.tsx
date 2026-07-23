@@ -17,13 +17,22 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
 
 export const supabase = supabaseUrl ? createClient(supabaseUrl, supabaseKey) : null
 
-export type SubscriptionTier = 'free' | 'pro' | 'lifetime' | 'developer'
+export type SubscriptionTier = 'free' | 'starter' | 'pro' | 'lifetime' | 'developer'
+
+/** 试用天数 */
+export const TRIAL_DAYS = 14
 
 interface AuthState {
   user: User | null
   session: Session | null
   tier: SubscriptionTier
   loading: boolean
+  /** 试用剩余天数: -1 = 不适用(已激活/开发者), 0 = 已过期, >0 = 剩余天数 */
+  trialDaysLeft: number
+  /** 是否在试用期内 */
+  isTrialing: boolean
+  /** 试用是否已过期 */
+  isTrialExpired: boolean
   signIn: (email: string, password: string) => Promise<{ error?: string }>
   signUp: (email: string, password: string) => Promise<{ error?: string }>
   signInWithMagicLink: (email: string) => Promise<{ error?: string }>
@@ -36,6 +45,7 @@ interface AuthState {
 
 const AuthContext = createContext<AuthState>({
   user: null, session: null, tier: 'free', loading: true,
+  trialDaysLeft: -1, isTrialing: false, isTrialExpired: false,
   signIn: async () => ({}), signUp: async () => ({}),
   signInWithMagicLink: async () => ({}), signInWithOAuth: async () => ({}),
   signOut: async () => {},
@@ -79,6 +89,115 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [tier, setTier] = useState<SubscriptionTier>(isDevBuild ? 'developer' : 'free')
   const [loading, setLoading] = useState(true)
 
+  // ── Trial state ──
+  const [trialDaysLeft, setTrialDaysLeft] = useState(-1)  // -1 = N/A
+  const isTrialing = trialDaysLeft > 0
+  const isTrialExpired = trialDaysLeft === 0
+
+  /** 计算试用剩余天数 (纯函数, 不依赖 state) */
+  function calcDaysLeft(trialStartMs: number): number {
+    const trialEnd = trialStartMs + TRIAL_DAYS * 24 * 60 * 60 * 1000
+    const remaining = Math.ceil((trialEnd - Date.now()) / (24 * 60 * 60 * 1000))
+    return Math.max(0, remaining)
+  }
+
+  /** 桌面端: 开始试用 (写 SQLite) */
+  async function startTrialDesktop(): Promise<number> {
+    const now = Date.now()
+    try {
+      const api = window.electronAPI
+      if (api?.trial?.setStart) {
+        await api.trial.setStart({ timestamp: now })
+      }
+    } catch {}
+    localStorage.setItem('pokerGTO_trial_start', String(now))
+    return now
+  }
+
+  /** 初始化试用状态 */
+  async function initTrial(currentTier?: SubscriptionTier) {
+    const effectiveTier = currentTier ?? tier
+    // 开发者 / 已激活用户跳过试用
+    if (isDevBuild || effectiveTier !== 'free') {
+      setTrialDaysLeft(-1)
+      return
+    }
+
+    const isDesktop = !isWeb
+
+    // 1. 读取试用开始时间
+    let storedStart: number | null = null
+
+    if (isDesktop) {
+      // 桌面端: 优先读 SQLite (防篡改), fallback 到 localStorage
+      try {
+        const api = window.electronAPI
+        if (api?.trial?.getStart) {
+          const result = await api.trial.getStart()
+          storedStart = result.trialStart
+        }
+      } catch {}
+
+      // 交叉校验: SQLite 有记录但 localStorage 没有 → 恢复 localStorage
+      if (storedStart) {
+        const localStart = localStorage.getItem('pokerGTO_trial_start')
+        if (!localStart || parseInt(localStart, 10) !== storedStart) {
+          localStorage.setItem('pokerGTO_trial_start', String(storedStart))
+        }
+      } else {
+        // SQLite 没有 → 检查 localStorage (首次启动迁移)
+        const localStart = localStorage.getItem('pokerGTO_trial_start')
+        if (localStart) {
+          storedStart = parseInt(localStart, 10)
+          // 回写到 SQLite
+          try {
+            const api = window.electronAPI
+            if (api?.trial?.setStart) {
+              await api.trial.setStart({ timestamp: storedStart })
+            }
+          } catch {}
+        }
+      }
+    } else {
+      // Web 端: 只用 localStorage
+      const localStart = localStorage.getItem('pokerGTO_trial_start')
+      storedStart = localStart ? parseInt(localStart, 10) : null
+    }
+
+    // 2. 判断状态
+    if (storedStart) {
+      const remaining = calcDaysLeft(storedStart)
+      setTrialDaysLeft(remaining)
+    } else {
+      // 首次启动: 记录试用开始时间
+      const now = Date.now()
+      localStorage.setItem('pokerGTO_trial_start', String(now))
+      if (isDesktop) {
+        try {
+          const api = window.electronAPI
+          if (api?.trial?.setStart) {
+            await api.trial.setStart({ timestamp: now })
+          }
+        } catch {}
+      }
+      setTrialDaysLeft(TRIAL_DAYS)
+    }
+  }
+
+  /** 清除试用状态 (激活 License 后调用) */
+  async function clearTrial() {
+    localStorage.removeItem('pokerGTO_trial_start')
+    if (!isWeb) {
+      try {
+        const api = window.electronAPI
+        if (api?.trial?.clear) {
+          await api.trial.clear()
+        }
+      } catch {}
+    }
+    setTrialDaysLeft(-1)
+  }
+
   useEffect(() => {
     // ── Listen for login modal auth changes (demo auth written to localStorage) ──
     // Must be set up regardless of Supabase availability — the HTML login modal
@@ -106,6 +225,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setTier('free')
       }
       setLoading(false)
+      initTrial('free')
 
       // Listen for subsequent modal logins (e.g. user enters email code)
       window.addEventListener('pokerGTO_auth_changed', handleAuthChanged)
@@ -139,6 +259,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── Desktop: load cached session ──
   const loadDesktopSession = async () => {
+    let resolvedTier: SubscriptionTier = isDevBuild ? 'developer' : 'free'
     try {
       const api = window.electronAPI
       if (api?.auth?.getSession) {
@@ -149,14 +270,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         // Always load tier from cache (works without login)
         if (cached?.tier && cached.tier !== 'free') {
-          setTier(cached.tier)
+          resolvedTier = cached.tier as SubscriptionTier
+          setTier(resolvedTier)
         }
       }
       // Also check license storage for tier (more reliable persistence)
       if (api?.license?.get) {
         const license = await api.license.get()
         if (license?.tier) {
-          setTier(license.tier as SubscriptionTier)
+          resolvedTier = license.tier as SubscriptionTier
+          setTier(resolvedTier)
           // Sync tier to auth session if it's out of date
           if (api?.auth?.setSession) {
             await api.auth.setSession({ tier: license.tier })
@@ -167,17 +290,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Failed to load desktop session:', e)
     }
     setLoading(false)
+    // Init trial AFTER tier is resolved
+    initTrial(resolvedTier)
   }
 
   const loadTier = async (userId: string) => {
     if (!supabase) return
     try {
       const { data } = await supabase.from('profiles').select('tier').eq('id', userId).single()
-      const loadedTier = data?.tier || 'free'
+      const loadedTier = (data?.tier || 'free') as SubscriptionTier
       setTier(loadedTier)
       // Cache tier on desktop
       cacheDesktopData({ tier: loadedTier })
-    } catch { setTier('free') }
+      initTrial(loadedTier)
+    } catch { setTier('free'); initTrial('free') }
   }
 
   // ── Cache session/tier to electron-store (desktop) ──
@@ -291,6 +417,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             await api.license.store({ key, tier: newTier })
           }
         } catch {}
+        clearTrial()
         return { success: true, message: result.message, tier: result.tier }
       }
       return { success: false, message: result.message }
@@ -324,6 +451,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             await api.license.store({ key, tier: data.tier })
           }
         } catch {}
+        clearTrial()
       }
 
       return {
@@ -358,6 +486,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider value={{
       user, session, tier, loading,
+      trialDaysLeft, isTrialing, isTrialExpired,
       signIn, signUp, signInWithMagicLink, signInWithOAuth,
       signOut, activateLicense, refreshTier, isWeb,
     }}>

@@ -11,6 +11,9 @@ import { useKeyboardShortcuts, DEFAULT_SHORTCUTS } from './hooks/useKeyboard'
 import { DemoBanner } from './components/auth/DemoBanner'
 import { DesktopRequiredModal, getDesktopRequiredInfo } from './components/auth/DesktopRequiredModal'
 import { WelcomeFlow, shouldShowWelcome } from './components/common/WelcomeFlow'
+import { TrialBanner } from './components/common/TrialBanner'
+import { TrialExpiredOverlay } from './components/common/TrialExpiredOverlay'
+import { useAuth } from './contexts/AuthContext'
 import type { FC, LazyExoticComponent } from 'react'
 
 // ── Lazy-loaded route components (code-split per feature) ──
@@ -85,6 +88,7 @@ export function App() {
   const activeRoute = useUIStore((s) => s.activeRoute)
   const setActiveRoute = useUIStore((s) => s.setActiveRoute)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
+  const { isTrialExpired } = useAuth()
 
   // Inject demo data when in demo mode
   useDemoData()
@@ -136,6 +140,7 @@ export function App() {
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-neutral-950">
       <DemoBanner />
+      <TrialBanner />
       <TitleBar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
@@ -170,6 +175,9 @@ export function App() {
       {isRunningInElectron() && shouldShowWelcome() && (
         <WelcomeFlow />
       )}
+
+      {/* Trial expired paywall — renders above everything */}
+      {isTrialExpired && <TrialExpiredOverlay />}
     </div>
   )
 }

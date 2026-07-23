@@ -8,7 +8,7 @@
 import { ipcMain } from 'electron'
 import { getDatabase, saveDatabase } from '../data/database'
 
-const VALID_TIERS = ['free', 'pro', 'lifetime', 'developer'] as const
+const VALID_TIERS = ['free', 'starter', 'pro', 'lifetime', 'developer'] as const
 
 export function registerLicenseIpc(): void {
   // Store license key locally (offline mode)

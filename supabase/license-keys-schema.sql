@@ -177,3 +177,21 @@ BEGIN
   );
 END;
 $$;
+
+-- ==========================================
+-- Order History — audit trail for purchases
+-- ==========================================
+CREATE TABLE IF NOT EXISTS public.order_history (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  profile_id UUID REFERENCES auth.users(id),
+  ls_order_id TEXT,
+  event TEXT NOT NULL,
+  tier TEXT,
+  amount REAL DEFAULT 0,
+  email TEXT,
+  license_key TEXT,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_order_history_profile ON public.order_history(profile_id);
+CREATE INDEX IF NOT EXISTS idx_order_history_created ON public.order_history(created_at DESC);

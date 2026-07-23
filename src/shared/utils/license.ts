@@ -17,7 +17,7 @@ const LICENSE_SECRET = import.meta.env.VITE_LICENSE_SECRET || 'pokergto-trainer-
 const BASE32 = '0123456789ABCDEFGHJKMNPQRSTVWXYZ'
 
 // Tier codes (must match key generator)
-const TIER_NAMES: Record<number, string> = { 0: 'pro', 1: 'lifetime', 2: 'developer' }
+const TIER_NAMES: Record<number, string> = { 0: 'pro', 1: 'lifetime', 2: 'developer', 3: 'starter' }
 
 export interface LicenseInfo {
   valid: boolean
@@ -180,7 +180,7 @@ export async function validateLicenseKey(key: string): Promise<LicenseInfo> {
     }
   }
 
-  const tierLabels: Record<string, string> = { pro: 'Pro 专业版', lifetime: '终身版', developer: '开发者' }
+  const tierLabels: Record<string, string> = { starter: '入门版', pro: 'Pro 专业版', lifetime: '终身版', developer: '开发者' }
   const expiryStr = expiry.getFullYear() >= 2098
     ? '永久有效'
     : `有效期至 ${expiry.toISOString().slice(0, 7)}`

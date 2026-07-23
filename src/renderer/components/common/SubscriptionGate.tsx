@@ -1,11 +1,12 @@
 /**
  * Subscription Gate — Tier-based feature access control
  *
- * Free tier: basic features only (explore, training, compare, editor, history, charts, playground, guide, settings, account)
- * Pro/Lifetime: all features unlocked
- *
- * DESKTOP_ONLY_FEATURES: require Electron (CFR solver, heavy compute).
- * On web, these show DesktopRequiredModal instead of UpgradePrompt.
+ * Tiers:
+ *   free      — trial-only. After trial expires, nothing works.
+ *   starter   — basic features (17 modules). ¥19.99/mo ($2.99) or ¥149/yr ($19.99).
+ *   pro       — all 26 modules. ¥49.99/mo ($6.99) or ¥399/yr ($49.99).
+ *   lifetime  — everything forever. ¥400 ($59).
+ *   developer — everything (dev builds only).
  */
 import { type ReactNode } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
@@ -15,211 +16,153 @@ import { Lock, Zap, Crown, ArrowRight, RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import { track } from '../../services/analytics'
 
-/**
- * List of premium feature IDs (require Pro or Lifetime subscription).
- * Everything NOT in this list is available for free.
- */
 export const PREMIUM_FEATURES = new Set([
-  'analytics',
-  'equitytrainer',
-  'battle',
-  'cashmttcompare',
-  'exploitadvisor',
-  'analyzer',
-  'tools',
-  'spots',
-  'icm',
+  'analytics', 'equitytrainer', 'battle', 'cashmttcompare',
+  'exploitadvisor', 'analyzer', 'tools', 'spots', 'icm',
 ])
 
-/**
- * Features that require the Electron desktop app (CFR solver, local compute).
- * On web, these trigger DesktopRequiredModal instead of UpgradePrompt.
- * On desktop (Electron), they behave like normal premium features.
- */
-export const DESKTOP_ONLY_FEATURES = new Set([
-  'advanced',    // Node Locking via CFR solver
-  'turnriver',   // Heavy board enumeration
-  'multiway',    // 3-6 player heuristic analysis
-])
+export const DESKTOP_ONLY_FEATURES = new Set(['advanced', 'turnriver', 'multiway'])
 
-/**
- * Detect if running in Electron desktop vs browser/web.
- */
 export function isRunningInElectron(): boolean {
   try {
     return !!window.electronAPI?.app?.getPlatform?.() !== 'browser'
   } catch {
-    // If electronAPI exists and is not the web bridge, we're in Electron
     const api = window.electronAPI
     return api != null && typeof api.app?.quit === 'function'
   }
 }
 
-/**
- * Check if a feature requires a paid subscription.
- */
 export function isPremiumFeature(featureId: string): boolean {
   return PREMIUM_FEATURES.has(featureId)
 }
 
-/**
- * Check if the current tier can access a feature.
- */
 export function canAccessFeature(tier: string, featureId: string): boolean {
   if (tier === 'pro' || tier === 'lifetime' || tier === 'developer') return true
-  return !isPremiumFeature(featureId)
+  if (tier === 'starter') return !isPremiumFeature(featureId)
+  return false
 }
 
-/**
- * Wraps premium features. Shows upgrade prompt for free users on both web AND desktop.
- */
 export function SubscriptionGate({ children, feature }: { children: ReactNode; feature?: string }) {
-  const { tier } = useAuth()
-
-  // Pro, lifetime, or developer: always allow
+  const { tier, isTrialing } = useAuth()
   if (tier === 'pro' || tier === 'lifetime' || tier === 'developer') return <>{children}</>
-
-  // Free tier: check if this is a premium feature
-  if (feature && isPremiumFeature(feature)) {
-    return <UpgradePrompt feature={feature} />
+  if (isTrialing) {
+    if (feature && isPremiumFeature(feature)) return <UpgradePrompt feature={feature} />
+    return <>{children}</>
   }
-
-  // If no feature specified, allow (gate is optional)
+  if (tier === 'starter') {
+    if (feature && isPremiumFeature(feature)) return <UpgradePrompt feature={feature} />
+    return <>{children}</>
+  }
+  if (feature) return <UpgradePrompt feature={feature} />
   return <>{children}</>
 }
 
-/**
- * Premium tier badge for display in nav/header
- */
 export function TierBadge() {
-  const { tier } = useAuth()
-
+  const { tier, isTrialing } = useAuth()
   const config = {
-    free: { label: '免费版', color: 'text-neutral-400', bg: 'bg-neutral-500/10 border-neutral-500/20' },
+    free: { label: isTrialing ? '试用中' : '未激活', color: 'text-neutral-400', bg: 'bg-neutral-500/10 border-neutral-500/20' },
+    starter: { label: '入门版', color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/20' },
     pro: { label: '专业版', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20' },
     lifetime: { label: '终身版', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/20' },
-    developer: { label: '🔑 开发者', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+    developer: { label: '开发者', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
   }
-
   const c = config[tier as keyof typeof config] || config.free
-  return (
-    <span className={cn('text-[9px] px-2 py-0.5 rounded-full font-semibold border', c.bg, c.color)}>
-      {c.label}
-    </span>
-  )
+  return <span className={cn('text-[9px] px-2 py-0.5 rounded-full font-semibold border', c.bg, c.color)}>{c.label}</span>
 }
 
-/**
- * Upgrade prompt displayed to free users trying to access premium features.
- */
+const NAMES: Record<string, string> = {
+  analytics: '数据分析', equitytrainer: '胜率训练', battle: 'Range Battle',
+  cashmttcompare: 'Cash vs MTT', exploitadvisor: '剥削顾问', analyzer: '手牌分析器',
+  advanced: '高级分析', turnriver: '转牌河牌分析', multiway: '多人底池',
+  tools: '工具箱', spots: '收藏夹', icm: 'ICM 计算器',
+}
+
 export function UpgradePrompt({ feature }: { feature?: string }) {
-  const { user } = useAuth()
+  const { user, tier, isTrialing } = useAuth()
   const [loading, setLoading] = useState<string | null>(null)
   const [error, setError] = useState('')
+  const fname = feature ? NAMES[feature] || feature : '此功能'
+  const isStarter = tier === 'starter' || isTrialing
 
-  const featureNames: Record<string, string> = {
-    analytics: '数据分析',
-    equitytrainer: '胜率训练',
-    battle: 'Range Battle',
-    cashmttcompare: 'Cash vs MTT',
-    exploitadvisor: '剥削顾问',
-    analyzer: '手牌分析器',
-    advanced: '高级分析',
-    turnriver: '转牌河牌分析',
-    multiway: '多人底池',
-    tools: '工具箱',
-    spots: '收藏夹',
-    icm: 'ICM 计算器',
-  }
-
-  const featureName = feature ? featureNames[feature] || feature : '此功能'
-
-  const handleUpgrade = async (priceId: string, tier: 'pro' | 'lifetime') => {
+  const go = async (priceId: string, plan: string) => {
     if (!priceId) return
-    setLoading(tier)
+    setLoading(plan)
     setError('')
-    track('upgrade_checkout_started', { tier, feature: feature || 'unknown' })
-    const result = await redirectToCheckout(priceId, tier, user?.email)
-    if (result.error) {
-      track('upgrade_checkout_error', { tier, error: result.error })
-      setError(result.error)
-    }
+    track('upgrade_checkout_started', { plan, feature: feature || 'unknown' })
+    const r = await redirectToCheckout(priceId, plan === 'lifetime' ? 'lifetime' : 'pro', user?.email)
+    if (r.error) { track('upgrade_checkout_error', { plan, error: r.error }); setError(r.error) }
     setLoading(null)
   }
 
   return (
     <div className="flex items-center justify-center p-8">
-      <div className="max-w-md w-full text-center space-y-5 animate-scale-in">
-        {/* Lock icon */}
-        <div className="w-16 h-16 rounded-2xl bg-amber-500/10 flex items-center justify-center mx-auto border border-amber-500/15">
-          <Lock size={28} className="text-amber-400" />
+      <div className="max-w-md w-full text-center space-y-4 animate-scale-in">
+        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mx-auto border ${isStarter ? 'bg-amber-500/10 border-amber-500/15' : 'bg-neutral-500/10 border-neutral-500/15'}`}>
+          <Lock size={24} className={isStarter ? 'text-amber-400' : 'text-neutral-400'} />
         </div>
-
-        {/* Message */}
         <div>
-          <h3 className="text-base font-bold text-neutral-200 mb-1">升级到专业版</h3>
+          <h3 className="text-base font-bold text-neutral-200 mb-1">{isStarter ? '升级到专业版' : '选择方案'}</h3>
           <p className="text-sm text-neutral-500">
-            「{featureName}」是<b className="text-amber-400">专业版</b>功能
+            {isStarter ? <>{fname} 是<b className="text-amber-400">专业版</b>功能</> : '试用已结束，选择一个方案继续使用'}
           </p>
         </div>
 
-        {/* Pricing cards */}
-        <div className="grid gap-3">
-          {/* Pro Monthly */}
-          <button
-            onClick={() => handleUpgrade(LS_PRICES.proMonthly, 'pro')}
-            disabled={loading === 'pro'}
-            className="w-full text-left bg-[#090D14] border border-[#152233] hover:border-blue-500/30 rounded-xl p-4 transition-all group"
-          >
+        <div className="grid gap-2.5">
+          {/* Starter $2.99/mo */}
+          <button onClick={() => go(LS_PRICES.starterMonthly, 'starter')} disabled={loading === 'starter'}
+            className="w-full text-left bg-[#090D14] border border-[#152233] hover:border-cyan-500/30 rounded-xl p-3.5 transition-all group">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-sm font-bold text-neutral-200">专业版 · 月付</div>
-                <div className="text-[10px] text-neutral-500">全部功能 + 无限使用</div>
+                <div className="text-sm font-bold text-neutral-200">入门版 · 月付</div>
+                <div className="text-[10px] text-neutral-500">17 个基础模块 · 日常训练够用</div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-black text-neutral-100">$29.99</span>
-                <span className="text-xs text-neutral-500">/月</span>
-                {loading === 'pro' ? (
-                  <RefreshCw size={14} className="animate-spin text-neutral-400" />
-                ) : (
-                  <ArrowRight size={14} className="text-neutral-600 group-hover:text-blue-400 transition-colors" />
-                )}
+              <div className="flex items-center gap-1.5">
+                <span className="text-lg font-black text-neutral-100">¥19.99</span>
+                <span className="text-[11px] text-neutral-500">/月</span>
+                {loading === 'starter' ? <RefreshCw size={13} className="animate-spin text-neutral-400" /> : <ArrowRight size={13} className="text-neutral-600 group-hover:text-cyan-400 transition-colors" />}
               </div>
             </div>
           </button>
 
-          {/* Pro Yearly */}
-          <button
-            onClick={() => handleUpgrade(LS_PRICES.proYearly, 'pro')}
-            disabled={loading === 'pro'}
-            className="w-full text-left bg-[#090D14] border border-emerald-500/20 hover:border-emerald-500/40 rounded-xl p-4 transition-all group"
-          >
+          {/* Pro $5.99/mo — highlighted */}
+          <button onClick={() => go(LS_PRICES.proMonthly, 'pro')} disabled={loading === 'pro'}
+            className="w-full text-left bg-[#090D14] border border-blue-500/20 hover:border-blue-500/40 rounded-xl p-3.5 transition-all group relative overflow-hidden">
+            <div className="absolute top-0 right-0 bg-blue-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">推荐</div>
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-sm font-bold text-neutral-200">专业版 · 月付</div>
+                <div className="text-[10px] text-neutral-500">全部 26 模块 + AI Coach</div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-lg font-black text-blue-400">¥49.99</span>
+                <span className="text-[11px] text-neutral-500">/月</span>
+                {loading === 'pro' ? <RefreshCw size={13} className="animate-spin text-neutral-400" /> : <ArrowRight size={13} className="text-neutral-600 group-hover:text-blue-400 transition-colors" />}
+              </div>
+            </div>
+          </button>
+
+          {/* Pro Yearly $39.99/yr */}
+          <button onClick={() => go(LS_PRICES.proYearly, 'pro')} disabled={loading === 'pro'}
+            className="w-full text-left bg-[#090D14] border border-emerald-500/20 hover:border-emerald-500/40 rounded-xl p-3.5 transition-all group">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div>
                   <div className="text-sm font-bold text-neutral-200">专业版 · 年付</div>
-                  <div className="text-[10px] text-neutral-500">月付全部 + 优先新功能</div>
+                  <div className="text-[10px] text-neutral-500">全部功能 + 优先支持</div>
                 </div>
-                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold">省 $140</span>
+                <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 font-bold">省 ¥200</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-black text-emerald-400">$219</span>
-                <span className="text-xs text-neutral-500">/年</span>
-                {loading === 'pro' ? (
-                  <RefreshCw size={14} className="animate-spin text-neutral-400" />
-                ) : (
-                  <ArrowRight size={14} className="text-neutral-600 group-hover:text-emerald-400 transition-colors" />
-                )}
+              <div className="flex items-center gap-1.5">
+                <span className="text-lg font-black text-emerald-400">¥399</span>
+                <span className="text-[11px] text-neutral-500">/年</span>
+                {loading === 'pro' ? <RefreshCw size={13} className="animate-spin text-neutral-400" /> : <ArrowRight size={13} className="text-neutral-600 group-hover:text-emerald-400 transition-colors" />}
               </div>
             </div>
           </button>
 
-          {/* Lifetime */}
-          <button
-            onClick={() => handleUpgrade(LS_PRICES.lifetime, 'lifetime')}
-            disabled={loading === 'lifetime'}
-            className="w-full text-left bg-gradient-to-r from-amber-500/[0.05] to-orange-500/[0.05] border border-amber-500/20 hover:border-amber-500/40 rounded-xl p-4 transition-all group"
-          >
+          {/* Lifetime $59 */}
+          <button onClick={() => go(LS_PRICES.lifetime, 'lifetime')} disabled={loading === 'lifetime'}
+            className="w-full text-left bg-gradient-to-r from-amber-500/[0.05] to-orange-500/[0.05] border border-amber-500/20 hover:border-amber-500/40 rounded-xl p-3.5 transition-all group">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div>
@@ -228,53 +171,25 @@ export function UpgradePrompt({ feature }: { feature?: string }) {
                 </div>
                 <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 font-bold">最划算</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-black text-amber-400">$299</span>
-                <span className="text-xs text-neutral-500">买断</span>
-                {loading === 'lifetime' ? (
-                  <RefreshCw size={14} className="animate-spin text-amber-400" />
-                ) : (
-                  <Crown size={14} className="text-amber-400" />
-                )}
+              <div className="flex items-center gap-1.5">
+                <span className="text-lg font-black text-amber-400">¥400</span>
+                <span className="text-[11px] text-neutral-500">买断</span>
+                {loading === 'lifetime' ? <RefreshCw size={13} className="animate-spin text-amber-400" /> : <Crown size={13} className="text-amber-400" />}
               </div>
             </div>
           </button>
         </div>
 
-        {error && (
-          <p className="text-xs text-red-400">{error}</p>
-        )}
+        {error && <p className="text-xs text-red-400">{error}</p>}
+        <p className="text-[10px] text-neutral-600">14 天免费试用 · 随时取消 · 安全支付由 Lemon Squeezy 提供</p>
 
-        <p className="text-[10px] text-neutral-600">
-          7 天免费试用 · 随时取消 · 安全支付由 Lemon Squeezy 提供
-        </p>
-
-        {/* Alternative: manual license key purchase (WeChat/Alipay) */}
-        <div className="border-t border-[#152233] pt-4 mt-2">
-          <p className="text-[10px] text-neutral-500 mb-2 text-center">
-            也支持微信/支付宝购买卡密，购买后在「账户」页面激活
-          </p>
-          <a
-            href="https://wei-d-web.github.io/poker-gto-trainer/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full text-center py-2 rounded-lg bg-[#0F141C] hover:bg-[#151B28] border border-[#1C2A3D] hover:border-[#2A3B52] text-xs text-neutral-400 hover:text-neutral-200 transition-all"
-          >
+        <div className="border-t border-[#152233] pt-3">
+          <p className="text-[10px] text-neutral-500 mb-2 text-center">也支持微信/支付宝购买卡密，购买后在「账户」页面激活</p>
+          <a href="https://wei-d-web.github.io/poker-gto-trainer/" target="_blank" rel="noopener noreferrer"
+            className="block w-full text-center py-2 rounded-lg bg-[#0F141C] hover:bg-[#151B28] border border-[#1C2A3D] hover:border-[#2A3B52] text-xs text-neutral-400 hover:text-neutral-200 transition-all">
             💬 微信/支付宝购买卡密
           </a>
         </div>
-
-        {/* Desktop nudge — show on web only */}
-        {!isRunningInElectron() && (
-          <a
-            href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block text-[11px] text-blue-400/60 hover:text-blue-400 transition-colors underline-offset-2 hover:underline"
-          >
-            💡 桌面版体验更快更流畅 — 点击下载
-          </a>
-        )}
       </div>
     </div>
   )

@@ -181,6 +181,15 @@ const electronAPI = {
     health: (): Promise<{ ok: boolean; agentId: string }> =>
       ipcRenderer.invoke('ai-coach:health'),
   },
+
+  trial: {
+    getStart: (): Promise<{ trialStart: number | null }> =>
+      ipcRenderer.invoke('trial:getStart'),
+    setStart: (params: { timestamp: number }): Promise<{ success: boolean; error?: string }> =>
+      ipcRenderer.invoke('trial:setStart', params),
+    clear: (): Promise<{ success: boolean; error?: string }> =>
+      ipcRenderer.invoke('trial:clear'),
+  },
 }
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI)

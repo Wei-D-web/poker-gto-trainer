@@ -66,12 +66,13 @@ async function findProfile(email?: string, userId?: string): Promise<{ id: strin
 }
 
 /**
- * Convert tier string to db value.
+ * Convert variant name to tier string.
  */
 function normalizeTier(variantName: string): string {
   const lower = variantName.toLowerCase()
   if (lower.includes('lifetime') || lower.includes('终身')) return 'lifetime'
-  if (lower.includes('pro') || lower.includes('monthly') || lower.includes('yearly')) return 'pro'
+  if (lower.includes('pro') || lower.includes('professional')) return 'pro'
+  if (lower.includes('starter') || lower.includes('basic') || lower.includes('入门')) return 'starter'
   return 'pro'
 }
 
@@ -198,11 +199,13 @@ async function handleOrderCreated(data: any) {
     updates.ls_subscription_id = String(attrs.first_order_item.subscription_id)
   }
 
-  // Auto-assign pre-generated license key
+  // Auto-assign pre-generated HMAC-signed license key from pool
+  // Keys are pre-generated via scripts/generate-license-keys.mjs + bulk-insert
   const { data: availableKey } = await supabase
     .from('license_keys')
     .select('key')
-    .eq('status', 'available')
+    .eq('status', 'active')
+    .eq('tier', tier)
     .limit(1)
     .single()
 
@@ -210,8 +213,16 @@ async function handleOrderCreated(data: any) {
     updates.license_key = availableKey.key
     await supabase
       .from('license_keys')
-      .update({ status: 'assigned', assigned_to: profile.id, assigned_at: new Date().toISOString() })
+      .update({
+        status: 'used',
+        activated_by: profile.id,
+        activated_email: email || profile.email,
+        activated_at: new Date().toISOString(),
+      })
       .eq('key', availableKey.key)
+    console.log(`🔑 Assigned key ${availableKey.key.slice(0, 10)}... to ${email}`)
+  } else {
+    console.warn(`⚠️ No available ${tier} keys in pool! Generate keys via scripts/bulk-insert-keys.mjs`)
   }
 
   const { error } = await supabase.from('profiles').update(updates).eq('id', profile.id)
@@ -219,7 +230,7 @@ async function handleOrderCreated(data: any) {
   if (error) {
     console.error('❌ Failed to update profile:', error.message)
   } else {
-    const keyMsg = availableKey?.key ? ` (key: ${availableKey.key.slice(0, 8)}...)` : ''
+    const keyMsg = availableKey?.key ? ` (key: ${availableKey.key})` : ''
     console.log(`✅ Upgraded ${profile.email || profile.id} to ${tier}${keyMsg}`)
   }
 
@@ -231,6 +242,7 @@ async function handleOrderCreated(data: any) {
     tier,
     amount: attrs.total || attrs.subtotal || 0,
     email: email || profile.email,
+    license_key: availableKey?.key || null,
     created_at: new Date().toISOString(),
   }).then(({ error: logErr }) => {
     if (logErr) console.warn('⚠️ Failed to log order:', logErr.message)
@@ -254,9 +266,6 @@ async function handleSubscriptionChange(data: any, status: string) {
     return
   }
 
-  const endsAt = attrs.ends_at
-  const isEnding = endsAt && new Date(endsAt).getTime() < Date.now() + 86400000 // within 24h
-
   const updates: Record<string, any> = {
     subscription_status: status,
     ls_subscription_id: String(data.id),
@@ -267,7 +276,6 @@ async function handleSubscriptionChange(data: any, status: string) {
   if (status === 'canceled' || status === 'expired' || status === 'paused') {
     updates.tier = 'free'
   } else if (status === 'past_due') {
-    // Keep tier but mark payment issue
     updates.subscription_status = 'past_due'
   }
 

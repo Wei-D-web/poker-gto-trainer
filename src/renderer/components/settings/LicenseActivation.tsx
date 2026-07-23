@@ -8,7 +8,7 @@ import { useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
 import { formatKeyForDisplay, isTypingDevKey, normalizeKeyInput } from '../../../shared/utils/license'
 import { cn } from '../../lib/utils'
-import { Key, Loader2, CheckCircle, AlertCircle, Crown, Zap } from 'lucide-react'
+import { Key, Loader2, CheckCircle, AlertCircle, Crown, Zap, Star } from 'lucide-react'
 
 interface Props {
   onActivated?: (tier: string) => void
@@ -16,7 +16,7 @@ interface Props {
 }
 
 export function LicenseActivation({ onActivated, compact }: Props) {
-  const { user, tier, isWeb, activateLicense } = useAuth()
+  const { user, tier, activateLicense } = useAuth()
   const [keyInput, setKeyInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<{ success: boolean; message: string; tier?: string } | null>(null)
@@ -57,37 +57,12 @@ export function LicenseActivation({ onActivated, compact }: Props) {
 
     try {
       const formattedKey = formatKeyForDisplay(rawInput)
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || ''
 
-      if (!supabaseUrl) {
-        // Offline mode — validate locally via HMAC
-        const res = await activateLicense(formattedKey)
-        setResult({ success: res.success, message: res.message, tier: res.tier })
-        onActivated?.(res.tier || 'pro')
-        return
-      }
-
-      const response = await fetch(`${supabaseUrl}/functions/v1/validate-license-key`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(await getAuthHeaders()),
-        },
-        body: JSON.stringify({
-          key: formattedKey,
-          userId: user.id,
-          email: user.email || '',
-        }),
-      })
-
-      const data = await response.json()
-
-      if (data.success) {
-        setResult({ success: true, message: data.message || '激活成功！', tier: data.tier })
-        onActivated?.(data.tier)
-      } else {
-        setResult({ success: false, message: data.message || '激活失败' })
-      }
+      // Always go through AuthContext.activateLicense — it handles
+      // offline HMAC, online Edge Function, tier caching, trial clear, etc.
+      const res = await activateLicense(formattedKey)
+      setResult({ success: res.success, message: res.message, tier: res.tier })
+      onActivated?.(res.tier || 'pro')
     } catch (e) {
       setResult({ success: false, message: '网络错误，请检查网络连接后重试' })
     } finally {
@@ -115,6 +90,20 @@ export function LicenseActivation({ onActivated, compact }: Props) {
   }
 
   // Already premium
+  if (tier === 'starter') {
+    return (
+      <div className={cn('rounded-xl p-5', compact ? 'bg-neutral-900/50' : 'bg-cyan-500/10 border border-cyan-500/30')}>
+        <div className="flex items-center gap-3">
+          <Star className="w-6 h-6 text-cyan-400" />
+          <div>
+            <div className="font-bold text-cyan-300">入门版</div>
+            <div className="text-sm text-cyan-400/70">基础训练功能已解锁 · 升级 Pro 解锁全部 26 模块</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (tier === 'lifetime') {
     return (
       <div className={cn('rounded-xl p-5', compact ? 'bg-neutral-900/50' : 'bg-amber-500/10 border border-amber-500/30')}>
@@ -154,8 +143,8 @@ export function LicenseActivation({ onActivated, compact }: Props) {
       <div className="flex items-center gap-2 mb-4">
         <Key className="w-5 h-5 text-cyan-400" />
         <h3 className="font-semibold text-neutral-200">激活卡密</h3>
-        {isWeb && (
-          <span className="text-xs text-neutral-500 ml-auto">已登录: {user?.email}</span>
+        {user?.email && (
+          <span className="text-xs text-neutral-500 ml-auto">{user.email}</span>
         )}
       </div>
 
@@ -228,26 +217,4 @@ export function LicenseActivation({ onActivated, compact }: Props) {
       </p>
     </div>
   )
-}
-
-/**
- * Get auth headers for Edge Function call
- */
-async function getAuthHeaders(): Promise<Record<string, string>> {
-  const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
-  const headers: Record<string, string> = {
-    'apikey': anonKey,
-    'Authorization': `Bearer ${anonKey}`,
-  }
-
-  try {
-    if (window.electronAPI?.auth?.getSession) {
-      const session = await window.electronAPI.auth.getSession()
-      if (session?.session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.session.access_token}`
-      }
-    }
-  } catch {}
-
-  return headers
 }
