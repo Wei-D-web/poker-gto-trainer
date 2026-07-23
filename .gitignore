@@ -6,3 +6,6 @@ out/
 *.dmg
 *.dmg.blockmap
 .DS_Store
+*.glb
+*.fbx
+__pycache__/
