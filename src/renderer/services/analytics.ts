@@ -99,10 +99,12 @@ export function track(
     meta,
   }
 
-  // Console log for debugging
-  const emoji = EVENT_EMOJI[event] || '📊'
-  const metaStr = meta ? ` ${JSON.stringify(meta)}` : ''
-  console.log(`[Analytics] ${emoji} ${event}${metaStr}`)
+  // Console log for debugging (dev builds only)
+  if (import.meta.env.DEV || import.meta.env.VITE_POKERGTO_DEV_BUILD === 'true') {
+    const emoji = EVENT_EMOJI[event] || '📊'
+    const metaStr = meta ? ` ${JSON.stringify(meta)}` : ''
+    console.debug(`[Analytics] ${emoji} ${event}${metaStr}`)
+  }
 
   // Persist to localStorage
   try {

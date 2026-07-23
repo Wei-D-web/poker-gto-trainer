@@ -198,13 +198,43 @@ async function handleOrderCreated(data: any) {
     updates.ls_subscription_id = String(attrs.first_order_item.subscription_id)
   }
 
+  // Auto-assign pre-generated license key
+  const { data: availableKey } = await supabase
+    .from('license_keys')
+    .select('key')
+    .eq('status', 'available')
+    .limit(1)
+    .single()
+
+  if (availableKey?.key) {
+    updates.license_key = availableKey.key
+    await supabase
+      .from('license_keys')
+      .update({ status: 'assigned', assigned_to: profile.id, assigned_at: new Date().toISOString() })
+      .eq('key', availableKey.key)
+  }
+
   const { error } = await supabase.from('profiles').update(updates).eq('id', profile.id)
 
   if (error) {
     console.error('❌ Failed to update profile:', error.message)
   } else {
-    console.log(`✅ Upgraded ${profile.email || profile.id} to ${tier} (${isSubscription ? 'subscription' : 'one-time'})`)
+    const keyMsg = availableKey?.key ? ` (key: ${availableKey.key.slice(0, 8)}...)` : ''
+    console.log(`✅ Upgraded ${profile.email || profile.id} to ${tier}${keyMsg}`)
   }
+
+  // Audit trail
+  await supabase.from('order_history').insert({
+    profile_id: profile.id,
+    ls_order_id: String(data.id),
+    event: 'order_created',
+    tier,
+    amount: attrs.total || attrs.subtotal || 0,
+    email: email || profile.email,
+    created_at: new Date().toISOString(),
+  }).then(({ error: logErr }) => {
+    if (logErr) console.warn('⚠️ Failed to log order:', logErr.message)
+  })
 }
 
 async function handleSubscriptionChange(data: any, status: string) {

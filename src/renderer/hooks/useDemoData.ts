@@ -232,7 +232,7 @@ export function useDemoData() {
       setHeroStrategy(buildStrategy('demo_hero_btn_100', heroCombos, true))
       setVillainStrategy(buildStrategy('demo_villain_bb_100', villainCombos, false))
 
-      console.log('🎯 Demo data injected — BTN vs BB, 100bb,', Object.keys(heroCombos).length, 'combos')
+      // Demo data ready — BTN vs BB, 100bb
     }, 500)
 
     return () => clearTimeout(timer)

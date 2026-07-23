@@ -1,34 +1,8 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, lazy, Suspense } from 'react'
 import { useUIStore } from './stores/uiStore'
 import { useDemoData } from './hooks/useDemoData'
 import { Sidebar } from './components/layout/Sidebar'
 import { TitleBar } from './components/layout/TitleBar'
-import { StrategyExplorer } from './components/scenario/StrategyExplorer'
-import { TrainingPage } from './components/training/TrainingPage'
-import { ComparePage } from './components/hand-history/ComparePage'
-import { RangeEditorPage } from './components/hand-history/RangeEditorPage'
-import { HandHistoryPage } from './components/hand-history/HandHistoryPage'
-import { HandHistoryDashboard } from './components/hand-history/HandHistoryDashboard'
-import { HandAnalyzerPage } from './components/hand-history/HandAnalyzerPage'
-import { AdvancedAnalysis } from './components/scenario/AdvancedAnalysis'
-import { ICMPage } from './components/settings/ICMPage'
-import { TurnRiverPage } from './components/scenario/TurnRiverPage'
-import { MultiwayPage } from './components/scenario/MultiwayPage'
-import { RangeBattlePage } from './components/scenario/RangeBattlePage'
-import { CashMttComparePage } from './components/scenario/CashMttComparePage'
-import { ExploitAdvisor } from './components/scenario/ExploitAdvisor'
-import { PlaygroundPage } from './components/playground/PlaygroundPage'
-import { PreflopChartsPage } from './components/charts/PreflopChartsPage'
-import { SpotLibraryPage } from './components/spots/SpotLibraryPage'
-import { ToolsPage } from './components/tools/ToolsPage'
-import { AnalyticsPage } from './components/analytics/AnalyticsPage'
-import { EquityTrainerPage } from './components/training/EquityTrainerPage'
-import { BluffCatcherPage } from './components/training/BluffCatcherPage'
-import { PremiumFeatures } from './components/premium/PremiumFeatures'
-import { SettingsPage } from './components/settings/SettingsPage'
-import { AccountPage } from './components/settings/AccountPage'
-import { GuidePage } from './components/guide/GuidePage'
-import { SessionReviewPage } from './components/session-review/SessionReviewPage'
 import { SubscriptionGate, isPremiumFeature, DESKTOP_ONLY_FEATURES, isRunningInElectron } from './components/common/SubscriptionGate'
 import { ErrorBoundary } from './components/common/ErrorBoundary'
 import { ToastContainer } from './components/common/ToastContainer'
@@ -37,9 +11,37 @@ import { useKeyboardShortcuts, DEFAULT_SHORTCUTS } from './hooks/useKeyboard'
 import { DemoBanner } from './components/auth/DemoBanner'
 import { DesktopRequiredModal, getDesktopRequiredInfo } from './components/auth/DesktopRequiredModal'
 import { WelcomeFlow, shouldShowWelcome } from './components/common/WelcomeFlow'
-import type { FC } from 'react'
+import type { FC, LazyExoticComponent } from 'react'
 
-const ROUTES: Record<string, FC> = {
+// ── Lazy-loaded route components (code-split per feature) ──
+const StrategyExplorer = lazy(() => import('./components/scenario/StrategyExplorer'))
+const TrainingPage = lazy(() => import('./components/training/TrainingPage'))
+const ComparePage = lazy(() => import('./components/hand-history/ComparePage'))
+const RangeEditorPage = lazy(() => import('./components/hand-history/RangeEditorPage'))
+const HandHistoryPage = lazy(() => import('./components/hand-history/HandHistoryPage'))
+const HandHistoryDashboard = lazy(() => import('./components/hand-history/HandHistoryDashboard'))
+const HandAnalyzerPage = lazy(() => import('./components/hand-history/HandAnalyzerPage'))
+const AdvancedAnalysis = lazy(() => import('./components/scenario/AdvancedAnalysis'))
+const ICMPage = lazy(() => import('./components/settings/ICMPage'))
+const TurnRiverPage = lazy(() => import('./components/scenario/TurnRiverPage'))
+const MultiwayPage = lazy(() => import('./components/scenario/MultiwayPage'))
+const RangeBattlePage = lazy(() => import('./components/scenario/RangeBattlePage'))
+const CashMttComparePage = lazy(() => import('./components/scenario/CashMttComparePage'))
+const ExploitAdvisor = lazy(() => import('./components/scenario/ExploitAdvisor'))
+const PlaygroundPage = lazy(() => import('./components/playground/PlaygroundPage'))
+const PreflopChartsPage = lazy(() => import('./components/charts/PreflopChartsPage'))
+const SpotLibraryPage = lazy(() => import('./components/spots/SpotLibraryPage'))
+const ToolsPage = lazy(() => import('./components/tools/ToolsPage'))
+const AnalyticsPage = lazy(() => import('./components/analytics/AnalyticsPage'))
+const EquityTrainerPage = lazy(() => import('./components/training/EquityTrainerPage'))
+const BluffCatcherPage = lazy(() => import('./components/training/BluffCatcherPage'))
+const PremiumFeatures = lazy(() => import('./components/premium/PremiumFeatures'))
+const SettingsPage = lazy(() => import('./components/settings/SettingsPage'))
+const AccountPage = lazy(() => import('./components/settings/AccountPage'))
+const GuidePage = lazy(() => import('./components/guide/GuidePage'))
+const SessionReviewPage = lazy(() => import('./components/session-review/SessionReviewPage'))
+
+const ROUTES: Record<string, LazyExoticComponent<FC>> = {
   explore: StrategyExplorer,
   training: TrainingPage,
   compare: ComparePage,
@@ -65,6 +67,18 @@ const ROUTES: Record<string, FC> = {
   guide: GuidePage,
   review: SessionReviewPage,
   bluffcatcher: BluffCatcherPage,
+}
+
+/** Lightweight loading skeleton shown during route chunk loading */
+function RouteSkeleton() {
+  return (
+    <div className="flex items-center justify-center h-full">
+      <div className="text-center space-y-4">
+        <div className="w-10 h-10 rounded-full border-2 border-neutral-700 border-t-emerald-500 animate-spin mx-auto" />
+        <p className="text-sm text-neutral-500">Loading...</p>
+      </div>
+    </div>
+  )
 }
 
 export function App() {
@@ -127,13 +141,15 @@ export function App() {
         <Sidebar />
         <main className="flex-1 overflow-hidden">
           <ErrorBoundary>
-            {needsGate ? (
-              <SubscriptionGate feature={activeRoute}>
+            <Suspense fallback={<RouteSkeleton />}>
+              {needsGate ? (
+                <SubscriptionGate feature={activeRoute}>
+                  <ActiveComponent />
+                </SubscriptionGate>
+              ) : (
                 <ActiveComponent />
-              </SubscriptionGate>
-            ) : (
-              <ActiveComponent />
-            )}
+              )}
+            </Suspense>
           </ErrorBoundary>
         </main>
       </div>

@@ -15,6 +15,7 @@ import { PresetSolutionsPanel } from './PresetSolutionsPanel'
 import { POSITION_LABELS, OPPONENT_PROFILES, type OpponentTypeType } from '@shared/types/poker'
 import { formatCard } from '@shared/utils/poker-math'
 import { Loader2, Sparkles, LayoutGrid, GitBranch, Zap, X, Crosshair, ChevronDown } from 'lucide-react'
+import { AICoachPanel, AICoachTrigger } from '../strategy/AICoachPanel'
 import { cn } from '../../lib/utils'
 
 type ViewMode = 'matrix' | 'tree'
@@ -42,6 +43,16 @@ export function StrategyExplorer() {
   const [showExploitBar, setShowExploitBar] = useState(false)
   const [exploitAdjustedResult, setExploitAdjustedResult] = useState<any>(null)
   const [loadingExploit, setLoadingExploit] = useState(false)
+
+  // === AI Coach state ===
+  const [showAICoach, setShowAICoach] = useState(false)
+  const aiContextDescription = useMemo(() => {
+    const hero = POSITION_LABELS[heroPosition] || `Pos${heroPosition}`
+    const villain = POSITION_LABELS[villainPosition] || `Pos${villainPosition}`
+    const board = activeBoard.length > 0 ? activeBoard.map(formatCard).join(' ') : '翻前'
+    const combo = selectedCombo ? `, 选中: ${selectedCombo}` : ''
+    return `${hero} vs ${villain}, ${stackDepth}bb, 牌面: ${board}${combo}`
+  }, [heroPosition, villainPosition, stackDepth, activeBoard, selectedCombo])
 
   const loadExploitAdjustments = async (type: OpponentTypeType) => {
     if (!postflopResult || customBoard.length < 3) return
@@ -471,6 +482,22 @@ export function StrategyExplorer() {
           )}
         </div>
       </div>
+
+      {/* AI Coach */}
+      <AICoachTrigger onClick={() => setShowAICoach(true)} visible={!showAICoach} />
+      <AICoachPanel
+        contextDescription={aiContextDescription}
+        contextData={{
+          heroPosition,
+          villainPosition,
+          stackDepth,
+          gameType,
+          board: activeBoard,
+          selectedCombo: selectedCombo || undefined,
+        }}
+        open={showAICoach}
+        onClose={() => setShowAICoach(false)}
+      />
     </div>
   )
 }

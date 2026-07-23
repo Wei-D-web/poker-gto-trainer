@@ -316,5 +316,5 @@ export function installWebBridge(): void {
 
   const bridge = createWebAPI()
   ;(window as any).electronAPI = bridge
-  console.log('🌐 Web API bridge installed — postflop analysis goes through Supabase')
+  // Web API bridge installed — postflop analysis via Supabase
 }

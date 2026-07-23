@@ -174,6 +174,13 @@ const electronAPI = {
     delete: (params: { sessionId: string }): Promise<{ deleted: boolean }> =>
       ipcRenderer.invoke('session:delete', params),
   },
+
+  aiCoach: {
+    send: (params: { message: string; history?: Array<{ role: string; content: string; timestamp: string }> }): Promise<{ text: string; sessionId: string; durationMs: number; error?: string }> =>
+      ipcRenderer.invoke('ai-coach:send', params),
+    health: (): Promise<{ ok: boolean; agentId: string }> =>
+      ipcRenderer.invoke('ai-coach:health'),
+  },
 }
 
 contextBridge.exposeInMainWorld('electronAPI', electronAPI)
