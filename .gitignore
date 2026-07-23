@@ -6,7 +6,5 @@ out/
 *.dmg
 *.dmg.blockmap
 .DS_Store
-*.glb
 *.fbx
-!jarvis-platform/frontend/**/*.glb
 __pycache__/
