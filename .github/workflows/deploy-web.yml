@@ -49,9 +49,11 @@ jobs:
           cp -r deploy/payment dist/pages/payment/ 2>/dev/null || echo "payment/ not found, skipping"
           # Demo screenshots (for landing page preview)
           mkdir -p dist/pages/demo-screenshots
-          cp -r demo-screenshots/*.png dist/pages/demo-screenshots/ 2>/dev/null || echo "demo-screenshots/ not found, skipping"
-          # Generate a minimal favicon
-          printf '\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x10\x00\x00\x00\x10\x08\x06\x00\x00\x00\x1f\xf3\xff\xae\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00\x00\x00\x19IDATx\xda\x63\xfc\xff\xff?\x03\x05\x00\x00\xff\xff\x03\x00\x01\x00\x01F\x15\x07\xb9\x00\x00\x00\x00IEND\xae\x42\x60\x82' > dist/pages/icon.png
+          cp -r demo-screenshots/*.png demo-screenshots/*.webp dist/pages/demo-screenshots/ 2>/dev/null || echo "demo-screenshots/ not found, skipping"
+          # Open Graph share image
+          cp deploy/og-image.png dist/pages/og-image.png 2>/dev/null || echo "og-image.png not found, skipping"
+          # Favicon (real app icon)
+          cp resources/icon.png dist/pages/icon.png 2>/dev/null || echo "icon.png not found, skipping"
           touch dist/pages/.nojekyll
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
