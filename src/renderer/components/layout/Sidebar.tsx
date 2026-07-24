@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils'
 import {
   Globe, Settings, BookOpen, BarChart3, Target, Edit3,
   Search, Lock, DollarSign, ArrowRight, Users, Zap, HelpCircle, Swords, Play, Library, Bookmark, Calculator, Flame,
-  GitCompare, Crosshair, Shield, LogOut, type LucideIcon,
+  GitCompare, Crosshair, Shield, LogOut, Bot, type LucideIcon,
 } from 'lucide-react'
 
 const DEMO_KEY = 'pokergto_demo_mode'
@@ -49,6 +49,7 @@ export function Sidebar() {
       label: t('nav.sectionCore'),
       items: [
         { id: 'premium', label: t('sidebar.premium'), icon: Flame, accent: 'text-amber-400' },
+        { id: 'aicoach', label: 'AI 教练', icon: Bot, accent: 'text-violet-400' },
         { id: 'playground', label: t('sidebar.playground'), icon: Play, accent: 'text-emerald-400' },
         { id: 'explore', label: t('nav.explore'), icon: Globe, shortcut: '1', accent: 'text-blue-400' },
         { id: 'training', label: t('nav.training'), icon: Target, shortcut: '2', accent: 'text-green-400' },

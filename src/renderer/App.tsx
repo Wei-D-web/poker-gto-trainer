@@ -43,6 +43,7 @@ const SettingsPage = lazy(() => import('./components/settings/SettingsPage'))
 const AccountPage = lazy(() => import('./components/settings/AccountPage'))
 const GuidePage = lazy(() => import('./components/guide/GuidePage'))
 const SessionReviewPage = lazy(() => import('./components/session-review/SessionReviewPage'))
+const AICoachPage = lazy(() => import('./components/ai-coach/AICoachPage'))
 
 const ROUTES: Record<string, LazyExoticComponent<FC>> = {
   explore: StrategyExplorer,
@@ -70,6 +71,7 @@ const ROUTES: Record<string, LazyExoticComponent<FC>> = {
   guide: GuidePage,
   review: SessionReviewPage,
   bluffcatcher: BluffCatcherPage,
+  aicoach: AICoachPage,
 }
 
 /** Lightweight loading skeleton shown during route chunk loading */

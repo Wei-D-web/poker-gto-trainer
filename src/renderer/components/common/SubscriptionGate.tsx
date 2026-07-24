@@ -19,6 +19,7 @@ import { track } from '../../services/analytics'
 export const PREMIUM_FEATURES = new Set([
   'analytics', 'equitytrainer', 'battle', 'cashmttcompare',
   'exploitadvisor', 'analyzer', 'tools', 'spots', 'icm',
+  'aicoach',
 ])
 
 export const DESKTOP_ONLY_FEATURES = new Set(['advanced', 'turnriver', 'multiway'])
@@ -74,7 +75,7 @@ const NAMES: Record<string, string> = {
   analytics: '数据分析', equitytrainer: '胜率训练', battle: 'Range Battle',
   cashmttcompare: 'Cash vs MTT', exploitadvisor: '剥削顾问', analyzer: '手牌分析器',
   advanced: '高级分析', turnriver: '转牌河牌分析', multiway: '多人底池',
-  tools: '工具箱', spots: '收藏夹', icm: 'ICM 计算器',
+  tools: '工具箱', spots: '收藏夹', icm: 'ICM 计算器', aicoach: 'AI 教练',
 }
 
 export function UpgradePrompt({ feature }: { feature?: string }) {

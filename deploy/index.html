@@ -8,6 +8,8 @@
 <meta name="keywords" content="GTO训练,德州扑克,扑克训练,扑克GTO,CFR求解器,扑克策略,中文扑克工具">
 <meta name="author" content="PokerGTO">
 <meta name="robots" content="index, follow">
+<link rel="canonical" href="https://wei-d-web.github.io/poker-gto-trainer/">
+<link rel="icon" type="image/png" href="/poker-gto-trainer/icon.png">
 
 <!-- Open Graph -->
 <meta property="og:title" content="PokerGTO Trainer — 专业 GTO 扑克训练平台">
@@ -15,11 +17,15 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://wei-d-web.github.io/poker-gto-trainer/">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://wei-d-web.github.io/poker-gto-trainer/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="PokerGTO Trainer — 专业 GTO 扑克训练平台">
 <meta name="twitter:description" content="26 个功能模块、13 个求解器引擎、CFR 算法驱动。全中文，桌面端，离线可用。">
+<meta name="twitter:image" content="https://wei-d-web.github.io/poker-gto-trainer/og-image.png">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior: smooth; scroll-padding-top: 80px; }
@@ -197,10 +203,28 @@
   "description": "专业 GTO 扑克训练桌面应用 — 26 个功能模块覆盖翻前到河牌。",
   "url": "https://wei-d-web.github.io/poker-gto-trainer/",
   "offers": {
-    "@type": "Offer",
-    "price": "29.99",
-    "priceCurrency": "USD"
+    "@type": "AggregateOffer",
+    "priceCurrency": "CNY",
+    "lowPrice": "19.99",
+    "highPrice": "400",
+    "offerCount": "3"
   }
+}
+</script>
+
+<!-- FAQ Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "和 GTO Wizard 比有什么区别？", "acceptedAnswer": {"@type": "Answer", "text": "功能覆盖 GTO Wizard 约 90%（翻前范围、CFR 求解、训练模式、EV 反馈），价格仅 1/3。全中文界面，桌面端 100% 本地运行、离线可用，并提供终身买断选项。"}},
+    {"@type": "Question", "name": "不付费能用什么？", "acceptedAnswer": {"@type": "Answer", "text": "无需注册即可免费使用策略浏览器、基础训练、手牌对比等功能，网页 Demo 点开即玩。激活卡密后解锁全部 26 个模块。"}},
+    {"@type": "Question", "name": "macOS 提示「无法验证开发者」，安全吗？", "acceptedAnswer": {"@type": "Answer", "text": "安全。这只是因为还未购买 Apple 官方签名。打开 系统设置 → 隐私与安全性 → 点「仍要打开」即可，只需操作一次。软件 100% 本地运行，不联网、不收集数据。"}},
+    {"@type": "Question", "name": "支持哪些系统？", "acceptedAnswer": {"@type": "Answer", "text": "macOS（Apple Silicon）和 Windows 10/11 x64 均有安装包，Linux 版打包中。所有版本功能一致，离线可用。"}},
+    {"@type": "Question", "name": "怎么付款和激活？", "acceptedAnswer": {"@type": "Answer", "text": "微信/支付宝扫码付款后加客服微信获取 19 位卡密，在 App 内「账户 → 激活卡密」输入即可解锁。国际用户可通过 Stripe 用信用卡支付。"}},
+    {"@type": "Question", "name": "卡密是永久的吗？", "acceptedAnswer": {"@type": "Answer", "text": "终身版卡密永久有效，含所有大版本免费更新；入门版/专业版为订阅制，到期后基础功能仍可免费使用。"}}
+  ]
 }
 </script>
 </head>
@@ -211,7 +235,7 @@
 <!-- ═══════ Top Sticky Nav ═══════ -->
 <nav class="nav" id="navbar">
   <div class="nav-inner">
-    <a href="#" class="nav-logo">PokerGTO</a>
+    <a href="#hero" class="nav-logo">PokerGTO</a>
     <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
     <div class="nav-links" id="navLinks">
       <a href="#features">功能</a>
@@ -219,6 +243,7 @@
       <a href="#download">下载</a>
       <a href="#pricing">定价</a>
       <a href="#community">社群</a>
+      <a href="#faq">常见问题</a>
       <a href="/poker-gto-trainer/app/" class="btn-nav">免费试用</a>
     </div>
   </div>
@@ -228,7 +253,7 @@
 <div class="sticky-cta" id="stickyCta">
   <span class="hint">🔥 无需下载，即刻体验</span>
   <a href="/poker-gto-trainer/app/?demo=1" class="btn btn-primary">🎯 免费体验 Demo</a>
-  <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" class="btn btn-outline">⬇ 下载桌面版</a>
+  <a href="#download" class="btn btn-outline">⬇ 下载桌面版</a>
 </div>
 
 <!-- ═══════ Hero ═══════ -->
@@ -241,7 +266,7 @@
         <p>26 个专业模块 · 本地 CFR 求解器 · Cash vs MTT 对比 · 对手剥削顾问 · Range Battle · 实战 AI 对局<br>对标 GTO Wizard，功能覆盖 90%，价格仅 1/3</p>
         <div class="cta-group">
           <a href="/poker-gto-trainer/app/?demo=1" class="btn btn-primary">🎯 免费体验 Demo</a>
-          <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" class="btn btn-secondary">⬇ 下载桌面版</a>
+          <a href="#download" class="btn btn-secondary">⬇ 下载桌面版</a>
           <a href="#pricing" class="btn btn-outline">查看价格</a>
         </div>
       </div>
@@ -271,19 +296,19 @@
     <p class="subtitle">Demo 里能直接上手操作这些功能</p>
     <div class="preview-grid">
       <div class="preview-card animate animate-delay-1">
-        <img src="/poker-gto-trainer/demo-screenshots/01-strategy-explorer.png" alt="策略浏览器 - 翻前范围矩阵" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <img src="/poker-gto-trainer/demo-screenshots/01-strategy-explorer.webp" alt="策略浏览器 - 翻前范围矩阵" width="1400" height="840" loading="lazy" onerror="this.parentElement.style.display='none'">
         <div class="caption">🌐 策略浏览器 — 13×13 范围矩阵 · CFR 求解</div>
       </div>
       <div class="preview-card animate animate-delay-2">
-        <img src="/poker-gto-trainer/demo-screenshots/04-training-quiz.png" alt="GTO训练模式" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <img src="/poker-gto-trainer/demo-screenshots/04-training-quiz.webp" alt="GTO训练模式" width="1400" height="840" loading="lazy" onerror="this.parentElement.style.display='none'">
         <div class="caption">🎯 训练模式 — 随机出题 · EV 即时反馈</div>
       </div>
       <div class="preview-card animate animate-delay-3">
-        <img src="/poker-gto-trainer/demo-screenshots/07-range-battle.png" alt="Range Battle 范围对战" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <img src="/poker-gto-trainer/demo-screenshots/07-range-battle.webp" alt="Range Battle 范围对战" width="1400" height="840" loading="lazy" onerror="this.parentElement.style.display='none'">
         <div class="caption">⚔️ Range Battle — 范围对战 · 胜率分布图</div>
       </div>
       <div class="preview-card animate animate-delay-4">
-        <img src="/poker-gto-trainer/demo-screenshots/03-range-editor.png" alt="范围编辑器" loading="lazy" onerror="this.parentElement.style.display='none'">
+        <img src="/poker-gto-trainer/demo-screenshots/03-range-editor.webp" alt="范围编辑器" width="1400" height="840" loading="lazy" onerror="this.parentElement.style.display='none'">
         <div class="caption">✏️ 范围编辑器 — 构建自定义手牌范围</div>
       </div>
     </div>
@@ -297,31 +322,31 @@
     <p class="subtitle">本地 CFR 求解器 · 离线使用 · 键盘快捷键 · 全部 26 个模块</p>
     <div class="download-grid" id="downloadGrid">
       <!-- macOS -->
-      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-1" data-os="mac" style="text-decoration:none;">
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/download/v0.1.2/PokerGTO.Trainer-0.1.2-arm64.dmg" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-1" data-os="mac" style="text-decoration:none;">
         <div class="os-icon">🍎</div>
         <h3 style="color:#EDF1F7;">macOS</h3>
-        <div class="arch">Apple Silicon · Intel</div>
-        <div class="version">v0.2.0 · Universal</div>
+        <div class="arch">Apple Silicon (M 系列芯片)</div>
+        <div class="version">v0.1.2 · DMG</div>
         <span class="btn btn-primary" style="display:block;">下载 macOS 版</span>
-        <div class="size">~180 MB · DMG</div>
+        <div class="size">~180 MB · 点击直接下载</div>
       </a>
       <!-- Windows -->
-      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-2" data-os="win" style="text-decoration:none;">
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/download/v0.1.1/PokerGTO-Trainer-Setup-0.1.1.exe" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-2" data-os="win" style="text-decoration:none;">
         <div class="os-icon">🪟</div>
         <h3 style="color:#EDF1F7;">Windows</h3>
         <div class="arch">Windows 10 / 11 · x64</div>
-        <div class="version">v0.2.0 · Installer</div>
+        <div class="version">v0.1.1 · Installer</div>
         <span class="btn btn-secondary" style="display:block;">下载 Windows 版</span>
-        <div class="size">~160 MB · EXE / MSI</div>
+        <div class="size">~160 MB · 点击直接下载</div>
       </a>
       <!-- Linux -->
-      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-3" data-os="linux" style="text-decoration:none;">
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-3" data-os="linux" style="text-decoration:none;">
         <div class="os-icon">🐧</div>
         <h3 style="color:#EDF1F7;">Linux</h3>
         <div class="arch">Ubuntu · Debian · Fedora</div>
-        <div class="version">v0.2.0 · AppImage</div>
-        <span class="btn btn-outline" style="display:block;">下载 Linux 版</span>
-        <div class="size">~170 MB · AppImage / deb</div>
+        <div class="version">即将推出</div>
+        <span class="btn btn-outline" style="display:block;">关注 Releases 获取通知</span>
+        <div class="size">AppImage / deb 打包中</div>
       </a>
     </div>
 
@@ -701,6 +726,40 @@
   </div>
 </div>
 
+<!-- ═══════ FAQ ═══════ -->
+<div class="container" id="faq">
+  <div class="section">
+    <h2>❓ 常见问题</h2>
+    <p class="subtitle">买之前想了解的，都在这里</p>
+    <div style="max-width:800px; margin:0 auto; display:flex; flex-direction:column; gap:12px;">
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">和 GTO Wizard 比有什么区别？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">功能覆盖 GTO Wizard 约 90%（翻前范围、CFR 求解、训练模式、EV 反馈），价格仅 1/3。全中文界面，桌面端 100% 本地运行、离线可用，并提供终身买断选项，没有订阅压力。</p>
+      </details>
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">不付费能用什么？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">无需注册即可免费使用策略浏览器、基础训练、手牌对比等功能，网页 Demo 点开即玩。觉得有用再购卡密，激活后解锁全部 26 个模块。</p>
+      </details>
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">macOS 提示「无法验证开发者」，安全吗？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">安全。这只是因为我们还没购买 Apple 官方签名（$99/年）。打开 系统设置 → 隐私与安全性 → 找到「PokerGTO Trainer 已被阻止」→ 点「仍要打开」即可，只需操作一次。软件 100% 本地运行，不联网、不收集数据。</p>
+      </details>
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">支持哪些系统？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">macOS（Apple Silicon，M 系列芯片）和 Windows 10/11 x64 均有安装包，Linux 版打包中。所有版本功能一致，离线可用。</p>
+      </details>
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">怎么付款和激活？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">微信/支付宝扫码付款 → 截图凭证 → 加客服微信（Mamba4life_0824）→ 收到 19 位卡密 → 在 App 内「账户 → 激活卡密」输入，立即解锁。国际用户可在 App 内通过 Stripe 用信用卡支付。</p>
+      </details>
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">卡密是永久的吗？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">终身版卡密永久有效，含所有大版本免费更新；入门版/专业版为订阅制（月付/年付），到期后基础功能仍可免费使用。</p>
+      </details>
+    </div>
+  </div>
+</div>
+
 <!-- Tech -->
 <div class="container" style="text-align:center;padding-bottom:60px;">
   <p style="color:#475569;font-size:13px;">
@@ -710,7 +769,7 @@
 </div>
 
 <div class="footer">
-  PokerGTO Trainer v0.2.0 · &copy; 2026 · poker-gto-trainer<br>
+  PokerGTO Trainer v0.1.2 · &copy; 2026 · poker-gto-trainer<br>
   <span style="color:#475569;">支持微信/支付宝 · Stripe · 卡密激活</span><br>
   <a href="/poker-gto-trainer/privacy.html" style="color:#475569;font-size:12px;">隐私政策</a> &middot;
   <a href="/poker-gto-trainer/terms.html" style="color:#475569;font-size:12px;">服务条款</a>
