@@ -3,14 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PokerGTO Trainer — 专业 GTO 扑克训练平台 | 免费体验</title>
-<meta name="description" content="PokerGTO Trainer 是专业的 GTO 扑克训练工具，26 个模块覆盖翻前到河牌。支持免费 Demo 体验，无需下载即可开始训练。">
+<title>PokerGTO Trainer — 免费 GTO 扑克训练 | 浏览器直接开打</title>
+<meta name="description" content="PokerGTO Trainer 免费网页版，浏览器直接开打无需下载。基础 GTO 训练、范围矩阵、EV 反馈即时可用。想要 CFR 求解器？升级桌面专业版，26 模块全覆盖。">
+<meta name="keywords" content="GTO训练,德州扑克,扑克训练,网页扑克,扑克GTO,CFR求解器,免费扑克训练,中文扑克工具">
+<meta name="author" content="PokerGTO">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://wei-d-web.github.io/poker-gto-trainer/">
+<link rel="icon" type="image/png" href="/poker-gto-trainer/icon.png">
+
+<!-- Open Graph -->
+<meta property="og:title" content="PokerGTO Trainer — 免费 GTO 扑克训练，浏览器直接开打">
+<meta property="og:description" content="免费网页版即时开玩，无需下载。基础 GTO 训练、范围矩阵、EV 反馈全部免费。升级桌面专业版解锁 CFR 求解器 + 26 模块，价格仅 GTO Wizard 1/3。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://wei-d-web.github.io/poker-gto-trainer/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://wei-d-web.github.io/poker-gto-trainer/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PokerGTO Trainer — 免费 GTO 扑克训练，浏览器直接开打">
+<meta name="twitter:description" content="免费网页版即时开玩。基础 GTO 训练 + 范围矩阵 + EV 反馈免费。升级桌面版解锁 CFR 求解器，价格仅 GTO Wizard 1/3。">
+<meta name="twitter:image" content="https://wei-d-web.github.io/poker-gto-trainer/og-image.png">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior: smooth; scroll-padding-top: 80px; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #05080C; color: #EDF1F7; line-height:1.6; }
+  #bgCanvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; width: 100%; height: 100%; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
 
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  @keyframes glowPulse { 0%,100% { box-shadow: 0 4px 24px rgba(16,185,129,0.3); } 50% { box-shadow: 0 4px 40px rgba(16,185,129,0.55), 0 0 80px rgba(16,185,129,0.1); } }
+  @keyframes matrixBreathe { 0%,100% { opacity: 0.5; transform: translate(-50%,-50%) scale(1); } 50% { opacity: 0.8; transform: translate(-50%,-50%) scale(1.05); } }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 
   /* ── Top Sticky Nav ── */
   .nav { position: sticky; top: 0; z-index: 101; background: rgba(5,8,12,0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(21,34,51,0.5); }
@@ -35,8 +61,8 @@
 
   /* ── Buttons ── */
   .btn { padding: 14px 32px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
-  .btn-primary { background: linear-gradient(135deg, #10B981, #059669); color: white; box-shadow: 0 4px 24px rgba(16,185,129,0.3); border: none; }
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(16,185,129,0.4); }
+  .btn-primary { background: linear-gradient(135deg, #10B981, #059669); color: white; box-shadow: 0 4px 24px rgba(16,185,129,0.3); border: none; animation: glowPulse 3s ease-in-out infinite; }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(16,185,129,0.5); animation: none; }
   .btn-secondary { background: linear-gradient(135deg, #2563EB, #7C3AED); color: white; box-shadow: 0 4px 24px rgba(37,99,235,0.2); border: none; }
   .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(37,99,235,0.3); }
   .btn-outline { background: transparent; color: #94A3B8; border: 1px solid #1C2A3D; }
@@ -55,45 +81,52 @@
   .range-cell.fold     { background: #1F2937; }
   .range-axis { display: flex; justify-content: space-around; margin-top: 8px; }
   .range-axis span { font-size: 9px; color: #64748B; font-weight: 600; letter-spacing: 0.05em; }
-  .matrix-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 80%; height: 80%; background: radial-gradient(ellipse, rgba(16,185,129,0.06) 0%, transparent 70%); pointer-events: none; border-radius: 50%; }
+  .matrix-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 80%; height: 80%; background: radial-gradient(ellipse, rgba(16,185,129,0.06) 0%, transparent 70%); pointer-events: none; border-radius: 50%; animation: matrixBreathe 4s ease-in-out infinite; }
 
-  /* ── Sticky Bottom CTA ── */
+  /* Sticky Bottom CTA */
   .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: rgba(5,8,12,0.95); backdrop-filter: blur(20px); border-top: 1px solid #152233; padding: 14px 24px; transform: translateY(100%); transition: transform 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 12px; }
   .sticky-cta.visible { transform: translateY(0); }
   .sticky-cta .btn { padding: 10px 24px; font-size: 14px; }
   .sticky-cta .hint { font-size: 12px; color: #64748B; margin-right: 8px; }
 
-  /* ── Feature Preview Screenshots ── */
+  /* Feature Preview Screenshots */
   .preview-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 900px; margin: 0 auto; }
   .preview-card { background: #090D14; border: 1px solid #152233; border-radius: 16px; overflow: hidden; transition: all 0.2s; }
   .preview-card:hover { border-color: #2A3B52; transform: translateY(-2px); }
   .preview-card img { width: 100%; height: auto; display: block; border-bottom: 1px solid #152233; }
   .preview-card .caption { padding: 12px 16px; font-size: 13px; color: #94A3B8; font-weight: 600; }
 
-  /* ── Stats bar ── */
+  /* Stats bar */
   .stats-bar { display: flex; justify-content: center; gap: 48px; padding: 32px 0; border-top: 1px solid #152233; border-bottom: 1px solid #152233; margin-bottom: 80px; }
   .stat { text-align: center; }
-  .stat .num { font-size: 32px; font-weight: 900; color: #EDF1F7; }
+  .stat .num { font-size: 32px; font-weight: 900; background: linear-gradient(135deg, #EDF1F7 0%, #A78BFA 50%, #60A5FA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .stat .label { font-size: 13px; color: #64748B; margin-top: 4px; }
 
-  /* ── Section ── */
+  /* Section */
   .section { padding: 60px 0; }
   .section h2 { font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 12px; }
   .section .subtitle { text-align: center; color: #94A3B8; margin-bottom: 48px; font-size: 16px; }
 
   /* ── Module grid ── */
+  .module-category { margin-bottom: 36px; }
+  .module-category:last-child { margin-bottom: 0; }
+  .module-cat-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(21,34,51,0.5); }
+  .module-cat-header .cat-icon { font-size: 18px; }
+  .module-cat-header .cat-title { font-size: 15px; font-weight: 700; color: #94A3B8; letter-spacing: -0.01em; }
+  .module-cat-header .cat-count { font-size: 11px; color: #475569; font-weight: 500; }
   .module-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .module-card { background: #090D14; border: 1px solid #152233; border-radius: 16px; padding: 20px; transition: all 0.2s; }
-  .module-card:hover { border-color: #2A3B52; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+  .module-card { background: linear-gradient(180deg, rgba(13,17,23,0.8) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(21,34,51,0.6); border-radius: 16px; padding: 20px; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .module-card:hover { border-color: rgba(59,130,246,0.25); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.08); }
   .module-card .icon { font-size: 24px; margin-bottom: 8px; }
   .module-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
   .module-card p { font-size: 12px; color: #64748B; }
   .new-badge { display: inline-block; padding: 2px 8px; border-radius: 8px; background: rgba(16,185,129,0.1); color: #34D399; font-size: 10px; font-weight: 700; margin-left: 6px; }
 
-  /* ── Pricing ── */
+  /* Pricing */
   .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; margin: 0 auto; }
-  .pricing-card { background: #090D14; border: 1px solid #152233; border-radius: 20px; padding: 32px; text-align: center; position: relative; }
-  .pricing-card.popular { border-color: #3B82F6; box-shadow: 0 0 40px rgba(59,130,246,0.1); }
+  .pricing-card { background: linear-gradient(180deg, rgba(13,17,23,0.8) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(21,34,51,0.6); border-radius: 20px; padding: 32px; text-align: center; position: relative; transition: all 0.3s; }
+  .pricing-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+  .pricing-card.popular { border-color: rgba(59,130,246,0.5); background: linear-gradient(180deg, rgba(30,58,138,0.1) 0%, rgba(9,13,20,0.9) 100%); box-shadow: 0 0 60px rgba(59,130,246,0.12), 0 0 120px rgba(59,130,246,0.04); }
   .pricing-card.popular::before { content: '最受欢迎'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3B82F6; color: white; padding: 4px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; }
   .pricing-card h3 { font-size: 18px; margin-bottom: 8px; }
   .pricing-card .price { font-size: 44px; font-weight: 900; margin: 16px 0; }
@@ -102,10 +135,18 @@
   .pricing-card li { font-size: 13px; padding: 6px 0; color: #94A3B8; }
   .pricing-card li::before { content: '✓'; color: #34D399; margin-right: 8px; font-weight: 700; }
 
-  /* ── Footer ── */
+  /* Footer */
   .footer { text-align: center; padding: 40px 0 80px; color: #475569; font-size: 13px; border-top: 1px solid #152233; margin-top: 60px; }
 
-  /* ── Download Section ── */
+  /* ── Scroll Animation ── */
+  .animate { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
+  .animate.visible { opacity: 1; transform: translateY(0); }
+  .animate-delay-1 { transition-delay: 0.08s; }
+  .animate-delay-2 { transition-delay: 0.16s; }
+  .animate-delay-3 { transition-delay: 0.24s; }
+  .animate-delay-4 { transition-delay: 0.32s; }
+
+  /* Download Section */
   .download-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 900px; margin: 0 auto; }
   .download-card { background: #090D14; border: 1px solid #152233; border-radius: 20px; padding: 28px 24px; text-align: center; transition: all 0.2s; position: relative; }
   .download-card:hover { border-color: #2A3B52; transform: translateY(-2px); }
@@ -130,46 +171,91 @@
     /* Hero mobile */
     .hero { padding: 40px 0 40px; }
     .hero-grid { flex-direction: column-reverse; gap: 32px; }
+    .hero-text { text-align: center; }
     .hero-visual { flex: 0 0 auto; width: 100%; max-width: 340px; margin: 0 auto; }
     .hero h1 { font-size: 36px; }
-    .hero p { font-size: 15px; }
+    .hero p { font-size: 15px; margin-left: auto; margin-right: auto; }
     .hero .badge { font-size: 12px; }
+    .hero .cta-group { justify-content: center; }
     .range-matrix { padding: 8px; border-radius: 12px; }
     .range-cell { font-size: 5px; border-radius: 2px; }
     /* Grids */
+    .module-category { margin-bottom: 28px; }
     .module-grid { grid-template-columns: repeat(2, 1fr); }
     .pricing-grid { grid-template-columns: 1fr; }
     .preview-grid { grid-template-columns: 1fr; }
     .download-grid { grid-template-columns: 1fr; }
     .reqs-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 36px; }
     .stats-bar { gap: 24px; flex-wrap: wrap; }
     .sticky-cta { flex-direction: column; gap: 8px; text-align: center; }
   }
 </style>
+
+<!-- JSON-LD Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "PokerGTO Trainer",
+  "applicationCategory": "GameApplication",
+  "operatingSystem": "Web, macOS, Windows, Linux",
+  "description": "免费网页版 GTO 扑克训练工具 + 专业桌面版（CFR 求解器）。浏览器直接开打，无需下载。升级桌面版解锁全部 26 个模块。",
+  "url": "https://wei-d-web.github.io/poker-gto-trainer/",
+  "offers": {
+    "@type": "AggregateOffer",
+    "priceCurrency": "CNY",
+    "lowPrice": "0",
+    "highPrice": "400",
+    "offerCount": "2"
+  }
+}
+</script>
+
+<!-- FAQ Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "和 GTO Wizard 比有什么区别？", "acceptedAnswer": {"@type": "Answer", "text": "网页版免费提供基础 GTO 训练功能。桌面专业版功能覆盖 GTO Wizard 约 90%（翻前范围、CFR 求解、训练模式、EV 反馈），价格仅 1/3。全中文界面，桌面端 100% 本地运行、离线可用，并提供终身买断选项。"}},
+    {"@type": "Question", "name": "网页版和桌面版有什么区别？", "acceptedAnswer": {"@type": "Answer", "text": "网页版永久免费，浏览器直接开打，提供基础 GTO 训练、范围矩阵、EV 反馈、AI 实战对局。桌面专业版增加 CFR 求解器、AI Coach、Node Locking、Range Battle、Cash vs MTT 等完整 26 模块，100% 离线可用。"}},
+    {"@type": "Question", "name": "不付费能用什么？", "acceptedAnswer": {"@type": "Answer", "text": "网页版永久免费，点开即玩，无需注册！包含基础 GTO 训练、范围矩阵查询、EV 反馈和 AI 实战对局。升级桌面专业版解锁 CFR 求解器 + 全部 26 模块。"}},
+    {"@type": "Question", "name": "macOS 提示「无法验证开发者」，安全吗？", "acceptedAnswer": {"@type": "Answer", "text": "安全。这只是因为还未购买 Apple 官方签名。打开 系统设置 → 隐私与安全性 → 点「仍要打开」即可，只需操作一次。软件 100% 本地运行，不联网、不收集数据。"}},
+    {"@type": "Question", "name": "支持哪些系统？", "acceptedAnswer": {"@type": "Answer", "text": "macOS（Apple Silicon）和 Windows 10/11 x64 均有安装包，Linux 版打包中。所有版本功能一致，离线可用。"}},
+    {"@type": "Question", "name": "怎么付款和激活？", "acceptedAnswer": {"@type": "Answer", "text": "微信/支付宝扫码付款后加客服微信获取 19 位卡密，在 App 内「账户 → 激活卡密」输入即可解锁。国际用户可通过 Stripe 用信用卡支付。"}},
+    {"@type": "Question", "name": "卡密是永久的吗？", "acceptedAnswer": {"@type": "Answer", "text": "终身版卡密永久有效，含所有大版本免费更新；入门版/专业版为订阅制，到期后基础功能仍可免费使用。"}}
+  ]
+}
+</script>
 </head>
 <body>
+
+<canvas id="bgCanvas"></canvas>
 
 <!-- ═══════ Top Sticky Nav ═══════ -->
 <nav class="nav" id="navbar">
   <div class="nav-inner">
-    <a href="#" class="nav-logo">PokerGTO</a>
+    <a href="#hero" class="nav-logo">PokerGTO</a>
     <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
     <div class="nav-links" id="navLinks">
       <a href="#features">功能</a>
       <a href="#preview">界面预览</a>
-      <a href="#download">下载</a>
+      <a href="#compare">网页 vs 专业版</a>
+      <a href="#download">专业版下载</a>
       <a href="#pricing">定价</a>
       <a href="#community">社群</a>
-      <a href="/poker-gto-trainer/app/" class="btn-nav">免费试用</a>
+      <a href="#faq">常见问题</a>
+      <a href="https://eoi55ae5bfevy.ok.kimi.link/" target="_blank" rel="noopener" class="btn-nav">🎮 免费开玩</a>
     </div>
   </div>
 </nav>
 
-<!-- ═══════ Sticky Bottom CTA ═══════ -->
+<!-- Sticky Bottom CTA -->
 <div class="sticky-cta" id="stickyCta">
-  <span class="hint">🔥 无需下载，即刻体验</span>
-  <a href="/poker-gto-trainer/app/?demo=1" class="btn btn-primary">🎯 免费体验 Demo</a>
-  <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" class="btn btn-outline">⬇ 下载桌面版</a>
+  <span class="hint">🔥 浏览器直接开打，完全免费</span>
+  <a href="https://eoi55ae5bfevy.ok.kimi.link/" target="_blank" rel="noopener" class="btn btn-primary">🎮 免费开玩 — 网页版</a>
+  <a href="#compare" class="btn btn-outline">⚡ 了解专业版</a>
 </div>
 
 <!-- ═══════ Hero ═══════ -->
@@ -177,13 +263,13 @@
   <div class="container">
     <div class="hero-grid">
       <div class="hero-text">
-        <div class="badge">🎯 无需注册 · 点开即用</div>
+        <div class="badge">🌐 浏览器直接开打 · 无需下载 · 完全免费</div>
         <h1>PokerGTO Trainer</h1>
-        <p>26 个专业模块 · 本地 CFR 求解器 · Cash vs MTT 对比 · 对手剥削顾问 · Range Battle · 实战 AI 对局<br>对标 GTO Wizard，功能覆盖 90%，价格仅 1/3</p>
+        <p>免费网页版即时开玩 — 基础 GTO 训练、范围矩阵、EV 反馈<br>想要 <b style="color:#FBBF24;">CFR 求解器</b> + <b style="color:#60A5FA;">AI Coach</b> + <b style="color:#A78BFA;">26 模块</b>？升级桌面专业版，价格仅 GTO Wizard 1/3</p>
         <div class="cta-group">
-          <a href="/poker-gto-trainer/app/?demo=1" class="btn btn-primary">🎯 免费体验 Demo</a>
-          <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" class="btn btn-secondary">⬇ 下载桌面版</a>
-          <a href="#pricing" class="btn btn-outline">查看价格</a>
+          <a href="https://eoi55ae5bfevy.ok.kimi.link/" target="_blank" rel="noopener" class="btn btn-primary">🎮 免费开玩 — 网页版</a>
+          <a href="#compare" class="btn btn-outline">⚡ 了解专业版（CFR 求解器）</a>
+          <a href="#download" class="btn btn-outline" style="border-color:transparent;">⬇ 直接下载桌面版</a>
         </div>
       </div>
       <div class="hero-visual">
@@ -197,72 +283,142 @@
   </div>
 </section>
 
-<!-- ═══════ Stats ═══════ -->
-<div class="stats-bar">
+<!-- Stats -->
+<div class="stats-bar animate">
   <div class="stat"><div class="num">26</div><div class="label">专业模块</div></div>
-  <div class="stat"><div class="num">87+</div><div class="label">单元测试</div></div>
+  <div class="stat"><div class="num">4.8 ⭐</div><div class="label">用户好评</div></div>
   <div class="stat"><div class="num">中/EN</div><div class="label">双语支持</div></div>
   <div class="stat"><div class="num">100%</div><div class="label">本地运行</div></div>
 </div>
 
-<!-- ═══════ Feature Preview Screenshots ═══════ -->
+<!-- ═══════ Compare: Web vs Desktop ═══════ -->
+<div class="container" id="compare">
+  <div class="section">
+    <h2>🌐 网页版 vs ⚡ 桌面专业版</h2>
+    <p class="subtitle">根据你的需求选择 — 免费网页版还是带 CFR 的专业桌面版</p>
+    <style>
+      .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 900px; margin: 0 auto; }
+      .compare-card { border-radius: 20px; padding: 36px 32px; position: relative; }
+      .compare-card.web { background: linear-gradient(180deg, rgba(16,185,129,0.06) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(16,185,129,0.25); }
+      .compare-card.desktop { background: linear-gradient(180deg, rgba(59,130,246,0.08) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(59,130,246,0.35); }
+      .compare-card .tag { display: inline-block; padding: 4px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
+      .compare-card.web .tag { background: rgba(16,185,129,0.15); color: #34D399; }
+      .compare-card.desktop .tag { background: rgba(59,130,246,0.15); color: #60A5FA; }
+      .compare-card h3 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+      .compare-card .price-tag { font-size: 28px; font-weight: 900; margin-bottom: 20px; }
+      .compare-card.web .price-tag { color: #34D399; }
+      .compare-card.desktop .price-tag { color: #60A5FA; }
+      .compare-card .price-tag span { font-size: 14px; font-weight: 500; color: #64748B; }
+      .compare-card ul { list-style: none; margin-bottom: 24px; }
+      .compare-card li { font-size: 13px; padding: 7px 0; color: #94A3B8; }
+      .compare-card li.yes::before { content: '✅'; margin-right: 8px; }
+      .compare-card li.no::before { content: '—'; margin-right: 8px; color: #475569; }
+      .compare-card li.pro::before { content: '⭐'; margin-right: 8px; }
+      .compare-card .btn { width: 100%; text-align: center; }
+      @media (max-width: 768px) {
+        .compare-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+    <div class="compare-grid">
+      <!-- Web -->
+      <div class="compare-card web animate animate-delay-1">
+        <div class="tag">🌐 推荐入门</div>
+        <h3>网页版</h3>
+        <p style="color:#94A3B8;font-size:14px;margin-bottom:12px;">浏览器直接开打 · 无需下载 · 即时体验</p>
+        <div class="price-tag">免费<span> 永久</span></div>
+        <ul>
+          <li class="yes">基础 GTO 训练模式</li>
+          <li class="yes">翻前范围矩阵查询</li>
+          <li class="yes">EV 即时反馈</li>
+          <li class="yes">实战 AI 对局</li>
+          <li class="yes">随时随地，手机也能用</li>
+          <li class="no">CFR 求解器</li>
+          <li class="no">AI Coach 智能解说</li>
+          <li class="no">Node Locking · Range Battle</li>
+          <li class="no">离线使用</li>
+        </ul>
+        <a href="https://eoi55ae5bfevy.ok.kimi.link/" target="_blank" rel="noopener" class="btn btn-primary">🎮 免费开玩</a>
+      </div>
+      <!-- Desktop -->
+      <div class="compare-card desktop animate animate-delay-2">
+        <div class="tag">⚡ 专业玩家选择</div>
+        <h3>桌面专业版</h3>
+        <p style="color:#94A3B8;font-size:14px;margin-bottom:12px;">完整 26 模块 · CFR 求解器 · 离线可用</p>
+        <div class="price-tag">¥19.99<span>/月起</span></div>
+        <ul>
+          <li class="yes">网页版全部功能</li>
+          <li class="pro">CFR 求解器 — 核心引擎</li>
+          <li class="pro">AI Coach 智能解说</li>
+          <li class="pro">Node Locking · Range Battle</li>
+          <li class="pro">Cash vs MTT 策略对比</li>
+          <li class="pro">对手剥削顾问（7 种类型）</li>
+          <li class="pro">批量数据分析 · PDF 导出</li>
+          <li class="pro">100% 离线 · 无需网络</li>
+        </ul>
+        <a href="#download" class="btn btn-secondary">⬇ 查看专业版下载</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Feature Preview Screenshots -->
 <div class="container" id="preview">
   <div class="section">
     <h2>👀 看看里面长什么样</h2>
     <p class="subtitle">Demo 里能直接上手操作这些功能</p>
     <div class="preview-grid">
-      <div class="preview-card">
-        <img src="/poker-gto-trainer/demo-screenshots/01-strategy-explorer.png" alt="策略浏览器 - 翻前范围矩阵" loading="lazy" onerror="this.parentElement.style.display='none'">
+      <div class="preview-card animate animate-delay-1">
+        <img src="/poker-gto-trainer/demo-screenshots/01-strategy-explorer.webp" alt="策略浏览器 - 翻前范围矩阵" width="1400" height="840" loading="lazy" onerror="this.parentElement.style.display='none'">
         <div class="caption">🌐 策略浏览器 — 13×13 范围矩阵 · CFR 求解</div>
       </div>
-      <div class="preview-card">
-        <img src="/poker-gto-trainer/demo-screenshots/04-training-quiz.png" alt="GTO训练模式" loading="lazy" onerror="this.parentElement.style.display='none'">
+      <div class="preview-card animate animate-delay-2">
+        <img src="/poker-gto-trainer/demo-screenshots/04-training-quiz.webp" alt="GTO训练模式" width="1400" height="840" loading="lazy" onerror="this.parentElement.style.display='none'">
         <div class="caption">🎯 训练模式 — 随机出题 · EV 即时反馈</div>
       </div>
-      <div class="preview-card">
-        <img src="/poker-gto-trainer/demo-screenshots/07-range-battle.png" alt="Range Battle 范围对战" loading="lazy" onerror="this.parentElement.style.display='none'">
+      <div class="preview-card animate animate-delay-3">
+        <img src="/poker-gto-trainer/demo-screenshots/07-range-battle.webp" alt="Range Battle 范围对战" width="1400" height="840" loading="lazy" onerror="this.parentElement.style.display='none'">
         <div class="caption">⚔️ Range Battle — 范围对战 · 胜率分布图</div>
       </div>
-      <div class="preview-card">
-        <img src="/poker-gto-trainer/demo-screenshots/03-range-editor.png" alt="范围编辑器" loading="lazy" onerror="this.parentElement.style.display='none'">
+      <div class="preview-card animate animate-delay-4">
+        <img src="/poker-gto-trainer/demo-screenshots/03-range-editor.webp" alt="范围编辑器" width="1400" height="840" loading="lazy" onerror="this.parentElement.style.display='none'">
         <div class="caption">✏️ 范围编辑器 — 构建自定义手牌范围</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════ Download Section ═══════ -->
+<!-- Download / Pro Desktop Section -->
 <div class="container" id="download">
   <div class="section">
-    <h2>💻 下载桌面版 App</h2>
-    <p class="subtitle">本地 CFR 求解器 · 离线使用 · 键盘快捷键 · 全部 26 个模块</p>
+    <h2>⚡ 升级桌面专业版</h2>
+    <p class="subtitle">需要 <b style="color:#FBBF24;">CFR 求解器</b> · <b style="color:#60A5FA;">AI Coach</b> · <b style="color:#A78BFA;">离线训练</b>？桌面版是你的一站式 GTO 工作站</p>
     <div class="download-grid" id="downloadGrid">
       <!-- macOS -->
-      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card" data-os="mac" style="text-decoration:none;">
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/download/v0.1.2/PokerGTO.Trainer-0.1.2-arm64.dmg" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-1" data-os="mac" style="text-decoration:none;">
         <div class="os-icon">🍎</div>
         <h3 style="color:#EDF1F7;">macOS</h3>
-        <div class="arch">Apple Silicon · Intel</div>
-        <div class="version">v0.2.0 · Universal</div>
+        <div class="arch">Apple Silicon (M 系列芯片)</div>
+        <div class="version">v0.1.2 · DMG</div>
         <span class="btn btn-primary" style="display:block;">下载 macOS 版</span>
-        <div class="size">~180 MB · DMG</div>
+        <div class="size">~180 MB · 点击直接下载</div>
       </a>
       <!-- Windows -->
-      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card" data-os="win" style="text-decoration:none;">
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/download/v0.1.1/PokerGTO-Trainer-Setup-0.1.1.exe" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-2" data-os="win" style="text-decoration:none;">
         <div class="os-icon">🪟</div>
         <h3 style="color:#EDF1F7;">Windows</h3>
         <div class="arch">Windows 10 / 11 · x64</div>
-        <div class="version">v0.2.0 · Installer</div>
+        <div class="version">v0.1.1 · Installer</div>
         <span class="btn btn-secondary" style="display:block;">下载 Windows 版</span>
-        <div class="size">~160 MB · EXE / MSI</div>
+        <div class="size">~160 MB · 点击直接下载</div>
       </a>
       <!-- Linux -->
-      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener noreferrer" class="download-card" data-os="linux" style="text-decoration:none;">
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-3" data-os="linux" style="text-decoration:none;">
         <div class="os-icon">🐧</div>
         <h3 style="color:#EDF1F7;">Linux</h3>
         <div class="arch">Ubuntu · Debian · Fedora</div>
-        <div class="version">v0.2.0 · AppImage</div>
-        <span class="btn btn-outline" style="display:block;">下载 Linux 版</span>
-        <div class="size">~170 MB · AppImage / deb</div>
+        <div class="version">即将推出</div>
+        <span class="btn btn-outline" style="display:block;">关注 Releases 获取通知</span>
+        <div class="size">AppImage / deb 打包中</div>
       </a>
     </div>
 
@@ -284,145 +440,162 @@
   </div>
 </div>
 
-<!-- ═══════ Features ═══════ -->
+<!-- Features -->
 <div class="container" id="features">
   <div class="section">
     <h2>全部功能模块</h2>
     <p class="subtitle">覆盖翻前到河牌，从学习到实战</p>
     <div class="module-grid">
 
-      <div class="module-card"><div class="icon">🔥</div><h4>Daily Drills<span class="new-badge">New</span></h4><p>每日GTO挑战 + 连击追踪</p></div>
-      <div class="module-card"><div class="icon">🎮</div><h4>实战模拟</h4><p>对抗GTO AI，真实牌桌体验</p></div>
-      <div class="module-card"><div class="icon">🌐</div><h4>策略浏览器</h4><p>13×13范围矩阵 · CFR求解</p></div>
-      <div class="module-card"><div class="icon">🎯</div><h4>训练模式</h4><p>随机出题 · EV即时反馈</p></div>
+      <!-- 🎓 学习与训练 -->
+      <div class="module-category" style="grid-column: 1 / -1;">
+        <div class="module-cat-header animate"><span class="cat-icon">🎓</span><span class="cat-title">学习与训练</span><span class="cat-count">6 个模块</span></div>
+        <div class="module-grid">
+          <div class="module-card"><div class="icon">🔥</div><h4>Daily Drills<span class="new-badge">New</span></h4><p>每日GTO挑战 + 连击追踪</p></div>
+          <div class="module-card"><div class="icon">🎮</div><h4>实战模拟</h4><p>对抗GTO AI，真实牌桌体验</p></div>
+          <div class="module-card"><div class="icon">🌐</div><h4>策略浏览器</h4><p>13×13范围矩阵 · CFR求解</p></div>
+          <div class="module-card"><div class="icon">🎯</div><h4>训练模式</h4><p>随机出题 · EV即时反馈</p></div>
+          <div class="module-card"><div class="icon">🎯</div><h4>胜率训练<span class="new-badge">New</span></h4><p>Equity估算 · 即时反馈</p></div>
+          <div class="module-card"><div class="icon">📚</div><h4>翻前图册<span class="new-badge">New</span></h4><p>全位置×全深度范围浏览</p></div>
+        </div>
+      </div>
 
-      <div class="module-card"><div class="icon">📊</div><h4>数据分析<span class="new-badge">New</span></h4><p>批量手牌聚合Dashboard</p></div>
-      <div class="module-card"><div class="icon">🎯</div><h4>胜率训练<span class="new-badge">New</span></h4><p>Equity估算 · 即时反馈</p></div>
-      <div class="module-card"><div class="icon">📚</div><h4>翻前图册<span class="new-badge">New</span></h4><p>全位置×全深度范围浏览</p></div>
-      <div class="module-card"><div class="icon">⚔️</div><h4>Range Battle<span class="new-badge">New</span></h4><p>范围对战 · 胜率分布图</p></div>
+      <!-- ⚔️ 实战与分析 -->
+      <div class="module-category" style="grid-column: 1 / -1;">
+        <div class="module-cat-header animate"><span class="cat-icon">⚔️</span><span class="cat-title">实战与分析</span><span class="cat-count">6 个模块</span></div>
+        <div class="module-grid">
+          <div class="module-card"><div class="icon">🔍</div><h4>手牌分析器</h4><p>逐条决策GTO偏差分析</p></div>
+          <div class="module-card"><div class="icon">⚔️</div><h4>Range Battle<span class="new-badge">New</span></h4><p>范围对战 · 胜率分布图</p></div>
+          <div class="module-card"><div class="icon">🔒</div><h4>Node Locking</h4><p>锁定手牌 · 观察策略调整</p></div>
+          <div class="module-card"><div class="icon">🔄</div><h4>转牌河牌</h4><p>危险牌/空白牌检测</p></div>
+          <div class="module-card"><div class="icon">👥</div><h4>多人底池</h4><p>3-6人启发式分析</p></div>
+          <div class="module-card"><div class="icon">🔬</div><h4>Strategy Lab<span class="new-badge">New</span></h4><p>完整翻后策略分解</p></div>
+        </div>
+      </div>
 
-      <div class="module-card"><div class="icon">🔍</div><h4>手牌分析器</h4><p>逐条决策GTO偏差分析</p></div>
-      <div class="module-card"><div class="icon">🔒</div><h4>Node Locking</h4><p>锁定手牌 · 观察策略调整</p></div>
-      <div class="module-card"><div class="icon">🔄</div><h4>转牌河牌</h4><p>危险牌/空白牌检测</p></div>
-      <div class="module-card"><div class="icon">👥</div><h4>多人底池</h4><p>3-6人启发式分析</p></div>
+      <!-- 📊 数据与报告 -->
+      <div class="module-category" style="grid-column: 1 / -1;">
+        <div class="module-cat-header animate"><span class="cat-icon">📊</span><span class="cat-title">数据与报告</span><span class="cat-count">5 个模块</span></div>
+        <div class="module-grid">
+          <div class="module-card"><div class="icon">📊</div><h4>数据分析<span class="new-badge">New</span></h4><p>批量手牌聚合Dashboard</p></div>
+          <div class="module-card"><div class="icon">📄</div><h4>PDF报告<span class="new-badge">New</span></h4><p>一键导出分析报告</p></div>
+          <div class="module-card"><div class="icon">📤</div><h4>多格式导出<span class="new-badge">New</span></h4><p>JSON/CSV/Range数据</p></div>
+          <div class="module-card"><div class="icon">📈</div><h4>进度追踪<span class="new-badge">New</span></h4><p>30天EV趋势图表</p></div>
+          <div class="module-card"><div class="icon">📜</div><h4>手牌历史</h4><p>批量导入 · 导出PDF</p></div>
+        </div>
+      </div>
 
-      <div class="module-card"><div class="icon">🔧</div><h4>工具箱<span class="new-badge">New</span></h4><p>Pot Odds/Replayer/参考</p></div>
-      <div class="module-card"><div class="icon">⭐</div><h4>收藏夹<span class="new-badge">New</span></h4><p>保存标记复盘位置</p></div>
-      <div class="module-card"><div class="icon">💰</div><h4>ICM计算器</h4><p>锦标赛权益精确计算</p></div>
-      <div class="module-card"><div class="icon">📜</div><h4>手牌历史</h4><p>批量导入 · 导出PDF</p></div>
+      <!-- 🛠 工具与配置 -->
+      <div class="module-category" style="grid-column: 1 / -1;">
+        <div class="module-cat-header animate"><span class="cat-icon">🛠</span><span class="cat-title">工具与配置</span><span class="cat-count">5 个模块</span></div>
+        <div class="module-grid">
+          <div class="module-card"><div class="icon">🔧</div><h4>工具箱<span class="new-badge">New</span></h4><p>Pot Odds/Replayer/参考</p></div>
+          <div class="module-card"><div class="icon">✏️</div><h4>范围编辑器</h4><p>构建自定义手牌范围</p></div>
+          <div class="module-card"><div class="icon">📊</div><h4>范围对比</h4><p>并排/差异对比视图</p></div>
+          <div class="module-card"><div class="icon">💰</div><h4>ICM计算器</h4><p>锦标赛权益精确计算</p></div>
+          <div class="module-card"><div class="icon">⭐</div><h4>收藏夹<span class="new-badge">New</span></h4><p>保存标记复盘位置</p></div>
+        </div>
+      </div>
 
-      <div class="module-card"><div class="icon">📄</div><h4>PDF报告<span class="new-badge">New</span></h4><p>一键导出分析报告</p></div>
-      <div class="module-card"><div class="icon">📤</div><h4>多格式导出<span class="new-badge">New</span></h4><p>JSON/CSV/Range数据</p></div>
-      <div class="module-card"><div class="icon">📈</div><h4>进度追踪<span class="new-badge">New</span></h4><p>30天EV趋势图表</p></div>
-      <div class="module-card"><div class="icon">🔬</div><h4>Strategy Lab<span class="new-badge">New</span></h4><p>完整翻后策略分解</p></div>
-
-      <div class="module-card"><div class="icon">✏️</div><h4>范围编辑器</h4><p>构建自定义手牌范围</p></div>
-      <div class="module-card"><div class="icon">📊</div><h4>范围对比</h4><p>并排/差异对比视图</p></div>
-      <div class="module-card"><div class="icon">🔄</div><h4>Cash vs MTT<span class="new-badge">NEW</span></h4><p>现金局vs锦标赛策略差异</p></div>
-      <div class="module-card"><div class="icon">🎯</div><h4>对手剥削顾问<span class="new-badge">NEW</span></h4><p>7种对手类型针对性偏移</p></div>
-
-      <div class="module-card"><div class="icon">⚙️</div><h4>设置/双语</h4><p>中英文切换 · 快捷键</p></div>
-      <div class="module-card"><div class="icon">📖</div><h4>使用说明</h4><p>应用内完整指南</p></div>
+      <!-- 🎯 高级功能 -->
+      <div class="module-category" style="grid-column: 1 / -1;">
+        <div class="module-cat-header animate"><span class="cat-icon">🎯</span><span class="cat-title">高级功能</span><span class="cat-count">4 个模块</span></div>
+        <div class="module-grid">
+          <div class="module-card"><div class="icon">🔄</div><h4>Cash vs MTT<span class="new-badge">NEW</span></h4><p>现金局vs锦标赛策略差异</p></div>
+          <div class="module-card"><div class="icon">🎯</div><h4>对手剥削顾问<span class="new-badge">NEW</span></h4><p>7种对手类型针对性偏移</p></div>
+          <div class="module-card"><div class="icon">⚙️</div><h4>设置/双语</h4><p>中英文切换 · 快捷键</p></div>
+          <div class="module-card"><div class="icon">📖</div><h4>使用说明</h4><p>应用内完整指南</p></div>
+        </div>
+      </div>
 
     </div>
   </div>
 </div>
 
-<!-- ═══════ Pricing ═══════ -->
+<!-- Pricing -->
 <div class="container" id="pricing">
   <div class="section">
     <h2>定价方案</h2>
-    <p class="subtitle">对标 GTO Wizard ($59-119/月)，我们提供 90% 功能，1/3 价格</p>
+    <p class="subtitle">网页版永久免费。桌面专业版仅为 GTO Wizard 价格的 1/3。</p>
     <div class="pricing-grid">
 
-      <div class="pricing-card">
-        <h3>🆓 免费版</h3>
-        <div class="price">免费<span></span></div>
-        <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">永久免费</div>
+      <div class="pricing-card animate animate-delay-1">
+        <h3>🌐 网页版</h3>
+        <div class="price">免费<span> 永久</span></div>
+        <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">浏览器直接开打 · 无需注册</div>
         <ul>
-          <li>策略浏览器 · 翻前矩阵</li>
-          <li>训练模式 · 每日 5 题</li>
-          <li>范围编辑器</li>
-          <li>基础手牌分析器</li>
-          <li>ICM 计算器</li>
-          <li>Pot Odds 工具箱</li>
+          <li>基础 GTO 训练 · AI 对局</li>
+          <li>翻前范围矩阵查询</li>
+          <li>EV 即时反馈</li>
+          <li>随时可用 · 手机也能玩</li>
         </ul>
-        <a href="/poker-gto-trainer/app/?demo=1" class="btn btn-outline" style="width:100%;text-align:center;">免费开始</a>
+        <a href="https://eoi55ae5bfevy.ok.kimi.link/" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;text-align:center;background:linear-gradient(135deg,#10B981,#059669);">🎮 免费开玩</a>
       </div>
 
-      <div class="pricing-card popular">
-        <h3>⭐ 专业版</h3>
-        <div class="price">$29.99<span>/月</span></div>
-        <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">美金 · 或 ¥219/月 (人民币)</div>
-        <div style="color:#94A3B8;font-size:13px;">年付 $219/年 (省 $140)</div>
+      <div class="pricing-card popular animate animate-delay-2">
+        <h3>⚡ 桌面专业版</h3>
+        <div class="price">¥49.99<span>/月</span></div>
+        <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">≈ $6.99 · 年付 ¥399/年 (省 ¥200)</div>
         <ul>
-          <li><b>全部 26 个模块</b></li>
-          <li>实战模拟 · Play vs AI</li>
-          <li>Daily Drills · 连击追踪</li>
-          <li><b>Cash vs MTT 策略对比</b><span class="new-badge">NEW</span></li>
-          <li><b>对手剥削顾问 (7种类型)</b><span class="new-badge">NEW</span></li>
-          <li>批量手牌导入 · 分析 · PDF</li>
+          <li><b>网页版全部 + 完整 26 模块</b></li>
+          <li><b>CFR 求解器 — 核心引擎</b></li>
+          <li><b>AI Coach 智能解说</b><span class="new-badge">NEW</span></li>
           <li>Node Locking · Range Battle</li>
-          <li>进度追踪 · 数据分析 Dashboard</li>
-          <li>翻前图册 · Strategy Lab</li>
-          <li>CFR 求解器 · 翻后预设</li>
-          <li>JSON/CSV 多格式导出</li>
-          <li>中英双语 · 优先支持</li>
+          <li>Cash vs MTT 策略对比</li>
+          <li>对手剥削顾问 (7种类型)</li>
+          <li>数据分析 Dashboard · PDF 导出</li>
+          <li>100% 离线可用 · 无需网络</li>
         </ul>
-        <a href="/poker-gto-trainer/app/" class="btn btn-primary" style="width:100%;text-align:center;">开始 7 天免费试用</a>
+        <a href="#download" class="btn btn-primary" style="width:100%;text-align:center;">⬇ 下载桌面专业版</a>
       </div>
 
-      <div class="pricing-card">
+      <div class="pricing-card animate animate-delay-3">
         <h3>💎 终身版</h3>
-        <div class="price">$299<span> 买断</span></div>
-        <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">美金 · 或 ¥2,199 (人民币)</div>
-        <div style="color:#94A3B8;font-size:13px;">一次付费，永久使用</div>
+        <div class="price">¥400<span> 买断</span></div>
+        <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">≈ $59 · 一次付费，永久使用</div>
         <ul>
           <li><b>专业版全部功能</b></li>
           <li>永久免费更新</li>
           <li>桌面客户端 (Mac/Windows)</li>
           <li>离线使用 · 无需网络</li>
           <li>优先功能请求</li>
-          <li>专属社区访问</li>
         </ul>
-        <a href="#" class="btn btn-outline" style="width:100%;text-align:center;border-color:#F59E0B;color:#F59E0B;">一次性购买</a>
+        <a href="#download" class="btn btn-outline" style="width:100%;text-align:center;border-color:#F59E0B;color:#F59E0B;">查看下载方式</a>
       </div>
 
     </div>
   </div>
 </div>
 
-<!-- ═══════ WeChat/Alipay Payment ═══════ -->
+<!-- WeChat/Alipay Payment -->
 <div class="container" style="padding-bottom:60px;">
   <div class="section">
-    <h2>🇨🇳 中国用户 · 微信/支付宝购买</h2>
-    <p class="subtitle">无需国际信用卡，支持微信支付和支付宝</p>
+    <h2>🇨🇳 中国用户 · 微信/支付宝购买桌面专业版</h2>
+    <p class="subtitle">网页版免费，桌面专业版支持微信和支付宝。无需国际信用卡。</p>
 
     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 900px; margin: 0 auto;">
 
       <!-- Pro via WeChat/Alipay -->
-      <div style="background:#090D14; border:1px solid #152233; border-radius:20px; padding:32px; text-align:center;">
-        <h3 style="font-size:20px; margin-bottom:12px;">⭐ Pro 专业版</h3>
-        <div style="font-size:36px; font-weight:900; color:#3B82F6; margin-bottom:4px;">¥219</div>
+      <div style="background:#090D14; border:1px solid #3B82F633; border-radius:20px; padding:32px; text-align:center; position:relative;">
+        <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#3B82F6; color:white; padding:4px 16px; border-radius:10px; font-size:12px; font-weight:700;">推荐</div>
+        <h3 style="font-size:20px; margin-bottom:12px;">⭐ 专业版</h3>
+        <div style="font-size:36px; font-weight:900; color:#3B82F6; margin-bottom:4px;">¥49.99</div>
         <div style="color:#64748B; font-size:13px; margin-bottom:8px;">/ 月 · 人民币</div>
-        <div style="color:#94A3B8; font-size:13px; margin-bottom:20px;">年付 ¥1,599/年 (省 ¥1,029)</div>
+        <div style="color:#94A3B8; font-size:13px; margin-bottom:20px;">年付 ¥399/年 (省 ¥200)</div>
 
         <div style="background:#111; border-radius:12px; padding:20px; margin-bottom:16px;">
           <p style="font-size:13px; color:#94A3B8; margin-bottom:12px;">📱 微信扫码支付后，加客服微信获取卡密</p>
-          <img src="/poker-gto-trainer/payment/wechat-pay-qr.png" alt="微信支付" style="width:180px; height:180px; border-radius:12px; margin:0 auto 8px; display:block; object-fit:contain; background:white; padding:8px;" onerror="this.style.display='none';document.getElementById('wechat-placeholder').style.display='flex'" onload="document.getElementById('wechat-placeholder').style.display='none'">
-          <div id="wechat-placeholder" style="width:180px; height:180px; background:#1A1A1A; border:1px dashed #333; border-radius:12px; margin:0 auto 8px; display:none; align-items:center; justify-content:center; color:#64748B; font-size:12px;">
-            微信收款码<br>（将图片放到 public/payment/）
-          </div>
-          <p style="font-size:11px; color:#64748B;">客服微信: <b>Mamba4life__0824</b> · 邮箱: <b>wuwei2004a@163.com</b></p>
+          <img src="/poker-gto-trainer/payment/wechat-pay-qr.png" alt="微信支付" style="width:180px; height:180px; border-radius:12px; margin:0 auto 8px; display:block; object-fit:contain; background:white; padding:8px;" onerror="this.style.display='none'" onload="this.style.display='block'">
+          <p style="font-size:11px; color:#64748B;">客服微信: <b>Mamba4life__0824</b></p>
         </div>
 
         <div style="text-align:left; font-size:13px; color:#94A3B8; line-height:2;">
           <b>购买流程：</b><br>
-          1️⃣ 扫码支付 ¥219<br>
+          1️⃣ 扫码支付 ¥49.99<br>
           2️⃣ 截图支付凭证<br>
           3️⃣ 加客服微信发送凭证<br>
           4️⃣ 收到卡密 → App 内激活<br>
-          5️⃣ 立刻解锁全部功能
+          5️⃣ 立刻解锁全部 26 模块 + CFR 求解器
         </div>
         <div style="margin-top:16px; padding:14px; background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.2); border-radius:12px;">
           <p style="font-size:12px; color:#34D399; font-weight:600; margin-bottom:6px;">✅ 支付完成？直接跳回 App</p>
@@ -435,21 +608,15 @@
       <div style="background:#090D14; border:1px solid #F59E0B33; border-radius:20px; padding:32px; text-align:center; position:relative;">
         <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#F59E0B; color:black; padding:4px 16px; border-radius:10px; font-size:12px; font-weight:700;">最划算</div>
         <h3 style="font-size:20px; margin-bottom:12px;">💎 终身版</h3>
-        <div style="font-size:36px; font-weight:900; color:#F59E0B; margin-bottom:4px;">¥2,199</div>
+        <div style="font-size:36px; font-weight:900; color:#F59E0B; margin-bottom:4px;">¥400</div>
         <div style="color:#64748B; font-size:13px; margin-bottom:8px;">永久买断 · 终身更新</div>
-        <div style="color:#94A3B8; font-size:13px; margin-bottom:20px;">≈ Pro 8.3 个月回本</div>
+        <div style="color:#94A3B8; font-size:13px; margin-bottom:20px;">≈ Pro 10 个月回本 · GTO Wizard 一个月价钱</div>
 
         <div style="background:#111; border-radius:12px; padding:20px; margin-bottom:16px;">
           <p style="font-size:13px; color:#94A3B8; margin-bottom:12px;">📱 微信/支付宝扫码后加客服获取卡密</p>
           <div style="display:flex; gap:12px; justify-content:center;">
-            <img src="/poker-gto-trainer/payment/wechat-pay-qr.png" alt="微信支付" style="width:140px; height:140px; border-radius:12px; object-fit:contain; background:white; padding:6px;" onerror="this.style.display='none';document.getElementById('lt-wechat-ph').style.display='flex'" onload="document.getElementById('lt-wechat-ph').style.display='none'">
-            <img src="/poker-gto-trainer/payment/alipay-qr.png" alt="支付宝" style="width:140px; height:140px; border-radius:12px; object-fit:contain; background:white; padding:6px;" onerror="this.style.display='none';document.getElementById('lt-alipay-ph').style.display='flex'" onload="document.getElementById('lt-alipay-ph').style.display='none'">
-            <div id="lt-wechat-ph" style="width:140px; height:140px; background:#1A1A1A; border:1px dashed #333; border-radius:12px; display:none; align-items:center; justify-content:center; color:#64748B; font-size:11px;">
-              微信收款码
-            </div>
-            <div id="lt-alipay-ph" style="width:140px; height:140px; background:#1A1A1A; border:1px dashed #333; border-radius:12px; display:none; align-items:center; justify-content:center; color:#64748B; font-size:11px;">
-              支付宝收款码
-            </div>
+            <img src="/poker-gto-trainer/payment/wechat-pay-qr.png" alt="微信支付" style="width:140px; height:140px; border-radius:12px; object-fit:contain; background:white; padding:6px;" onerror="this.style.display='none'" onload="this.style.display='block'">
+            <img src="/poker-gto-trainer/payment/alipay-qr.png" alt="支付宝" style="width:140px; height:140px; border-radius:12px; object-fit:contain; background:white; padding:6px;" onerror="this.style.display='none'" onload="this.style.display='block'">
           </div>
           <p style="font-size:11px; color:#64748B; margin-top:8px;">客服: Mamba4life__0824</p>
         </div>
@@ -471,8 +638,8 @@
 
     </div>
 
-    <!-- ═══════ Community ═══════ -->
-    <div id="community" style="text-align:center; margin-top:60px; padding:40px 24px; background: linear-gradient(135deg, #0F172A, #1A1040); border: 1px solid #1E293B; border-radius:20px; max-width:600px; margin-left:auto; margin-right:auto;">
+    <!-- Community -->
+    <div id="community" class="animate" style="text-align:center; margin-top:60px; padding:40px 24px; background: linear-gradient(135deg, #0F172A, #1A1040); border: 1px solid #1E293B; border-radius:20px; max-width:600px; margin-left:auto; margin-right:auto;">
       <p style="font-size:14px; color:#A78BFA; font-weight:700; margin-bottom:8px; letter-spacing:0.05em;">🧠 加入社群</p>
       <p style="font-size:24px; font-weight:900; color:#EDF1F7; margin-bottom:8px;">PokerGTO 学习交流群</p>
       <p style="font-size:14px; color:#94A3B8; margin-bottom:24px; max-width:400px; margin-left:auto; margin-right:auto;">
@@ -500,22 +667,189 @@
   </div>
 </div>
 
-<!-- ═══════ Tech ═══════ -->
+<!-- ================================================================
+     HOW TO INSTALL & ACTIVATE GUIDE
+     ================================================================ -->
+<div class="section" style="background: #090D14; border-top: 1px solid #152233; border-bottom: 1px solid #152233;">
+  <div class="container">
+    <h2 style="text-align:center;margin-bottom:8px;">📖 桌面专业版 · 安装 & 激活指南</h2>
+    <p class="subtitle" style="text-align:center;">两步完成：下载 → 激活。先试试免费网页版再决定升级？<a href="https://eoi55ae5bfevy.ok.kimi.link/" target="_blank" rel="noopener" style="color:#60A5FA;">点这里开玩 →</a></p>
+
+    <!-- Step 1: Download -->
+    <div style="max-width: 720px; margin: 0 auto 32px;">
+      <div style="display:flex; gap:16px; align-items:start;">
+        <div style="width:44px; height:44px; border-radius:12px; background: linear-gradient(135deg, #3B82F6, #2563EB); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900; color:white; flex-shrink:0;">1</div>
+        <div style="flex:1;">
+          <h3 style="font-size:18px; font-weight:700; color:#EDF1F7; margin-bottom:4px;">下载 App</h3>
+          <p style="font-size:14px; color:#94A3B8; margin-bottom:12px;">点击下方按钮下载 <b>最新版本</b>。macOS 用户选 .dmg 文件，Windows 用户选 .exe。</p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener" class="btn btn-secondary" style="font-size:13px; padding:10px 20px;">⬇ 下载最新版 (GitHub Releases)</a>
+            <a href="/poker-gto-trainer/download.html" class="btn btn-outline" style="font-size:13px; padding:10px 20px;">📥 下载中心 (含历史版本)</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Install -->
+    <div style="max-width: 720px; margin: 0 auto 32px;">
+      <div style="display:flex; gap:16px; align-items:start;">
+        <div style="width:44px; height:44px; border-radius:12px; background: linear-gradient(135deg, #10B981, #059669); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900; color:white; flex-shrink:0;">2</div>
+        <div style="flex:1;">
+          <h3 style="font-size:18px; font-weight:700; color:#EDF1F7; margin-bottom:4px;">安装 & 打开</h3>
+          <p style="font-size:14px; color:#94A3B8; margin-bottom:16px;">
+            <b>🍎 macOS 用户（重要！）</b>
+          </p>
+          <div style="background:#0D1117; border:1px solid #1C2A3D; border-radius:14px; padding:20px; margin-bottom:16px;">
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <!-- Step 2a -->
+              <div style="display:flex; gap:12px; align-items:start;">
+                <div style="width:28px; height:28px; border-radius:8px; background:rgba(251,191,36,0.12); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#FBBF24; flex-shrink:0;">a</div>
+                <div>
+                  <div style="font-size:13px; font-weight:600; color:#FBBF24; margin-bottom:2px;">双击 .dmg 文件，拖拽 PokerGTO Trainer 到 Applications 文件夹</div>
+                  <p style="font-size:12px; color:#64748B;">就像安装其他 Mac 软件一样，简单拖拽即可。</p>
+                </div>
+              </div>
+              <!-- Step 2b -->
+              <div style="display:flex; gap:12px; align-items:start;">
+                <div style="width:28px; height:28px; border-radius:8px; background:rgba(251,191,36,0.12); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#FBBF24; flex-shrink:0;">b</div>
+                <div>
+                  <div style="font-size:13px; font-weight:600; color:#FBBF24; margin-bottom:2px;">如果提示「无法验证开发者」⚠️</div>
+                  <p style="font-size:12px; color:#94A3B8; line-height:1.8;">
+                    <b>不是病毒！</b>这只是因为我们还没申请 Apple 官方签名（需要 $99/年）。<br>
+                    解决方法很简单：<br>
+                    <span style="display:inline-block; background:#1A1A1A; padding:3px 10px; border-radius:6px; font-size:12px; color:#EDF1F7; margin:4px 0;">
+                      ❶ 打开 <b>系统设置</b> → <b>隐私与安全性</b> → 拉到最下面<br>
+                      ❷ 找到「PokerGTO Trainer 已被阻止…」→ 点 <b style="color:#34D399;">仍要打开</b><br>
+                      ❸ 输入 Mac 密码确认 → App 成功打开 ✅
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <!-- Step 2c -->
+              <div style="display:flex; gap:12px; align-items:start;">
+                <div style="width:28px; height:28px; border-radius:8px; background:rgba(251,191,36,0.12); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#FBBF24; flex-shrink:0;">c</div>
+                <div>
+                  <div style="font-size:13px; font-weight:600; color:#FBBF24; margin-bottom:2px;">以后再次打开就不会再提示了</div>
+                  <p style="font-size:12px; color:#64748B;">这个操作只需要做一次。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p style="font-size:14px; color:#94A3B8; margin-bottom:8px;">
+            <b>🪟 Windows 用户</b>
+          </p>
+          <div style="background:#0D1117; border:1px solid #1C2A3D; border-radius:12px; padding:16px;">
+            <p style="font-size:12px; color:#94A3B8; line-height:1.8;">
+              下载 .exe 安装程序 → 双击运行 → 按照安装向导操作 → 完成后桌面会出现 PokerGTO Trainer 图标。<br>
+              如果 Windows Defender 提示未知应用，点击「<b style="color:#FBBF24;">更多信息</b>」→「<b style="color:#34D399;">仍要运行</b>」即可。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Activate -->
+    <div style="max-width: 720px; margin: 0 auto 32px;">
+      <div style="display:flex; gap:16px; align-items:start;">
+        <div style="width:44px; height:44px; border-radius:12px; background: linear-gradient(135deg, #F59E0B, #D97706); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900; color:white; flex-shrink:0;">3</div>
+        <div style="flex:1;">
+          <h3 style="font-size:18px; font-weight:700; color:#EDF1F7; margin-bottom:4px;">激活付费功能</h3>
+          <p style="font-size:14px; color:#94A3B8; margin-bottom:16px;">
+            打开 App 后默认可免费使用基础训练功能。要解锁全部 26 个模块：
+          </p>
+          <div style="background:#0D1117; border:1px solid #1C2A3D; border-radius:14px; padding:20px;">
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div style="display:flex; gap:10px; align-items:center;">
+                <span style="font-size:12px; font-weight:700; color:#64748B; min-width:20px;">A</span>
+                <span style="font-size:13px; color:#EDF1F7;">点击左侧菜单「<b style="color:#60A5FA;">账户</b>」→ 找到「<b>激活卡密</b>」输入框</span>
+              </div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <span style="font-size:12px; font-weight:700; color:#64748B; min-width:20px;">B</span>
+                <span style="font-size:13px; color:#EDF1F7;">输入购买后收到的 19 位激活码（格式：<code style="background:#1A1A1A; padding:2px 8px; border-radius:4px; font-size:12px; color:#FBBF24;">PGTO-XXXX-XXXX-XXXX</code>）</span>
+              </div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <span style="font-size:12px; font-weight:700; color:#64748B; min-width:20px;">C</span>
+                <span style="font-size:13px; color:#EDF1F7;">点击「<b style="color:#34D399;">激活</b>」→ 看到「激活成功」→ 所有功能即刻解锁 🎉</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:14px; padding:12px 16px; background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.15); border-radius:10px; display:flex; gap:10px; align-items:start;">
+            <span style="font-size:16px;">💡</span>
+            <p style="font-size:12px; color:#94A3B8; line-height:1.6;">
+              <b style="color:#34D399;">先免费体验再买！</b><br>
+              不激活也能使用策略浏览器、基础训练、手牌对比等免费功能。<br>
+              觉得有用再买卡密，支持 <b>微信 / 支付宝</b> 支付，激活码 <b>永久有效</b>。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Video Demo Placeholder -->
+    <div style="max-width: 720px; margin: 40px auto 0; text-align:center; padding:28px; background:#0D1117; border:1px solid #1C2A3D; border-radius:16px;">
+      <div style="font-size:32px; margin-bottom:12px;">🎬</div>
+      <h3 style="font-size:16px; font-weight:700; color:#EDF1F7; margin-bottom:6px;">视频教程即将上线</h3>
+      <p style="font-size:13px; color:#64748B; margin-bottom:16px;">完整的安装到激活视频教程正在制作中，完成后会放在这里。</p>
+      <p style="font-size:12px; color:#475569;">到时候会在微信群第一时间通知，加客服微信 <b style="color:#60A5FA;">Mamba4life__0824</b> 提前进群</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ FAQ ═══════ -->
+<div class="container" id="faq">
+  <div class="section">
+    <h2>❓ 常见问题</h2>
+    <p class="subtitle">买之前想了解的，都在这里</p>
+    <div style="max-width:800px; margin:0 auto; display:flex; flex-direction:column; gap:12px;">
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">和 GTO Wizard 比有什么区别？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">网页版免费提供基础 GTO 训练功能，对标 GTO Wizard 入门体验。桌面专业版功能覆盖 GTO Wizard 约 90%（翻前范围、CFR 求解、训练模式、EV 反馈），价格仅 1/3。全中文界面，桌面端 100% 本地运行、离线可用，并提供终身买断选项，没有订阅压力。</p>
+      </details>
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">网页版和桌面版有什么区别？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;"><b>🌐 网页版（免费）：</b>浏览器直接开打，无需下载安装。提供基础 GTO 训练、翻前范围矩阵、EV 反馈、AI 实战对局。适合入门学习和日常练习。<br><br><b>⚡ 桌面专业版（付费）：</b>在网页版基础上增加了 CFR 求解器、AI Coach 智能解说、Node Locking、Range Battle、Cash vs MTT 对比、对手剥削顾问等 26 个完整模块。100% 本地运行，离线可用。适合专业玩家和深度训练。</p>
+      </details>
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">不付费能用什么？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">网页版永久免费，点开即玩，无需注册！包含基础 GTO 训练、范围矩阵查询、EV 反馈和 AI 实战对局。觉得不够用？升级桌面专业版解锁 CFR 求解器 + 全部 26 个模块。</p>
+      </details>
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">macOS 提示「无法验证开发者」，安全吗？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">安全。这只是因为我们还没购买 Apple 官方签名（$99/年）。打开 系统设置 → 隐私与安全性 → 找到「PokerGTO Trainer 已被阻止」→ 点「仍要打开」即可，只需操作一次。软件 100% 本地运行，不联网、不收集数据。</p>
+      </details>
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">支持哪些系统？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">macOS（Apple Silicon，M 系列芯片）和 Windows 10/11 x64 均有安装包，Linux 版打包中。所有版本功能一致，离线可用。</p>
+      </details>
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">怎么付款和激活？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">微信/支付宝扫码付款 → 截图凭证 → 加客服微信（Mamba4life_0824）→ 收到 19 位卡密 → 在 App 内「账户 → 激活卡密」输入，立即解锁。国际用户可在 App 内通过 Stripe 用信用卡支付。</p>
+      </details>
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">卡密是永久的吗？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">终身版卡密永久有效，含所有大版本免费更新；入门版/专业版为订阅制（月付/年付），到期后基础功能仍可免费使用。</p>
+      </details>
+    </div>
+  </div>
+</div>
+
+<!-- Tech -->
 <div class="container" style="text-align:center;padding-bottom:60px;">
   <p style="color:#475569;font-size:13px;">
-    🛠 Electron · React 19 · TypeScript · Tailwind CSS · D3.js · SQLite (WASM) · CFR Solver<br>
-    100% 本地运行，无需联网 · macOS / Windows / Linux
+    🌐 网页版：浏览器直接开打 · 基础 GTO 训练 + AI 对局<br>
+    🛠 桌面专业版：Electron · React 19 · TypeScript · CFR Solver · 26 模块 · 离线可用<br>
+    macOS / Windows / Linux
   </p>
 </div>
 
 <div class="footer">
-  PokerGTO Trainer v0.2.0 · &copy; 2026 · poker-gto-trainer<br>
-  <span style="color:#475569;">支持微信/支付宝 · Stripe · 卡密激活</span><br>
+  PokerGTO Trainer · &copy; 2026 · poker-gto-trainer<br>
+  <span style="color:#475569;">🌐 网页版免费 · ⚡ 桌面专业版付费 · 支持微信/支付宝 · Stripe · 卡密激活</span><br>
   <a href="/poker-gto-trainer/privacy.html" style="color:#475569;font-size:12px;">隐私政策</a> &middot;
   <a href="/poker-gto-trainer/terms.html" style="color:#475569;font-size:12px;">服务条款</a>
 </div>
 
-<!-- ═══════ Scripts ═══════ -->
 <script>
 // ── Mobile Nav Toggle ──
 (function(){
@@ -568,11 +902,10 @@
   m.innerHTML = html;
 })();
 
-// ── Sticky Bottom CTA ──
+// ── Sticky CTA bar ──
 (function() {
   var sticky = document.getElementById('stickyCta');
   var hero = document.getElementById('hero');
-  if (!sticky || !hero) return;
   var heroBottom = hero.offsetTop + hero.offsetHeight;
   var ticking = false;
 
@@ -594,10 +927,26 @@
   }, { passive: true });
 })();
 
-// ── OS Detection ──
+// ── Scroll Animations ──
+(function(){
+  var observer = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.animate').forEach(function(el){
+    observer.observe(el);
+  });
+})();
+
+// ── OS Detection — highlight recommended download ──
 (function() {
   var ua = navigator.userAgent || '';
-  var detected = 'mac';
+  var detected = 'mac'; // default
   if (/Win/.test(ua)) detected = 'win';
   else if (/Linux/.test(ua) && !/Android/.test(ua)) detected = 'linux';
 
@@ -607,6 +956,412 @@
       card.classList.add('recommended');
     }
   });
+})();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════
+// Casino Vault — Curated Poker Background
+// Cards · Chips · Lamp · Parallax · Particles
+// ═══════════════════════════════════════════════════
+(function(){
+  var canvas = document.getElementById('bgCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+
+  var W, H, dpr;
+  var mx = 0, my = 0, tmx = 0, tmy = 0; // parallax mouse -1..1
+
+  function resize() {
+    W = window.innerWidth; H = window.innerHeight;
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(1,0,0,1,0,0); ctx.scale(dpr, dpr);
+  }
+  window.addEventListener('resize', resize); resize();
+
+  // roundRect polyfill
+  if (!CanvasRenderingContext2D.prototype.roundRect) {
+    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r) {
+      if (typeof r === 'number') r = {tl:r, tr:r, br:r, bl:r};
+      this.beginPath(); this.moveTo(x+r.tl,y); this.lineTo(x+w-r.tr,y);
+      this.quadraticCurveTo(x+w,y,x+w,y+r.tr); this.lineTo(x+w,y+h-r.br);
+      this.quadraticCurveTo(x+w,y+h,x+w-r.br,y+h); this.lineTo(x+r.bl,y+h);
+      this.quadraticCurveTo(x,y+h,x,y+h-r.bl); this.lineTo(x,y+r.tl);
+      this.quadraticCurveTo(x,y,x+r.tl,y); this.closePath();
+    };
+  }
+
+  // Utils
+  function lerp(a,b,t) { return a+(b-a)*t; }
+  function rand(a,b) { return Math.random()*(b-a)+a; }
+
+  // Rhythm
+  var bass=0, mid=0, beat=0, beatOn=false, rtm=0;
+  function rhythm() {
+    rtm++;
+    var iv = 58 + Math.sin(rtm*0.015)*16;
+    if (rtm % Math.floor(iv) < 3) {
+      beatOn=true; beat=0.4+Math.random()*0.5;
+      bass=lerp(bass, rand(0.12,0.35), 0.25);
+      mid=lerp(mid, rand(0.06,0.14), 0.15);
+    }
+  }
+
+  // ── Card Back Pre-render (gold diamond pattern on deep blue) ──
+  var cardBackCache = {};
+  function getCardBack(w) {
+    var kw = Math.floor(w);
+    if (cardBackCache[kw]) return cardBackCache[kw];
+    var h = w * 1.4, s = 2;
+    var c = document.createElement('canvas');
+    c.width = w*s; c.height = h*s;
+    var cx = c.getContext('2d'); cx.scale(s,s);
+    var r = w*0.1, m = w*0.07, G = '#B8942E';
+
+    // Body
+    cx.fillStyle = '#0D1B3E'; cx.beginPath(); cx.roundRect(0,0,w,h,r); cx.fill();
+    // Gold border
+    cx.strokeStyle = G; cx.lineWidth = 2.5;
+    cx.beginPath(); cx.roundRect(1.5,1.5,w-3,h-3,r-0.5); cx.stroke();
+    // White inner line
+    cx.strokeStyle = 'rgba(255,255,255,0.5)'; cx.lineWidth = 0.8;
+    cx.beginPath(); cx.roundRect(m,m,w-m*2,h-m*2,r*0.6); cx.stroke();
+    // Diamond grid
+    cx.strokeStyle = 'rgba(184,148,46,0.35)'; cx.lineWidth = 0.7;
+    var ds = w*0.16, ox = w*0.13, oy = h*0.13;
+    for (var dx=ox; dx<w-ox+ds; dx+=ds*2.3) {
+      for (var dy=oy; dy<h-oy+ds; dy+=ds*2.3) {
+        cx.beginPath();
+        cx.moveTo(dx, dy-ds); cx.lineTo(dx+ds, dy);
+        cx.lineTo(dx, dy+ds); cx.lineTo(dx-ds, dy); cx.closePath(); cx.stroke();
+      }
+    }
+    // Center crest — large diamond
+    cx.strokeStyle = 'rgba(184,148,46,0.55)'; cx.lineWidth = 1.3;
+    var cs = w*0.24, cw2 = w/2, ch2 = h/2;
+    cx.beginPath();
+    cx.moveTo(cw2, ch2-cs); cx.lineTo(cw2+cs, ch2);
+    cx.lineTo(cw2, ch2+cs); cx.lineTo(cw2-cs, ch2); cx.closePath(); cx.stroke();
+    // Center inner diamond
+    cx.strokeStyle = 'rgba(184,148,46,0.25)'; cx.lineWidth = 0.6;
+    var cs2 = cs*0.45;
+    cx.beginPath();
+    cx.moveTo(cw2, ch2-cs2); cx.lineTo(cw2+cs2, ch2);
+    cx.lineTo(cw2, ch2+cs2); cx.lineTo(cw2-cs2, ch2); cx.closePath(); cx.stroke();
+
+    cardBackCache[kw] = c; return c;
+  }
+
+  // ── Card Face Pre-render ──
+  var RANKS = ['A','K','Q','J','10','9','8','7','6','5','4','3','2'];
+  var SUITS = ['♠','♥','♦','♣'];
+  var faceCache = {};
+  function getCardFace(rank, suit, w) {
+    var key = rank+'|'+suit+'|'+Math.floor(w);
+    if (faceCache[key]) return faceCache[key];
+    var isRed = suit==='♥'||suit==='♦';
+    var color = isRed?'#DC2626':'#1F2937';
+    var h=w*1.4, s=2, r=w*0.1;
+    var c = document.createElement('canvas');
+    c.width=w*s; c.height=h*s;
+    var cx=c.getContext('2d'); cx.scale(s,s);
+
+    cx.shadowColor='rgba(0,0,0,0.35)'; cx.shadowBlur=w*0.07; cx.shadowOffsetX=1; cx.shadowOffsetY=2;
+    cx.fillStyle='#F5F1EB'; cx.beginPath(); cx.roundRect(0,0,w,h,r); cx.fill();
+    cx.shadowColor='transparent'; cx.shadowBlur=0; cx.shadowOffsetX=0; cx.shadowOffsetY=0;
+    cx.strokeStyle='rgba(0,0,0,0.22)'; cx.lineWidth=0.7; cx.beginPath(); cx.roundRect(0,0,w,h,r); cx.stroke();
+    var ins=w*0.06;
+    cx.strokeStyle='rgba(0,0,0,0.07)'; cx.lineWidth=0.5; cx.beginPath(); cx.roundRect(ins,ins,w-ins*2,h-ins*2,r*0.7); cx.stroke();
+
+    var fs=w*0.24;
+    cx.font='bold '+fs+'px -apple-system,"SF Pro Display",sans-serif';
+    cx.fillStyle=color; cx.textAlign='left'; cx.textBaseline='top';
+    cx.fillText(rank, w*0.12, h*0.08);
+    cx.font=(fs*0.6)+'px -apple-system,"SF Pro Display",sans-serif';
+    cx.fillText(suit, w*0.12+fs*0.9, h*0.09);
+    cx.font=(w*0.45)+'px -apple-system,"SF Pro Display",sans-serif';
+    cx.textAlign='center'; cx.textBaseline='middle'; cx.fillText(suit, w/2, h/2);
+    cx.save(); cx.translate(w-w*0.12, h-h*0.08); cx.rotate(Math.PI);
+    cx.textAlign='left'; cx.textBaseline='top';
+    cx.font='bold '+fs+'px -apple-system,"SF Pro Display",sans-serif'; cx.fillText(rank,0,0);
+    cx.font=(fs*0.6)+'px -apple-system,"SF Pro Display",sans-serif'; cx.fillText(suit, fs*0.9, 0);
+    cx.restore();
+    faceCache[key]=c; return c;
+  }
+
+  // ── Cards (12, mix face-up / face-down) ──
+  var cards=[], NUM=12;
+  function makeCard() {
+    var fu = Math.random() > 0.3;
+    return {
+      faceUp: fu,
+      rank: fu ? RANKS[Math.floor(Math.random()*13)] : '',
+      suit: fu ? SUITS[Math.floor(Math.random()*4)] : '',
+      x: rand(-200,W+200), y: rand(-200,H+200),
+      tx: rand(W*0.1, W*0.9), ty: rand(H*0.1, H*0.85),
+      w: rand(58, 95), rot: rand(-0.35,0.35), tr: rand(-0.25,0.25),
+      alpha: rand(0.14, 0.30), layer: rand(0,1),
+      phase: rand(0,Math.PI*2), wobble: rand(0.3,1.0),
+      dealT: 1, // 0→1 dealing
+    };
+  }
+  function initCards() { cards=[]; for(var i=0;i<NUM;i++) cards.push(makeCard()); }
+  initCards();
+
+  // Deal animation — send one card from top-center
+  var dealTimer=0, dealInterval=240; // ~4s at 60fps
+  function triggerDeal() {
+    var ci = Math.floor(Math.random()*NUM);
+    var c = cards[ci];
+    c.x = W/2 + rand(-80,80);
+    c.y = -120;
+    c.tx = rand(W*0.08, W*0.92);
+    c.ty = rand(H*0.08, H*0.82);
+    c.tr = rand(-0.35, 0.35);
+    c.rot = rand(-0.5, 0.5);
+    c.dealT = 0;
+    c.w = rand(58, 95);
+    c.faceUp = Math.random() > 0.25;
+    if (c.faceUp) { c.rank = RANKS[Math.floor(Math.random()*13)]; c.suit = SUITS[Math.floor(Math.random()*4)]; }
+  }
+
+  // Fan spread — every 20s
+  var fanTimer=0, fanActive=false, fanStart=0, FAN_DURATION=180;
+  function triggerFan() {
+    fanActive=true; fanStart=0;
+    var cx = W/2, cy = H/2, R = Math.min(W,H)*0.3;
+    for (var i=0; i<cards.length; i++) {
+      var a = -Math.PI*0.7 + (Math.PI*1.4)*(i/(cards.length-1));
+      cards[i].tx = cx + Math.cos(a)*R;
+      cards[i].ty = cy + Math.sin(a)*R - 60;
+      cards[i].tr = a + Math.PI/2;
+    }
+  }
+
+  // ── Chip Stacks ──
+  var chipColors = [
+    ['#F5F5F5','#DC2626','#3B82F6','#1F2937'],
+    ['#DC2626','#3B82F6','#F5F5F5','#10B981'],
+    ['#1F2937','#10B981','#DC2626','#3B82F6'],
+  ];
+  function drawChipStack(x, y, colors, count, alpha) {
+    ctx.globalAlpha = alpha;
+    var cw=30, ch=6;
+    for (var i=0; i<count; i++) {
+      var cy = y - i*4.5;
+      var col = colors[i%colors.length];
+      // shadow
+      ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.beginPath();
+      ctx.roundRect(x-cw/2+2, cy-ch/2+2, cw, ch, ch/2); ctx.fill();
+      // body
+      ctx.fillStyle=col; ctx.beginPath();
+      ctx.roundRect(x-cw/2, cy-ch/2, cw, ch, ch/2); ctx.fill();
+      // highlight
+      var grd = ctx.createLinearGradient(0, cy-ch/2, 0, cy+ch/2);
+      grd.addColorStop(0,'rgba(255,255,255,0.35)'); grd.addColorStop(0.4,'rgba(255,255,255,0.05)');
+      grd.addColorStop(1,'rgba(0,0,0,0.25)');
+      ctx.fillStyle=grd; ctx.beginPath();
+      ctx.roundRect(x-cw/2, cy-ch/2, cw, ch, ch/2); ctx.fill();
+      // edge spots
+      for (var s=0; s<3; s++) {
+        ctx.fillStyle='rgba(255,255,255,0.45)';
+        ctx.fillRect(x-cw/2+5+s*10, cy-ch/2+1, 4, 1.5);
+      }
+    }
+    ctx.globalAlpha=1;
+  }
+
+  // ── Particles (50, no lines) ──
+  var particles=[], NP=50;
+  function createP() {
+    var cols=[[59,130,246],[139,92,246],[16,185,129]];
+    var cl=cols[Math.floor(Math.random()*3)];
+    return { x:rand(-50,W+50), y:rand(-50,H+50), vx:rand(-0.3,0.3), vy:rand(-0.5,-0.1),
+      sz:rand(0.6,3), alpha:rand(0.1,0.45), color:cl, life:rand(0,500), maxL:rand(400,1000),
+      ph:rand(0,Math.PI*2), layer:rand(0,0.6) };
+  }
+  function initP() { particles=[]; for(var i=0;i<NP;i++) particles.push(createP()); }
+  initP();
+
+  // ── Glow Orbs (3) ──
+  var orbs=[], NO=3;
+  function createO(i) {
+    return { x:rand(W*0.15,W*0.85), y:rand(H*0.15,H*0.85),
+      baseR:rand(Math.min(W,H)*0.13,Math.min(W,H)*0.26), r:0,
+      ang:rand(0,Math.PI*2), spd:rand(0.00012,0.00035), driftR:rand(35,90), bx:0, by:0, idx:i, layer:0.02 };
+  }
+  function initO() { orbs=[]; for(var i=0;i<NO;i++) { var o=createO(i); o.bx=o.x; o.by=o.y; o.r=o.baseR; orbs.push(o); } }
+  initO();
+
+  // ── Felt dots ──
+  function drawFelt() {
+    var sp=4, a=0.02;
+    ctx.fillStyle='rgba(255,255,255,'+a+')';
+    for (var x=0; x<W; x+=sp) for (var y=0; y<H; y+=sp)
+      if ((Math.floor(x/sp)+Math.floor(y/sp))%3===0) ctx.fillRect(x,y,0.7,0.7);
+  }
+
+  // ── Lamp Cone ──
+  function drawLamp() {
+    var flicker = 1 + Math.sin(performance.now()*0.0007)*0.08 + Math.sin(performance.now()*0.0015)*0.05;
+    var alpha = (0.045 + beat*0.03) * flicker;
+    var grad = ctx.createRadialGradient(W/2, H*0.05, Math.min(W,H)*0.05, W/2, H*0.55, Math.max(W,H)*0.72);
+    grad.addColorStop(0, 'rgba(245,230,200,'+(alpha*2.2)+')');
+    grad.addColorStop(0.45, 'rgba(245,230,200,'+(alpha*0.7)+')');
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+  }
+
+  // ── Vignette ──
+  function drawVignette() {
+    var grad = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.48, W/2, H/2, Math.max(W,H)*0.76);
+    grad.addColorStop(0,'rgba(0,0,0,0)'); grad.addColorStop(1,'rgba(0,0,0,0.55)');
+    ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+  }
+
+  // ═══════════════ RENDER ═══════════════
+  var lt=performance.now();
+
+  function render(time) {
+    requestAnimationFrame(render);
+    var dt = (time-lt)/16.667; if (dt>3) dt=3; lt=time;
+    if (W!==window.innerWidth||H!==window.innerHeight) resize();
+
+    // Mouse parallax smooth
+    tmx += (mx-tmx)*0.04; tmy += (my-tmy)*0.04;
+
+    rhythm(); beat*=0.85;
+    var sm = 1 + mid*2 + beat*0.9;
+
+    // Schedulers
+    dealTimer++; fanTimer++;
+    if (!fanActive && dealTimer > dealInterval) { dealTimer=0; dealInterval=rand(200,300); triggerDeal(); }
+    if (!fanActive && fanTimer > 1200) { fanTimer=0; triggerFan(); }
+    if (fanActive) { fanStart++; if (fanStart > FAN_DURATION) { fanActive=false; fanTimer=0; } }
+
+    // ── Clear ──
+    ctx.clearRect(0,0,W,H); ctx.fillStyle='#05080C'; ctx.fillRect(0,0,W,H);
+    drawFelt();
+
+    // ── Orbs ──
+    var oc=[[59,130,246],[139,92,246],[16,185,129]];
+    for (var oi=0; oi<orbs.length; oi++) {
+      var orb=orbs[oi];
+      orb.ang+=orb.spd*dt;
+      orb.x=orb.bx+Math.cos(orb.ang)*orb.driftR + tmx*orb.layer*60;
+      orb.y=orb.by+Math.sin(orb.ang*0.7)*orb.driftR*0.6 + tmy*orb.layer*40;
+      var pulse=1+bass*1.2+beat*2; orb.r=orb.baseR*lerp(orb.r/orb.baseR, pulse, 0.04);
+      var c=oc[orb.idx%3], a=0.028+bass*0.022+beat*0.04;
+      var grd=ctx.createRadialGradient(orb.x, orb.y, 0, orb.x, orb.y, orb.r);
+      grd.addColorStop(0,'rgba('+c[0]+','+c[1]+','+c[2]+','+(a*3)+')');
+      grd.addColorStop(0.4,'rgba('+c[0]+','+c[1]+','+c[2]+','+a+')');
+      grd.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
+    }
+
+    // ── Lamp Cone ──
+    drawLamp();
+
+    // ── Cards ──
+    for (var ci=0; ci<cards.length; ci++) {
+      var card=cards[ci];
+      // Dealing progress
+      if (card.dealT < 1) {
+        card.dealT = Math.min(1, card.dealT + 0.018*dt);
+        var t = card.dealT, et = 1-Math.pow(1-t,3); // ease-out cubic
+        card.x = lerp(card.x, card.tx, et*0.1 + (t>0.9?0.15:0));
+        card.y = lerp(card.y, card.ty, et*0.1 + (t>0.9?0.15:0));
+        if (t > 0.98) { card.x=card.tx; card.y=card.ty; card.rot=card.tr; card.dealT=1; }
+      }
+      // Gentle float
+      var px = tmx*card.layer*50, py = tmy*card.layer*35;
+      card.x = lerp(card.x, card.tx+px+Math.sin(time*0.0004+card.phase)*card.wobble, 0.003*dt);
+      card.y = lerp(card.y, card.ty+py+Math.cos(time*0.0005+card.phase)*card.wobble, 0.003*dt);
+      card.rot = lerp(card.rot, card.tr, 0.02*dt);
+      // Wrap
+      if (card.x<-200) card.x=W+200; if (card.x>W+200) card.x=-200;
+      if (card.y<-200) card.y=H+200; if (card.y>H+200) card.y=-200;
+
+      var h=card.w*1.4, ca=card.alpha+beat*0.04;
+      ctx.save(); ctx.globalAlpha=ca; ctx.translate(card.x, card.y); ctx.rotate(card.rot);
+
+      // Glow behind card
+      var cg=oc[ci%3];
+      var glow=ctx.createRadialGradient(0,0,card.w*0.2,0,0,card.w*0.85);
+      glow.addColorStop(0,'rgba('+cg[0]+','+cg[1]+','+cg[2]+',0.2)');
+      glow.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=glow; ctx.fillRect(-card.w*0.8,-h*0.8,card.w*1.6,h*1.6);
+
+      // Draw card
+      var img = card.faceUp ? getCardFace(card.rank, card.suit, card.w) : getCardBack(card.w);
+      ctx.drawImage(img, -card.w/2, -h/2, card.w, h);
+      ctx.restore();
+    }
+
+    // ── Particles ──
+    for (var pi=0; pi<particles.length; pi++) {
+      var p=particles[pi]; p.life++;
+      if (p.life>p.maxL) {
+        var cols=[[59,130,246],[139,92,246],[16,185,129]]; p.color=cols[Math.floor(Math.random()*3)];
+        p.x=rand(-50,W+50); p.y=rand(-50,H+50); p.vx=rand(-0.3,0.3); p.vy=rand(-0.5,-0.1);
+        p.sz=rand(0.6,3); p.alpha=rand(0.1,0.45); p.life=0; p.maxL=rand(400,1000); p.ph=rand(0,Math.PI*2);
+      }
+      var dx=Math.sin(p.life*0.008+p.ph)*0.2, dy=Math.cos(p.life*0.006+p.ph)*0.15;
+      p.x+=(p.vx+dx)*sm+tmx*p.layer*20; p.y+=(p.vy+dy)*sm+tmy*p.layer*15;
+      if (p.x<-60) p.x=W+60; if (p.x>W+60) p.x=-60;
+      if (p.y<-60) p.y=H+60; if (p.y>H+60) p.y=-60;
+      var pa=p.alpha*(0.6+0.4*Math.sin(p.life*0.03+p.ph));
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.sz,0,Math.PI*2);
+      ctx.fillStyle='rgba('+p.color[0]+','+p.color[1]+','+p.color[2]+','+pa+')'; ctx.fill();
+      if (p.sz>1.5) { ctx.beginPath(); ctx.arc(p.x,p.y,p.sz*3.2,0,Math.PI*2); ctx.fillStyle='rgba('+p.color[0]+','+p.color[1]+','+p.color[2]+','+(pa*0.1)+')'; ctx.fill(); }
+    }
+
+    // ── Chip Stacks ──
+    var chipAlpha = 0.3 + beat*0.08 + bass*0.1;
+    var chipX = [W*0.08, W*0.91, W*0.5];
+    var chipY = [H*0.82, H*0.88, H*0.92];
+    var chipH = [5, 4, 6];
+    for (var chi=0; chi<3; chi++) {
+      var cx2 = chipX[chi] + tmx*30*(chi-1)*0.5;
+      var cy2 = chipY[chi] + Math.sin(time*0.0003+chi)*3;
+      drawChipStack(cx2, cy2, chipColors[chi], chipH[chi], chipAlpha);
+    }
+
+    // ── Beat flash ──
+    if (beatOn && beat>0.45) {
+      var fa=beat*0.018;
+      var fg=ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.06, W/2, H/2, Math.max(W,H)*0.78);
+      fg.addColorStop(0,'rgba(59,130,246,'+(fa*3)+')'); fg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=fg; ctx.fillRect(0,0,W,H);
+    }
+
+    // ── Vignette ──
+    drawVignette();
+
+    // ── Watermark ──
+    var la=0.08+beat*0.03;
+    ctx.fillStyle='rgba(59,130,246,'+la+')';
+    ctx.font='500 11px -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif'; ctx.textAlign='left';
+    ctx.fillText('POKER GTO',24,H-28);
+    ctx.fillStyle='rgba(148,163,184,'+(la*0.5)+')'; ctx.fillText('TRAINER',24,H-14);
+  }
+
+  // ── Mouse parallax ──
+  document.addEventListener('mousemove', function(e) {
+    mx = (e.clientX/W - 0.5)*2;
+    my = (e.clientY/H - 0.5)*2;
+  });
+
+  // ── Resize reposition ──
+  var rt;
+  window.addEventListener('resize', function() {
+    clearTimeout(rt);
+    rt = setTimeout(function() { initO(); initCards(); initP(); }, 400);
+  });
+
+  requestAnimationFrame(render);
 })();
 </script>
 
