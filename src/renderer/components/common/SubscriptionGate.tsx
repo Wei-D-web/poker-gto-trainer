@@ -19,16 +19,18 @@ import { track } from '../../services/analytics'
 export const PREMIUM_FEATURES = new Set([
   'analytics', 'equitytrainer', 'battle', 'cashmttcompare',
   'exploitadvisor', 'analyzer', 'tools', 'spots', 'icm',
-  'aicoach',
 ])
 
 export const DESKTOP_ONLY_FEATURES = new Set(['advanced', 'turnriver', 'multiway'])
 
 export function isRunningInElectron(): boolean {
   try {
-    return !!window.electronAPI?.app?.getPlatform?.() !== 'browser'
+    const platform = window.electronAPI?.app?.getPlatform?.()
+    // On web: electronAPI is undefined → platform is undefined → false
+    // On Electron: platform is 'darwin'/'win32'/'linux' → true
+    return platform != null && platform !== 'browser'
   } catch {
-    const api = window.electronAPI
+    const api = (window as any).electronAPI
     return api != null && typeof api.app?.quit === 'function'
   }
 }
@@ -75,7 +77,8 @@ const NAMES: Record<string, string> = {
   analytics: '数据分析', equitytrainer: '胜率训练', battle: 'Range Battle',
   cashmttcompare: 'Cash vs MTT', exploitadvisor: '剥削顾问', analyzer: '手牌分析器',
   advanced: '高级分析', turnriver: '转牌河牌分析', multiway: '多人底池',
-  tools: '工具箱', spots: '收藏夹', icm: 'ICM 计算器', aicoach: 'AI 教练',
+  tools: '工具箱', spots: '收藏夹', icm: 'ICM 计算器',
+  aigame: 'AI 对战',
 }
 
 export function UpgradePrompt({ feature }: { feature?: string }) {

@@ -11,9 +11,7 @@ import { useKeyboardShortcuts, DEFAULT_SHORTCUTS } from './hooks/useKeyboard'
 import { DemoBanner } from './components/auth/DemoBanner'
 import { DesktopRequiredModal, getDesktopRequiredInfo } from './components/auth/DesktopRequiredModal'
 import { WelcomeFlow, shouldShowWelcome } from './components/common/WelcomeFlow'
-import { TrialBanner } from './components/common/TrialBanner'
-import { TrialExpiredOverlay } from './components/common/TrialExpiredOverlay'
-import { useAuth } from './contexts/AuthContext'
+import { WebWelcomeOverlay } from './components/common/WebWelcomeOverlay'
 import type { FC, LazyExoticComponent } from 'react'
 
 // ── Lazy-loaded route components (code-split per feature) ──
@@ -43,7 +41,7 @@ const SettingsPage = lazy(() => import('./components/settings/SettingsPage'))
 const AccountPage = lazy(() => import('./components/settings/AccountPage'))
 const GuidePage = lazy(() => import('./components/guide/GuidePage'))
 const SessionReviewPage = lazy(() => import('./components/session-review/SessionReviewPage'))
-const AICoachPage = lazy(() => import('./components/ai-coach/AICoachPage'))
+const AIBattlePage = lazy(() => import('./components/battle/AIBattlePage'))
 
 const ROUTES: Record<string, LazyExoticComponent<FC>> = {
   explore: StrategyExplorer,
@@ -71,7 +69,7 @@ const ROUTES: Record<string, LazyExoticComponent<FC>> = {
   guide: GuidePage,
   review: SessionReviewPage,
   bluffcatcher: BluffCatcherPage,
-  aicoach: AICoachPage,
+  aigame: AIBattlePage,
 }
 
 /** Lightweight loading skeleton shown during route chunk loading */
@@ -90,8 +88,6 @@ export function App() {
   const activeRoute = useUIStore((s) => s.activeRoute)
   const setActiveRoute = useUIStore((s) => s.setActiveRoute)
   const toggleSidebar = useUIStore((s) => s.toggleSidebar)
-  const { isTrialExpired } = useAuth()
-
   // Inject demo data when in demo mode
   useDemoData()
 
@@ -142,7 +138,6 @@ export function App() {
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-neutral-950">
       <DemoBanner />
-      <TrialBanner />
       <TitleBar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
@@ -178,8 +173,11 @@ export function App() {
         <WelcomeFlow />
       )}
 
-      {/* Trial expired paywall — renders above everything */}
-      {isTrialExpired && <TrialExpiredOverlay />}
+      {/* Web Welcome Overlay — first web/Kimi visit only */}
+      {!isRunningInElectron() && (
+        <WebWelcomeOverlay />
+      )}
+
     </div>
   )
 }
