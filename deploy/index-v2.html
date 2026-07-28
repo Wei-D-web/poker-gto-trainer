@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PokerGTO Trainer — 专业 GTO 扑克训练 | ¥29.9/月 网页版 · ¥666 终身桌面版</title>
-<meta name="description" content="PokerGTO Trainer 网页版 ¥29.9/月：CFR 求解、牌桌模拟、范围矩阵、GTO 训练、EV 反馈。桌面终身版 ¥666.66 含 AI 教练 + 离线 + 高精度引擎，即将上线。7 天免费试用。">
-<meta name="keywords" content="GTO训练,德州扑克,扑克训练,网页扑克,扑克GTO,CFR求解器,扑克训练软件,中文扑克工具,GTO策略">
+<title>PokerGTO Trainer — 免费 GTO 扑克训练 | 浏览器直接开打</title>
+<meta name="description" content="PokerGTO Trainer 免费网页版，浏览器直接开打无需下载。基础 GTO 训练、范围矩阵、EV 反馈即时可用。想要 CFR 求解器？升级桌面专业版，26 模块全覆盖。">
+<meta name="keywords" content="GTO训练,德州扑克,扑克训练,网页扑克,扑克GTO,CFR求解器,免费扑克训练,中文扑克工具">
 <meta name="author" content="PokerGTO">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://wei-d-web.github.io/poker-gto-trainer/">
 <link rel="icon" type="image/png" href="/poker-gto-trainer/icon.png">
 
 <!-- Open Graph -->
-<meta property="og:title" content="PokerGTO Trainer — 专业 GTO 扑克训练，¥29.9/月 网页版 · ¥666 终身桌面版">
-<meta property="og:description" content="网页版 ¥29.9/月：CFR 求解、牌桌模拟、GTO 训练。桌面终身版 ¥666.66 含 AI 教练 + 离线 + 高精度引擎，即将上线。7 天免费试用。">
+<meta property="og:title" content="PokerGTO Trainer — 免费 GTO 扑克训练，浏览器直接开打">
+<meta property="og:description" content="免费网页版即时开玩，无需下载。基础 GTO 训练、范围矩阵、EV 反馈全部免费。升级桌面专业版解锁 CFR 求解器 + 26 模块，价格仅 GTO Wizard 1/3。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://wei-d-web.github.io/poker-gto-trainer/">
 <meta property="og:locale" content="zh_CN">
@@ -23,8 +23,8 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PokerGTO Trainer — 专业 GTO 扑克训练，¥29.9/月 网页版 · ¥666 终身桌面版">
-<meta name="twitter:description" content="网页版 ¥29.9/月：CFR 求解 + 牌桌模拟 + GTO 训练，7 天免费试用。桌面终身版 ¥666.66 含 AI 教练 + 离线，即将上线。">
+<meta name="twitter:title" content="PokerGTO Trainer — 免费 GTO 扑克训练，浏览器直接开打">
+<meta name="twitter:description" content="免费网页版即时开玩。基础 GTO 训练 + 范围矩阵 + EV 反馈免费。升级桌面版解锁 CFR 求解器，价格仅 GTO Wizard 1/3。">
 <meta name="twitter:image" content="https://wei-d-web.github.io/poker-gto-trainer/og-image.png">
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -37,7 +37,6 @@
   @keyframes matrixBreathe { 0%,100% { opacity: 0.5; transform: translate(-50%,-50%) scale(1); } 50% { opacity: 0.8; transform: translate(-50%,-50%) scale(1.05); } }
   @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
   @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-  @keyframes comingSoonPulse { 0%,100% { box-shadow: 0 0 20px rgba(245,158,11,0.3); } 50% { box-shadow: 0 0 40px rgba(245,158,11,0.6), 0 0 80px rgba(245,158,11,0.15); } }
 
   /* ── Top Sticky Nav ── */
   .nav { position: sticky; top: 0; z-index: 101; background: rgba(5,8,12,0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(21,34,51,0.5); }
@@ -58,8 +57,7 @@
   .hero .badge { display: inline-block; padding: 6px 16px; border-radius: 20px; background: rgba(16,185,129,0.1); color: #34D399; font-size: 13px; font-weight: 600; margin-bottom: 24px; border: 1px solid rgba(16,185,129,0.2); }
   .hero h1 { font-size: 56px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 16px; background: linear-gradient(135deg, #60A5FA, #A78BFA, #34D399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .hero p { font-size: 18px; color: #94A3B8; max-width: 600px; margin-bottom: 32px; }
-  .hero .cta-group { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-  .hero .price-hint { font-size: 13px; color: #64748B; margin-top: 12px; }
+  .hero .cta-group { display: flex; gap: 12px; flex-wrap: wrap; }
 
   /* ── Buttons ── */
   .btn { padding: 14px 32px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
@@ -67,8 +65,6 @@
   .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(16,185,129,0.5); animation: none; }
   .btn-secondary { background: linear-gradient(135deg, #2563EB, #7C3AED); color: white; box-shadow: 0 4px 24px rgba(37,99,235,0.2); border: none; }
   .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(37,99,235,0.3); }
-  .btn-gold { background: linear-gradient(135deg, #F59E0B, #D97706); color: #0A0A0A; box-shadow: 0 4px 24px rgba(245,158,11,0.3); border: none; animation: comingSoonPulse 2.5s ease-in-out infinite; }
-  .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(245,158,11,0.5); animation: none; }
   .btn-outline { background: transparent; color: #94A3B8; border: 1px solid #1C2A3D; }
   .btn-outline:hover { border-color: #3B82F6; color: #EDF1F7; }
 
@@ -127,32 +123,17 @@
   .new-badge { display: inline-block; padding: 2px 8px; border-radius: 8px; background: rgba(16,185,129,0.1); color: #34D399; font-size: 10px; font-weight: 700; margin-left: 6px; }
 
   /* Pricing */
-  .pricing-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 720px; margin: 0 auto; }
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 900px; margin: 0 auto; }
   .pricing-card { background: linear-gradient(180deg, rgba(13,17,23,0.8) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(21,34,51,0.6); border-radius: 20px; padding: 32px; text-align: center; position: relative; transition: all 0.3s; }
   .pricing-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
-  .pricing-card.popular { border-color: rgba(16,185,129,0.5); background: linear-gradient(180deg, rgba(6,78,59,0.12) 0%, rgba(9,13,20,0.9) 100%); box-shadow: 0 0 60px rgba(16,185,129,0.12), 0 0 120px rgba(16,185,129,0.04); }
-  .pricing-card.popular::before { content: '推荐'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #10B981; color: white; padding: 4px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; }
-  .pricing-card.coming-soon { border-color: rgba(245,158,11,0.4); background: linear-gradient(180deg, rgba(146,64,14,0.08) 0%, rgba(9,13,20,0.9) 100%); }
-  .pricing-card.coming-soon::after { content: '即将上线 🚀'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #F59E0B; color: #0A0A0A; padding: 4px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; }
-  .pricing-card h3 { font-size: 18px; margin-bottom: 4px; }
-  .pricing-card .subtitle-text { color: #94A3B8; font-size: 13px; margin-bottom: 16px; }
+  .pricing-card.popular { border-color: rgba(59,130,246,0.5); background: linear-gradient(180deg, rgba(30,58,138,0.1) 0%, rgba(9,13,20,0.9) 100%); box-shadow: 0 0 60px rgba(59,130,246,0.12), 0 0 120px rgba(59,130,246,0.04); }
+  .pricing-card.popular::before { content: '最受欢迎'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #3B82F6; color: white; padding: 4px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; }
+  .pricing-card h3 { font-size: 18px; margin-bottom: 8px; }
   .pricing-card .price { font-size: 44px; font-weight: 900; margin: 16px 0; }
   .pricing-card .price span { font-size: 16px; font-weight: 500; color: #64748B; }
   .pricing-card ul { list-style: none; text-align: left; margin: 24px 0; }
   .pricing-card li { font-size: 13px; padding: 6px 0; color: #94A3B8; }
   .pricing-card li::before { content: '✓'; color: #34D399; margin-right: 8px; font-weight: 700; }
-  .pricing-card li.highlight::before { content: '⭐'; }
-
-  /* Desktop Teaser */
-  .desktop-teaser { background: linear-gradient(135deg, rgba(245,158,11,0.06) 0%, rgba(217,119,6,0.03) 100%); border: 1px solid rgba(245,158,11,0.2); border-radius: 20px; padding: 40px 32px; max-width: 720px; margin: 40px auto 0; text-align: center; }
-  .desktop-teaser h3 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
-  .desktop-teaser .benefits { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
-  .desktop-teaser .benefit-item { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #94A3B8; }
-  .desktop-teaser .benefit-item .icon { font-size: 18px; }
-  .desktop-teaser .notify-box { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
-  .desktop-teaser .notify-box input { padding: 12px 18px; border-radius: 12px; border: 1px solid #1C2A3D; background: #090D14; color: #EDF1F7; font-size: 14px; min-width: 260px; outline: none; transition: border-color 0.2s; }
-  .desktop-teaser .notify-box input:focus { border-color: #F59E0B; }
-  .desktop-teaser .notify-box input::placeholder { color: #475569; }
 
   /* Footer */
   .footer { text-align: center; padding: 40px 0 80px; color: #475569; font-size: 13px; border-top: 1px solid #152233; margin-top: 60px; }
@@ -164,6 +145,23 @@
   .animate-delay-2 { transition-delay: 0.16s; }
   .animate-delay-3 { transition-delay: 0.24s; }
   .animate-delay-4 { transition-delay: 0.32s; }
+
+  /* Download Section */
+  .download-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 900px; margin: 0 auto; }
+  .download-card { background: #090D14; border: 1px solid #152233; border-radius: 20px; padding: 28px 24px; text-align: center; transition: all 0.2s; position: relative; }
+  .download-card:hover { border-color: #2A3B52; transform: translateY(-2px); }
+  .download-card.recommended { border-color: #10B981; box-shadow: 0 0 32px rgba(16,185,129,0.08); }
+  .download-card.recommended::before { content: '推荐'; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #10B981; color: #05080C; padding: 3px 14px; border-radius: 8px; font-size: 11px; font-weight: 700; }
+  .download-card .os-icon { font-size: 36px; margin-bottom: 10px; }
+  .download-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .download-card .arch { font-size: 11px; color: #64748B; margin-bottom: 14px; }
+  .download-card .version { font-size: 11px; color: #475569; margin-bottom: 14px; }
+  .download-card .btn { width: 100%; text-align: center; }
+  .download-card .size { font-size: 10px; color: #475569; margin-top: 10px; }
+  .reqs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 900px; margin: 24px auto 0; }
+  .req-card { background: rgba(255,255,255,0.015); border: 1px solid rgba(255,255,255,0.04); border-radius: 12px; padding: 14px 16px; text-align: center; }
+  .req-card .label { font-size: 10px; color: #64748B; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+  .req-card .value { font-size: 13px; color: #94A3B8; font-weight: 600; }
 
   @media (max-width: 900px) {
     /* Nav mobile */
@@ -186,10 +184,11 @@
     .module-grid { grid-template-columns: repeat(2, 1fr); }
     .pricing-grid { grid-template-columns: 1fr; }
     .preview-grid { grid-template-columns: 1fr; }
+    .download-grid { grid-template-columns: 1fr; }
+    .reqs-grid { grid-template-columns: 1fr; }
     .hero h1 { font-size: 36px; }
     .stats-bar { gap: 24px; flex-wrap: wrap; }
     .sticky-cta { flex-direction: column; gap: 8px; text-align: center; }
-    .desktop-teaser .benefits { flex-direction: column; align-items: center; }
   }
 </style>
 
@@ -201,13 +200,13 @@
   "name": "PokerGTO Trainer",
   "applicationCategory": "GameApplication",
   "operatingSystem": "Web, macOS, Windows, Linux",
-  "description": "专业 GTO 扑克训练工具。网页版 ¥29.9/月：CFR 求解、牌桌模拟、范围矩阵、GTO 训练、EV 反馈，7 天免费试用。桌面终身版 ¥666.66 即将上线，含 AI 教练、离线模式、高精度本地引擎，一次付费永久使用。",
+  "description": "免费网页版 GTO 扑克训练工具 + 专业桌面版（CFR 求解器）。浏览器直接开打，无需下载。升级桌面版解锁全部 26 个模块。",
   "url": "https://wei-d-web.github.io/poker-gto-trainer/",
   "offers": {
     "@type": "AggregateOffer",
     "priceCurrency": "CNY",
-    "lowPrice": "29.9",
-    "highPrice": "666.66",
+    "lowPrice": "0",
+    "highPrice": "400",
     "offerCount": "2"
   }
 }
@@ -219,13 +218,13 @@
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
-    {"@type": "Question", "name": "和 GTO Wizard 比有什么区别？", "acceptedAnswer": {"@type": "Answer", "text": "PokerGTO 网页版 ¥29.9/月提供 CFR 求解、牌桌模拟、范围矩阵、GTO 训练等核心功能，价格仅为 GTO Wizard（¥499/月）的 1/16。桌面终身版 ¥666.66 增加 AI 教练、离线模式、高精度本地引擎，一次买断。全中文界面。"}},
-    {"@type": "Question", "name": "网页版和桌面版有什么区别？", "acceptedAnswer": {"@type": "Answer", "text": "网页版 ¥29.9/月：浏览器即用，含 CFR 求解（Web Worker）、牌桌模拟、范围矩阵、GTO 训练、EV 反馈。桌面版 ¥666.66 终身：全部网页功能 + AI 教练（DeepSeek V4）+ 离线使用 + 高精度本地 CFR 引擎 + Node Locking + 转牌河牌深度分析 + 多人底池分析。桌面版即将上线。"}},
-    {"@type": "Question", "name": "有免费试用吗？", "acceptedAnswer": {"@type": "Answer", "text": "有！网页版提供 7 天免费试用，无需绑卡，注册即用全部功能。试用期间无任何功能限制，到期后如果不续费，基础功能（范围矩阵查询、EV 反馈）仍可继续使用。"}},
-    {"@type": "Question", "name": "桌面版什么时候上线？", "acceptedAnswer": {"@type": "Answer", "text": "桌面版（macOS/Windows）正在最后打磨中，预计 2026 年 9 月上线。定价 ¥666.66 终身买断，含 AI 教练 + 离线使用 + 高精度本地引擎 + 所有大版本免费更新。在页面下方可留下联系方式，上线第一时间通知。"}},
+    {"@type": "Question", "name": "和 GTO Wizard 比有什么区别？", "acceptedAnswer": {"@type": "Answer", "text": "网页版免费提供基础 GTO 训练功能。桌面专业版功能覆盖 GTO Wizard 约 90%（翻前范围、CFR 求解、训练模式、EV 反馈），价格仅 1/3。全中文界面，桌面端 100% 本地运行、离线可用，并提供终身买断选项。"}},
+    {"@type": "Question", "name": "网页版和桌面版有什么区别？", "acceptedAnswer": {"@type": "Answer", "text": "网页版永久免费，浏览器直接开打，提供基础 GTO 训练、范围矩阵、EV 反馈、AI 实战对局。桌面专业版增加 CFR 求解器、AI Coach、Node Locking、Range Battle、Cash vs MTT 等完整 26 模块，100% 离线可用。"}},
+    {"@type": "Question", "name": "不付费能用什么？", "acceptedAnswer": {"@type": "Answer", "text": "网页版永久免费，点开即玩，无需注册！包含基础 GTO 训练、范围矩阵查询、EV 反馈和 AI 实战对局。升级桌面专业版解锁 CFR 求解器 + 全部 26 模块。"}},
     {"@type": "Question", "name": "macOS 提示「无法验证开发者」，安全吗？", "acceptedAnswer": {"@type": "Answer", "text": "安全。这只是因为还未购买 Apple 官方签名。打开 系统设置 → 隐私与安全性 → 点「仍要打开」即可，只需操作一次。软件 100% 本地运行，不联网、不收集数据。"}},
-    {"@type": "Question", "name": "支持哪些系统？", "acceptedAnswer": {"@type": "Answer", "text": "网页版所有设备可用（电脑、平板、手机）。桌面版支持 macOS（Apple Silicon）和 Windows 10/11 x64，Linux 版打包中。"}},
-    {"@type": "Question", "name": "怎么付款和激活？", "acceptedAnswer": {"@type": "Answer", "text": "网页版：微信/支付宝扫码订阅，¥29.9/月或 ¥199/年，7 天免费试用。桌面版（即将上线）：¥666.66 微信/支付宝一次支付，加客服微信获取 19 位卡密，App 内激活永久使用。国际用户可通过 Stripe 信用卡支付。"}}
+    {"@type": "Question", "name": "支持哪些系统？", "acceptedAnswer": {"@type": "Answer", "text": "macOS（Apple Silicon）和 Windows 10/11 x64 均有安装包，Linux 版打包中。所有版本功能一致，离线可用。"}},
+    {"@type": "Question", "name": "怎么付款和激活？", "acceptedAnswer": {"@type": "Answer", "text": "微信/支付宝扫码付款后加客服微信获取 19 位卡密，在 App 内「账户 → 激活卡密」输入即可解锁。国际用户可通过 Stripe 用信用卡支付。"}},
+    {"@type": "Question", "name": "卡密是永久的吗？", "acceptedAnswer": {"@type": "Answer", "text": "终身版卡密永久有效，含所有大版本免费更新；入门版/专业版为订阅制，到期后基础功能仍可免费使用。"}}
   ]
 }
 </script>
@@ -242,21 +241,21 @@
     <div class="nav-links" id="navLinks">
       <a href="#features">功能</a>
       <a href="#preview">界面预览</a>
-      <a href="#compare">网页 vs 桌面</a>
+      <a href="#compare">网页 vs 专业版</a>
+      <a href="#download">专业版下载</a>
       <a href="#pricing">定价</a>
-      <a href="#desktop-teaser">桌面版预告</a>
       <a href="#community">社群</a>
       <a href="#faq">常见问题</a>
-      <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn-nav">🚀 免费试用</a>
+      <a href="https://poker-gto-web-production.up.railway.app" target="_blank" rel="noopener" class="btn-nav">🎮 免费开玩</a>
     </div>
   </div>
 </nav>
 
 <!-- Sticky Bottom CTA -->
 <div class="sticky-cta" id="stickyCta">
-  <span class="hint">🔥 7 天免费试用 · ¥29.9/月 · 随时取消</span>
-  <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn btn-primary">🚀 开始免费试用 — 网页版</a>
-  <a href="#desktop-teaser" class="btn btn-outline" style="border-color:#F59E0B;color:#F59E0B;">🖥️ 桌面终身版 · 即将上线</a>
+  <span class="hint">🔥 浏览器直接开打，完全免费</span>
+  <a href="https://poker-gto-web-production.up.railway.app" target="_blank" rel="noopener" class="btn btn-primary">🎮 免费开玩 — 网页版</a>
+  <a href="#compare" class="btn btn-outline">⚡ 了解专业版</a>
 </div>
 
 <!-- ═══════ Hero ═══════ -->
@@ -264,21 +263,14 @@
   <div class="container">
     <div class="hero-grid">
       <div class="hero-text">
-        <div class="badge">🃏 专业 GTO 训练 · ¥29.9/月 · 7 天免费试用</div>
+        <div class="badge">🌐 浏览器直接开打 · 无需下载 · 完全免费</div>
         <h1>PokerGTO Trainer</h1>
-        <p>
-          网页版 <b style="color:#34D399;">¥29.9/月</b>，核心功能全部开放。<br>
-          CFR 求解 · 牌桌模拟 · 范围矩阵 · GTO 训练 · EV 反馈 — <b style="color:#EDF1F7;">实用功能都给全。</b><br>
-          <span style="display:inline-block;margin-top:8px;padding:6px 14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;font-size:14px;">
-            🖥️ <b style="color:#FBBF24;">桌面终身版 ¥666.66</b> — AI 教练 · 离线可用 · 高精度引擎 · 即将上线
-          </span>
-        </p>
+        <p>免费网页版即时开玩 — 基础 GTO 训练、范围矩阵、EV 反馈<br>想要 <b style="color:#FBBF24;">CFR 求解器</b> + <b style="color:#60A5FA;">AI Coach</b> + <b style="color:#A78BFA;">26 模块</b>？升级桌面专业版，价格仅 GTO Wizard 1/3</p>
         <div class="cta-group">
-          <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn btn-primary">🚀 免费试用 7 天</a>
-          <a href="#compare" class="btn btn-outline">⚡ 网页 vs 桌面对比</a>
-          <a href="#desktop-teaser" class="btn btn-gold" style="font-size:14px;padding:14px 24px;">🖥️ 桌面版上线通知我</a>
+          <a href="https://poker-gto-web-production.up.railway.app" target="_blank" rel="noopener" class="btn btn-primary">🎮 免费开玩 — 网页版</a>
+          <a href="#compare" class="btn btn-outline">⚡ 了解专业版（CFR 求解器）</a>
+          <a href="#download" class="btn btn-outline" style="border-color:transparent;">⬇ 直接下载桌面版</a>
         </div>
-        <div class="price-hint">无需绑卡 · 试用期满 ¥29.9/月 或 ¥199/年（省 45%）· 随时取消</div>
       </div>
       <div class="hero-visual">
         <div class="range-matrix-wrap">
@@ -294,36 +286,35 @@
 <!-- Stats -->
 <div class="stats-bar animate">
   <div class="stat"><div class="num">26</div><div class="label">专业模块</div></div>
-  <div class="stat"><div class="num">¥29.9</div><div class="label">月费 · 全功能</div></div>
-  <div class="stat"><div class="num">7 天</div><div class="label">免费试用</div></div>
+  <div class="stat"><div class="num">4.8 ⭐</div><div class="label">用户好评</div></div>
   <div class="stat"><div class="num">中/EN</div><div class="label">双语支持</div></div>
+  <div class="stat"><div class="num">100%</div><div class="label">本地运行</div></div>
 </div>
 
 <!-- ═══════ Compare: Web vs Desktop ═══════ -->
 <div class="container" id="compare">
   <div class="section">
-    <h2>🌐 网页版 vs 🖥️ 桌面终身版</h2>
-    <p class="subtitle">网页版按月订阅，核心功能全给。桌面版一次买断，解锁 AI 教练 + 高精度引擎 + 离线。</p>
+    <h2>🌐 网页版 vs ⚡ 桌面专业版</h2>
+    <p class="subtitle">根据你的需求选择 — 免费网页版还是带 CFR 的专业桌面版</p>
     <style>
       .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 900px; margin: 0 auto; }
       .compare-card { border-radius: 20px; padding: 36px 32px; position: relative; }
       .compare-card.web { background: linear-gradient(180deg, rgba(16,185,129,0.06) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(16,185,129,0.25); }
-      .compare-card.desktop { background: linear-gradient(180deg, rgba(245,158,11,0.06) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(245,158,11,0.3); }
+      .compare-card.desktop { background: linear-gradient(180deg, rgba(59,130,246,0.08) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(59,130,246,0.35); }
       .compare-card .tag { display: inline-block; padding: 4px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
       .compare-card.web .tag { background: rgba(16,185,129,0.15); color: #34D399; }
-      .compare-card.desktop .tag { background: rgba(245,158,11,0.15); color: #FBBF24; }
-      .compare-card h3 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
-      .compare-card .subtitle-text { font-size: 13px; color: #94A3B8; margin-bottom: 16px; }
+      .compare-card.desktop .tag { background: rgba(59,130,246,0.15); color: #60A5FA; }
+      .compare-card h3 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
       .compare-card .price-tag { font-size: 28px; font-weight: 900; margin-bottom: 20px; }
       .compare-card.web .price-tag { color: #34D399; }
-      .compare-card.desktop .price-tag { color: #FBBF24; }
+      .compare-card.desktop .price-tag { color: #60A5FA; }
       .compare-card .price-tag span { font-size: 14px; font-weight: 500; color: #64748B; }
       .compare-card ul { list-style: none; margin-bottom: 24px; }
       .compare-card li { font-size: 13px; padding: 7px 0; color: #94A3B8; }
       .compare-card li.yes::before { content: '✅'; margin-right: 8px; }
-      .compare-card li.plus::before { content: '⭐'; margin-right: 8px; }
+      .compare-card li.no::before { content: '—'; margin-right: 8px; color: #475569; }
+      .compare-card li.pro::before { content: '⭐'; margin-right: 8px; }
       .compare-card .btn { width: 100%; text-align: center; }
-      .compare-card .coming-badge { display: inline-block; padding: 4px 12px; border-radius: 8px; background: rgba(245,158,11,0.12); color: #FBBF24; font-size: 11px; font-weight: 700; margin-left: 8px; }
       @media (max-width: 768px) {
         .compare-grid { grid-template-columns: 1fr; }
       }
@@ -333,40 +324,38 @@
       <div class="compare-card web animate animate-delay-1">
         <div class="tag">🌐 推荐入门</div>
         <h3>网页版</h3>
-        <p class="subtitle-text">浏览器直接使用 · 核心功能全开放 · 按月订阅</p>
-        <div class="price-tag">¥29.9<span>/月</span></div>
+        <p style="color:#94A3B8;font-size:14px;margin-bottom:12px;">浏览器直接开打 · 无需下载 · 即时体验</p>
+        <div class="price-tag">免费<span> 永久</span></div>
         <ul>
-          <li class="yes">CFR 求解器（浏览器引擎）</li>
-          <li class="yes">牌桌模拟 — AI 对局训练</li>
-          <li class="yes">翻前范围矩阵 + 策略浏览器</li>
-          <li class="yes">GTO 训练模式 · EV 即时反馈</li>
-          <li class="yes">范围编辑器 · Range Battle</li>
-          <li class="yes">胜率训练 · Bluff Catcher</li>
-          <li class="yes">Cash vs MTT 策略对比</li>
-          <li class="yes">随时随地 · 手机平板电脑都能用</li>
-          <li class="yes" style="color:#64748B;font-size:12px;">⚠️ CFR 精度低于桌面版（浏览器限制）</li>
+          <li class="yes">基础 GTO 训练模式</li>
+          <li class="yes">翻前范围矩阵查询</li>
+          <li class="yes">EV 即时反馈</li>
+          <li class="yes">实战 AI 对局</li>
+          <li class="yes">随时随地，手机也能用</li>
+          <li class="no">CFR 求解器</li>
+          <li class="no">AI Coach 智能解说</li>
+          <li class="no">Node Locking · Range Battle</li>
+          <li class="no">离线使用</li>
         </ul>
-        <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn btn-primary">🚀 免费试用 7 天</a>
+        <a href="https://poker-gto-web-production.up.railway.app" target="_blank" rel="noopener" class="btn btn-primary">🎮 免费开玩</a>
       </div>
       <!-- Desktop -->
       <div class="compare-card desktop animate animate-delay-2">
-        <div class="tag">🖥️ 重度用户首选</div>
-        <h3>桌面终身版 <span class="coming-badge">即将上线</span></h3>
-        <p class="subtitle-text">网页版全部 + AI 教练 + 离线 + 高精度引擎 · 一次买断</p>
-        <div class="price-tag">¥666.66<span> 终身</span></div>
+        <div class="tag">⚡ 专业玩家选择</div>
+        <h3>桌面专业版</h3>
+        <p style="color:#94A3B8;font-size:14px;margin-bottom:12px;">完整 26 模块 · CFR 求解器 · 离线可用</p>
+        <div class="price-tag">¥19.99<span>/月起</span></div>
         <ul>
           <li class="yes">网页版全部功能</li>
-          <li class="plus">🧠 AI 教练 — DeepSeek V4 实时解说</li>
-          <li class="plus">📡 离线使用 — 无需网络</li>
-          <li class="plus">⚡ 高精度本地 CFR 引擎 — 比网页版更快更准</li>
-          <li class="plus">🔒 Node Locking — 锁定手牌重新求解</li>
-          <li class="plus">🔄 转牌/河牌深度分析</li>
-          <li class="plus">👥 多人底池分析（3-6人）</li>
-          <li class="plus">📂 手牌历史文件导入 + PDF 导出</li>
-          <li class="plus">💾 本地数据存储 · 隐私安全</li>
-          <li class="plus">🔄 所有大版本免费更新</li>
+          <li class="pro">CFR 求解器 — 核心引擎</li>
+          <li class="pro">AI Coach 智能解说</li>
+          <li class="pro">Node Locking · Range Battle</li>
+          <li class="pro">Cash vs MTT 策略对比</li>
+          <li class="pro">对手剥削顾问（7 种类型）</li>
+          <li class="pro">批量数据分析 · PDF 导出</li>
+          <li class="pro">100% 离线 · 无需网络</li>
         </ul>
-        <a href="#desktop-teaser" class="btn btn-gold">🔔 上线通知我</a>
+        <a href="#download" class="btn btn-secondary">⬇ 查看专业版下载</a>
       </div>
     </div>
   </div>
@@ -376,7 +365,7 @@
 <div class="container" id="preview">
   <div class="section">
     <h2>👀 看看里面长什么样</h2>
-    <p class="subtitle">网页版核心功能，这些你都能用</p>
+    <p class="subtitle">Demo 里能直接上手操作这些功能</p>
     <div class="preview-grid">
       <div class="preview-card animate animate-delay-1">
         <img src="/poker-gto-trainer/demo-screenshots/01-strategy-explorer.webp" alt="策略浏览器 - 翻前范围矩阵" width="1400" height="840" loading="lazy" onerror="this.parentElement.style.display='none'">
@@ -398,11 +387,64 @@
   </div>
 </div>
 
+<!-- Download / Pro Desktop Section -->
+<div class="container" id="download">
+  <div class="section">
+    <h2>⚡ 升级桌面专业版</h2>
+    <p class="subtitle">需要 <b style="color:#FBBF24;">CFR 求解器</b> · <b style="color:#60A5FA;">AI Coach</b> · <b style="color:#A78BFA;">离线训练</b>？桌面版是你的一站式 GTO 工作站</p>
+    <div class="download-grid" id="downloadGrid">
+      <!-- macOS -->
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/download/v0.1.2/PokerGTO.Trainer-0.1.2-arm64.dmg" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-1" data-os="mac" style="text-decoration:none;">
+        <div class="os-icon">🍎</div>
+        <h3 style="color:#EDF1F7;">macOS</h3>
+        <div class="arch">Apple Silicon (M 系列芯片)</div>
+        <div class="version">v0.1.2 · DMG</div>
+        <span class="btn btn-primary" style="display:block;">下载 macOS 版</span>
+        <div class="size">~180 MB · 点击直接下载</div>
+      </a>
+      <!-- Windows -->
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/download/v0.1.1/PokerGTO-Trainer-Setup-0.1.1.exe" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-2" data-os="win" style="text-decoration:none;">
+        <div class="os-icon">🪟</div>
+        <h3 style="color:#EDF1F7;">Windows</h3>
+        <div class="arch">Windows 10 / 11 · x64</div>
+        <div class="version">v0.1.1 · Installer</div>
+        <span class="btn btn-secondary" style="display:block;">下载 Windows 版</span>
+        <div class="size">~160 MB · 点击直接下载</div>
+      </a>
+      <!-- Linux -->
+      <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases" target="_blank" rel="noopener noreferrer" class="download-card animate animate-delay-3" data-os="linux" style="text-decoration:none;">
+        <div class="os-icon">🐧</div>
+        <h3 style="color:#EDF1F7;">Linux</h3>
+        <div class="arch">Ubuntu · Debian · Fedora</div>
+        <div class="version">即将推出</div>
+        <span class="btn btn-outline" style="display:block;">关注 Releases 获取通知</span>
+        <div class="size">AppImage / deb 打包中</div>
+      </a>
+    </div>
+
+    <!-- System Requirements -->
+    <div class="reqs-grid">
+      <div class="req-card">
+        <div class="label">💾 内存</div>
+        <div class="value">4 GB+ RAM</div>
+      </div>
+      <div class="req-card">
+        <div class="label">💿 磁盘</div>
+        <div class="value">500 MB 可用空间</div>
+      </div>
+      <div class="req-card">
+        <div class="label">🌐 网络</div>
+        <div class="value">离线可用 · 更新需联网</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Features -->
 <div class="container" id="features">
   <div class="section">
     <h2>全部功能模块</h2>
-    <p class="subtitle">网页版含核心训练模块。标注 ⚡ 的为桌面版独占（需本地高精度引擎）。</p>
+    <p class="subtitle">覆盖翻前到河牌，从学习到实战</p>
     <div class="module-grid">
 
       <!-- 🎓 学习与训练 -->
@@ -424,9 +466,9 @@
         <div class="module-grid">
           <div class="module-card"><div class="icon">🔍</div><h4>手牌分析器</h4><p>逐条决策GTO偏差分析</p></div>
           <div class="module-card"><div class="icon">⚔️</div><h4>Range Battle<span class="new-badge">New</span></h4><p>范围对战 · 胜率分布图</p></div>
-          <div class="module-card"><div class="icon">🔒</div><h4>Node Locking<span class="new-badge" style="background:rgba(245,158,11,0.15);color:#FBBF24;">桌面</span></h4><p>锁定手牌 · 观察策略调整</p></div>
-          <div class="module-card"><div class="icon">🔄</div><h4>转牌河牌<span class="new-badge" style="background:rgba(245,158,11,0.15);color:#FBBF24;">桌面</span></h4><p>危险牌/空白牌检测</p></div>
-          <div class="module-card"><div class="icon">👥</div><h4>多人底池<span class="new-badge" style="background:rgba(245,158,11,0.15);color:#FBBF24;">桌面</span></h4><p>3-6人启发式分析</p></div>
+          <div class="module-card"><div class="icon">🔒</div><h4>Node Locking</h4><p>锁定手牌 · 观察策略调整</p></div>
+          <div class="module-card"><div class="icon">🔄</div><h4>转牌河牌</h4><p>危险牌/空白牌检测</p></div>
+          <div class="module-card"><div class="icon">👥</div><h4>多人底池</h4><p>3-6人启发式分析</p></div>
           <div class="module-card"><div class="icon">🔬</div><h4>Strategy Lab<span class="new-badge">New</span></h4><p>完整翻后策略分解</p></div>
         </div>
       </div>
@@ -436,7 +478,7 @@
         <div class="module-cat-header animate"><span class="cat-icon">📊</span><span class="cat-title">数据与报告</span><span class="cat-count">5 个模块</span></div>
         <div class="module-grid">
           <div class="module-card"><div class="icon">📊</div><h4>数据分析<span class="new-badge">New</span></h4><p>批量手牌聚合Dashboard</p></div>
-          <div class="module-card"><div class="icon">📄</div><h4>PDF报告<span class="new-badge" style="background:rgba(245,158,11,0.15);color:#FBBF24;">桌面</span></h4><p>一键导出分析报告</p></div>
+          <div class="module-card"><div class="icon">📄</div><h4>PDF报告<span class="new-badge">New</span></h4><p>一键导出分析报告</p></div>
           <div class="module-card"><div class="icon">📤</div><h4>多格式导出<span class="new-badge">New</span></h4><p>JSON/CSV/Range数据</p></div>
           <div class="module-card"><div class="icon">📈</div><h4>进度追踪<span class="new-badge">New</span></h4><p>30天EV趋势图表</p></div>
           <div class="module-card"><div class="icon">📜</div><h4>手牌历史</h4><p>批量导入 · 导出PDF</p></div>
@@ -470,128 +512,108 @@
   </div>
 </div>
 
-<!-- ═══════ Pricing ═══════ -->
+<!-- Pricing -->
 <div class="container" id="pricing">
   <div class="section">
-    <h2>简单定价</h2>
-    <p class="subtitle">网页版核心功能全给，桌面版解锁 AI 教练 + 高精度引擎。7 天免费试用，不满意全额退。</p>
+    <h2>定价方案</h2>
+    <p class="subtitle">网页版永久免费。桌面专业版仅为 GTO Wizard 价格的 1/3。</p>
     <div class="pricing-grid">
 
-      <!-- Web Monthly -->
-      <div class="pricing-card popular animate animate-delay-1">
-        <h3>🌐 网页版 · 核心功能全开</h3>
-        <p class="subtitle-text">浏览器即用 · CFR 求解 + 牌桌模拟 + GTO 训练 · 7 天免费试用</p>
-        <div class="price" style="color:#34D399;">¥29.9<span>/月</span></div>
-        <p style="color:#64748B;font-size:13px;margin-top:-12px;">或 ¥199/年（省 ¥160 · 相当于 ¥16.6/月）</p>
+      <div class="pricing-card animate animate-delay-1">
+        <h3>🌐 网页版</h3>
+        <div class="price">免费<span> 永久</span></div>
+        <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">浏览器直接开打 · 无需注册</div>
         <ul>
-          <li>CFR 求解器（浏览器引擎）</li>
-          <li>牌桌模拟 — AI 对局训练</li>
-          <li>翻前范围矩阵 + 策略浏览器</li>
-          <li>GTO 训练模式 · EV 即时反馈</li>
-          <li>范围编辑器 · Range Battle</li>
-          <li>胜率训练 · Bluff Catcher</li>
+          <li>基础 GTO 训练 · AI 对局</li>
+          <li>翻前范围矩阵查询</li>
+          <li>EV 即时反馈</li>
+          <li>随时可用 · 手机也能玩</li>
+        </ul>
+        <a href="https://poker-gto-web-production.up.railway.app" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;text-align:center;background:linear-gradient(135deg,#10B981,#059669);">🎮 免费开玩</a>
+      </div>
+
+      <div class="pricing-card popular animate animate-delay-2">
+        <h3>⚡ 桌面专业版</h3>
+        <div class="price">¥49.99<span>/月</span></div>
+        <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">≈ $6.99 · 年付 ¥399/年 (省 ¥200)</div>
+        <ul>
+          <li><b>网页版全部 + 完整 26 模块</b></li>
+          <li><b>CFR 求解器 — 核心引擎</b></li>
+          <li><b>AI Coach 智能解说</b><span class="new-badge">NEW</span></li>
+          <li>Node Locking · Range Battle</li>
           <li>Cash vs MTT 策略对比</li>
-          <li>手机平板电脑都能用</li>
-          <li>7 天免费试用 · 无需绑卡</li>
-          <li>随时取消 · 不满意全额退</li>
+          <li>对手剥削顾问 (7种类型)</li>
+          <li>数据分析 Dashboard · PDF 导出</li>
+          <li>100% 离线可用 · 无需网络</li>
         </ul>
-        <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;text-align:center;">🚀 免费试用 7 天</a>
+        <a href="#download" class="btn btn-primary" style="width:100%;text-align:center;">⬇ 下载桌面专业版</a>
       </div>
 
-      <!-- Desktop Lifetime -->
-      <div class="pricing-card coming-soon animate animate-delay-2">
-        <h3>🖥️ 桌面版 · 终身买断</h3>
-        <p class="subtitle-text">网页版全部 + AI 教练 + 离线 + 高精度引擎 · 一次付费永久使用</p>
-        <div class="price" style="color:#FBBF24;">¥666.66<span> 终身</span></div>
-        <p style="color:#64748B;font-size:13px;margin-top:-12px;">≈ GTO Wizard 1.3 个月的价格 · 用 23 个月回本</p>
+      <div class="pricing-card animate animate-delay-3">
+        <h3>💎 终身版</h3>
+        <div class="price">¥400<span> 买断</span></div>
+        <div style="color:#94A3B8;font-size:13px;margin-top:-12px;">≈ $59 · 一次付费，永久使用</div>
         <ul>
-          <li>网页版全部功能</li>
-          <li class="highlight">🧠 AI 教练 — DeepSeek V4 实时解说</li>
-          <li class="highlight">📡 离线使用 · 无需网络</li>
-          <li class="highlight">⚡ 高精度本地 CFR 引擎</li>
-          <li class="highlight">🔒 Node Locking · 转牌河牌 · 多人底池</li>
-          <li class="highlight">📂 手牌历史导入 · PDF 导出</li>
-          <li class="highlight">💾 本地数据存储 · 隐私安全</li>
-          <li class="highlight">🔄 所有大版本免费更新</li>
+          <li><b>专业版全部功能</b></li>
+          <li>永久免费更新</li>
+          <li>桌面客户端 (Mac/Windows)</li>
+          <li>离线使用 · 无需网络</li>
+          <li>优先功能请求</li>
         </ul>
-        <a href="#desktop-teaser" class="btn btn-gold" style="width:100%;text-align:center;">🔔 上线通知我</a>
+        <a href="#download" class="btn btn-outline" style="width:100%;text-align:center;border-color:#F59E0B;color:#F59E0B;">查看下载方式</a>
       </div>
 
     </div>
-
-    <!-- Desktop Teaser Section -->
-    <div class="desktop-teaser animate" id="desktop-teaser">
-      <div style="font-size:40px;margin-bottom:12px;">🖥️</div>
-      <h3>桌面终身版 — 即将上线</h3>
-      <p style="color:#94A3B8;font-size:15px;max-width:560px;margin:0 auto 0;">
-        ¥666.66 终身买断。含 <b style="color:#FBBF24;">AI 教练</b>（DeepSeek V4）+ <b style="color:#FBBF24;">离线使用</b> + <b style="color:#FBBF24;">高精度本地 CFR 引擎</b> + Node Locking + 转牌河牌 + 多人底池。<br>
-        现在订阅网页版，桌面版上线时<span style="color:#FBBF24;font-weight:700;">已付订阅费可抵扣桌面版</span>。
-      </p>
-      <div class="benefits">
-        <div class="benefit-item"><span class="icon">🧠</span> AI 教练</div>
-        <div class="benefit-item"><span class="icon">📡</span> 离线可用</div>
-        <div class="benefit-item"><span class="icon">⚡</span> 高精度引擎</div>
-        <div class="benefit-item"><span class="icon">🔒</span> Node Locking</div>
-        <div class="benefit-item"><span class="icon">💾</span> 本地数据</div>
-        <div class="benefit-item"><span class="icon">🔄</span> 永久更新</div>
-      </div>
-      <p style="color:#64748B;font-size:14px;margin-bottom:12px;">留下联系方式，上线第一时间通知 + 早鸟优惠</p>
-      <div class="notify-box">
-        <input type="email" placeholder="输入邮箱地址" id="notifyEmail">
-        <button class="btn btn-gold" style="font-size:14px;padding:12px 24px;" onclick="document.getElementById('notifyEmail').value ? alert('✅ 已记录！桌面版上线时我们会第一时间通知你。') : alert('请输入邮箱地址')">🔔 通知我</button>
-      </div>
-      <p style="color:#475569;font-size:12px;margin-top:8px;">不加微信也能收到通知 · 也可以直接加客服微信 <b style="color:#94A3B8;">Mamba4life__0824</b> 提前锁定早鸟价</p>
-    </div>
-
   </div>
 </div>
 
-<!-- ═══════ Payment ═══════ -->
+<!-- WeChat/Alipay Payment -->
 <div class="container" style="padding-bottom:60px;">
   <div class="section">
-    <h2>🇨🇳 微信/支付宝订阅</h2>
-    <p class="subtitle">网页版 ¥29.9/月（CFR 求解 + 牌桌模拟 + GTO 训练）· 桌面终身版 ¥666.66（含 AI 教练 + 离线，即将上线）</p>
+    <h2>🇨🇳 中国用户 · 微信/支付宝购买桌面专业版</h2>
+    <p class="subtitle">网页版免费，桌面专业版支持微信和支付宝。无需国际信用卡。</p>
 
     <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 900px; margin: 0 auto;">
 
-      <!-- Web Subscription -->
-      <div style="background:#090D14; border:1px solid #10B98133; border-radius:20px; padding:32px; text-align:center; position:relative;">
-        <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#10B981; color:white; padding:4px 16px; border-radius:10px; font-size:12px; font-weight:700;">推荐</div>
-        <h3 style="font-size:20px; margin-bottom:12px;">🌐 网页版 · 核心功能全开</h3>
-        <div style="font-size:36px; font-weight:900; color:#34D399; margin-bottom:4px;">¥29.9</div>
-        <div style="color:#64748B; font-size:13px; margin-bottom:8px;">/ 月 · 7 天免费试用</div>
-        <div style="color:#94A3B8; font-size:13px; margin-bottom:20px;">年付 ¥199/年 (省 ¥160 · 相当于 ¥16.6/月)</div>
+      <!-- Pro via WeChat/Alipay -->
+      <div style="background:#090D14; border:1px solid #3B82F633; border-radius:20px; padding:32px; text-align:center; position:relative;">
+        <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#3B82F6; color:white; padding:4px 16px; border-radius:10px; font-size:12px; font-weight:700;">推荐</div>
+        <h3 style="font-size:20px; margin-bottom:12px;">⭐ 专业版</h3>
+        <div style="font-size:36px; font-weight:900; color:#3B82F6; margin-bottom:4px;">¥49.99</div>
+        <div style="color:#64748B; font-size:13px; margin-bottom:8px;">/ 月 · 人民币</div>
+        <div style="color:#94A3B8; font-size:13px; margin-bottom:20px;">年付 ¥399/年 (省 ¥200)</div>
 
         <div style="background:#111; border-radius:12px; padding:20px; margin-bottom:16px;">
-          <p style="font-size:13px; color:#94A3B8; margin-bottom:12px;">📱 微信/支付宝扫码订阅，自助开通</p>
+          <p style="font-size:13px; color:#94A3B8; margin-bottom:12px;">📱 微信扫码支付后，加客服微信获取卡密</p>
           <img src="/poker-gto-trainer/payment/wechat-pay-qr.png" alt="微信支付" style="width:180px; height:180px; border-radius:12px; margin:0 auto 8px; display:block; object-fit:contain; background:white; padding:8px;" onerror="this.style.display='none'" onload="this.style.display='block'">
           <p style="font-size:11px; color:#64748B;">客服微信: <b>Mamba4life__0824</b></p>
         </div>
 
         <div style="text-align:left; font-size:13px; color:#94A3B8; line-height:2;">
-          <b>开通流程：</b><br>
-          1️⃣ 扫码支付 ¥29.9（首月）<br>
+          <b>购买流程：</b><br>
+          1️⃣ 扫码支付 ¥49.99<br>
           2️⃣ 截图支付凭证<br>
           3️⃣ 加客服微信发送凭证<br>
-          4️⃣ 收到激活链接 → 立即使用<br>
-          5️⃣ 7 天试用期内不满意全额退
+          4️⃣ 收到卡密 → App 内激活<br>
+          5️⃣ 立刻解锁全部 26 模块 + CFR 求解器
         </div>
         <div style="margin-top:16px; padding:14px; background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.2); border-radius:12px;">
-          <p style="font-size:12px; color:#34D399; font-weight:600; margin-bottom:6px;">✅ 已订阅？直接开始训练</p>
-          <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" style="display:block; padding:10px 0; background:#34D399; color:#0A0A0A; border-radius:10px; font-size:13px; font-weight:700; text-decoration:none; text-align:center;">打开网页版 🚀</a>
+          <p style="font-size:12px; color:#34D399; font-weight:600; margin-bottom:6px;">✅ 支付完成？直接跳回 App</p>
+          <p style="font-size:11px; color:#64748B; margin-bottom:10px;">收到卡密后，点击下方按钮自动跳转到登录页并激活</p>
+          <a href="/poker-gto-trainer/app/?plan=pro" style="display:block; padding:10px 0; background:#34D399; color:#0A0A0A; border-radius:10px; font-size:13px; font-weight:700; text-decoration:none; text-align:center;">回到 App 激活 🚀</a>
         </div>
       </div>
 
-      <!-- Desktop Lifetime -->
+      <!-- Lifetime via WeChat/Alipay -->
       <div style="background:#090D14; border:1px solid #F59E0B33; border-radius:20px; padding:32px; text-align:center; position:relative;">
-        <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#F59E0B; color:black; padding:4px 16px; border-radius:10px; font-size:12px; font-weight:700;">即将上线</div>
-        <h3 style="font-size:20px; margin-bottom:12px;">🖥️ 桌面版 · 终身买断</h3>
-        <div style="font-size:36px; font-weight:900; color:#F59E0B; margin-bottom:4px;">¥666.66</div>
-        <div style="color:#64748B; font-size:13px; margin-bottom:8px;">一次付费 · 永久使用 · 含所有大版本更新</div>
-        <div style="color:#94A3B8; font-size:13px; margin-bottom:20px;">含 AI 教练 + 离线 + 高精度引擎 + Node Locking · 预计 2026 年 9 月上线</div>
+        <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#F59E0B; color:black; padding:4px 16px; border-radius:10px; font-size:12px; font-weight:700;">最划算</div>
+        <h3 style="font-size:20px; margin-bottom:12px;">💎 终身版</h3>
+        <div style="font-size:36px; font-weight:900; color:#F59E0B; margin-bottom:4px;">¥400</div>
+        <div style="color:#64748B; font-size:13px; margin-bottom:8px;">永久买断 · 终身更新</div>
+        <div style="color:#94A3B8; font-size:13px; margin-bottom:20px;">≈ Pro 10 个月回本 · GTO Wizard 一个月价钱</div>
 
         <div style="background:#111; border-radius:12px; padding:20px; margin-bottom:16px;">
-          <p style="font-size:13px; color:#94A3B8; margin-bottom:12px;">📱 提前锁定早鸟价，上线优先通知</p>
+          <p style="font-size:13px; color:#94A3B8; margin-bottom:12px;">📱 微信/支付宝扫码后加客服获取卡密</p>
           <div style="display:flex; gap:12px; justify-content:center;">
             <img src="/poker-gto-trainer/payment/wechat-pay-qr.png" alt="微信支付" style="width:140px; height:140px; border-radius:12px; object-fit:contain; background:white; padding:6px;" onerror="this.style.display='none'" onload="this.style.display='block'">
             <img src="/poker-gto-trainer/payment/alipay-qr.png" alt="支付宝" style="width:140px; height:140px; border-radius:12px; object-fit:contain; background:white; padding:6px;" onerror="this.style.display='none'" onload="this.style.display='block'">
@@ -600,17 +622,17 @@
         </div>
 
         <div style="text-align:left; font-size:13px; color:#94A3B8; line-height:2;">
-          <b>桌面版特权：</b><br>
-          ✅ 网页版全部功能 · 永久有效<br>
-          ✅ 离线使用 · 无需网络<br>
-          ✅ 本地数据存储 · 隐私安全<br>
-          ✅ 所有大版本免费更新<br>
+          <b>终身版特权：</b><br>
+          ✅ 所有 Pro 功能 · 永久有效<br>
+          ✅ 所有大版本更新免费<br>
+          ✅ 桌面端离线使用<br>
+          ✅ 专属 Discord 角色<br>
           ✅ 优先功能请求通道
         </div>
         <div style="margin-top:16px; padding:14px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); border-radius:12px;">
-          <p style="font-size:12px; color:#FBBF24; font-weight:600; margin-bottom:6px;">🔔 桌面版上线通知</p>
-          <p style="font-size:11px; color:#64748B; margin-bottom:10px;">留下联系方式或加客服微信，上线第一时间通知 + 早鸟价</p>
-          <a href="#desktop-teaser" style="display:block; padding:10px 0; background:#F59E0B; color:#0A0A0A; border-radius:10px; font-size:13px; font-weight:700; text-decoration:none; text-align:center;">📩 预约早鸟价</a>
+          <p style="font-size:12px; color:#F59E0B; font-weight:600; margin-bottom:6px;">✅ 支付完成？直接跳回 App</p>
+          <p style="font-size:11px; color:#64748B; margin-bottom:10px;">收到卡密后，点击下方按钮自动跳转到登录页并激活</p>
+          <a href="/poker-gto-trainer/app/?plan=lifetime" style="display:block; padding:10px 0; background:#F59E0B; color:#0A0A0A; border-radius:10px; font-size:13px; font-weight:700; text-decoration:none; text-align:center;">回到 App 激活 🚀</a>
         </div>
       </div>
 
@@ -621,7 +643,7 @@
       <p style="font-size:14px; color:#A78BFA; font-weight:700; margin-bottom:8px; letter-spacing:0.05em;">🧠 加入社群</p>
       <p style="font-size:24px; font-weight:900; color:#EDF1F7; margin-bottom:8px;">PokerGTO 学习交流群</p>
       <p style="font-size:14px; color:#94A3B8; margin-bottom:24px; max-width:400px; margin-left:auto; margin-right:auto;">
-        免费手牌分析 · GTO 策略讨论 · 软件内测资格 · 桌面版早鸟优惠
+        免费手牌分析 · GTO 策略讨论 · 软件内测资格 · 卡密优惠
       </p>
       <div style="display:inline-block; background:white; padding:8px; border-radius:12px; box-shadow:0 4px 24px rgba(167,139,250,0.15);">
         <img src="/poker-gto-trainer/payment/wechat-group-qr.png" alt="微信群二维码" style="width:160px; height:160px; display:block; border-radius:8px;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
@@ -639,8 +661,137 @@
         🌍 国际用户支持信用卡支付 (Visa/Mastercard)
       </p>
       <p style="font-size:12px; color:#64748B;">
-        网页版 ¥29.9/月或 $4.99/月，Stripe 安全支付
+        在 App 内登录后进入「账户管理」选择 Stripe 支付
       </p>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     HOW TO INSTALL & ACTIVATE GUIDE
+     ================================================================ -->
+<div class="section" style="background: #090D14; border-top: 1px solid #152233; border-bottom: 1px solid #152233;">
+  <div class="container">
+    <h2 style="text-align:center;margin-bottom:8px;">📖 桌面专业版 · 安装 & 激活指南</h2>
+    <p class="subtitle" style="text-align:center;">两步完成：下载 → 激活。先试试免费网页版再决定升级？<a href="https://poker-gto-web-production.up.railway.app" target="_blank" rel="noopener" style="color:#60A5FA;">点这里开玩 →</a></p>
+
+    <!-- Step 1: Download -->
+    <div style="max-width: 720px; margin: 0 auto 32px;">
+      <div style="display:flex; gap:16px; align-items:start;">
+        <div style="width:44px; height:44px; border-radius:12px; background: linear-gradient(135deg, #3B82F6, #2563EB); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900; color:white; flex-shrink:0;">1</div>
+        <div style="flex:1;">
+          <h3 style="font-size:18px; font-weight:700; color:#EDF1F7; margin-bottom:4px;">下载 App</h3>
+          <p style="font-size:14px; color:#94A3B8; margin-bottom:12px;">点击下方按钮下载 <b>最新版本</b>。macOS 用户选 .dmg 文件，Windows 用户选 .exe。</p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a href="https://github.com/Wei-D-web/poker-gto-trainer/releases/latest" target="_blank" rel="noopener" class="btn btn-secondary" style="font-size:13px; padding:10px 20px;">⬇ 下载最新版 (GitHub Releases)</a>
+            <a href="/poker-gto-trainer/download.html" class="btn btn-outline" style="font-size:13px; padding:10px 20px;">📥 下载中心 (含历史版本)</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Install -->
+    <div style="max-width: 720px; margin: 0 auto 32px;">
+      <div style="display:flex; gap:16px; align-items:start;">
+        <div style="width:44px; height:44px; border-radius:12px; background: linear-gradient(135deg, #10B981, #059669); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900; color:white; flex-shrink:0;">2</div>
+        <div style="flex:1;">
+          <h3 style="font-size:18px; font-weight:700; color:#EDF1F7; margin-bottom:4px;">安装 & 打开</h3>
+          <p style="font-size:14px; color:#94A3B8; margin-bottom:16px;">
+            <b>🍎 macOS 用户（重要！）</b>
+          </p>
+          <div style="background:#0D1117; border:1px solid #1C2A3D; border-radius:14px; padding:20px; margin-bottom:16px;">
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <!-- Step 2a -->
+              <div style="display:flex; gap:12px; align-items:start;">
+                <div style="width:28px; height:28px; border-radius:8px; background:rgba(251,191,36,0.12); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#FBBF24; flex-shrink:0;">a</div>
+                <div>
+                  <div style="font-size:13px; font-weight:600; color:#FBBF24; margin-bottom:2px;">双击 .dmg 文件，拖拽 PokerGTO Trainer 到 Applications 文件夹</div>
+                  <p style="font-size:12px; color:#64748B;">就像安装其他 Mac 软件一样，简单拖拽即可。</p>
+                </div>
+              </div>
+              <!-- Step 2b -->
+              <div style="display:flex; gap:12px; align-items:start;">
+                <div style="width:28px; height:28px; border-radius:8px; background:rgba(251,191,36,0.12); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#FBBF24; flex-shrink:0;">b</div>
+                <div>
+                  <div style="font-size:13px; font-weight:600; color:#FBBF24; margin-bottom:2px;">如果提示「无法验证开发者」⚠️</div>
+                  <p style="font-size:12px; color:#94A3B8; line-height:1.8;">
+                    <b>不是病毒！</b>这只是因为我们还没申请 Apple 官方签名（需要 $99/年）。<br>
+                    解决方法很简单：<br>
+                    <span style="display:inline-block; background:#1A1A1A; padding:3px 10px; border-radius:6px; font-size:12px; color:#EDF1F7; margin:4px 0;">
+                      ❶ 打开 <b>系统设置</b> → <b>隐私与安全性</b> → 拉到最下面<br>
+                      ❷ 找到「PokerGTO Trainer 已被阻止…」→ 点 <b style="color:#34D399;">仍要打开</b><br>
+                      ❸ 输入 Mac 密码确认 → App 成功打开 ✅
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <!-- Step 2c -->
+              <div style="display:flex; gap:12px; align-items:start;">
+                <div style="width:28px; height:28px; border-radius:8px; background:rgba(251,191,36,0.12); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#FBBF24; flex-shrink:0;">c</div>
+                <div>
+                  <div style="font-size:13px; font-weight:600; color:#FBBF24; margin-bottom:2px;">以后再次打开就不会再提示了</div>
+                  <p style="font-size:12px; color:#64748B;">这个操作只需要做一次。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p style="font-size:14px; color:#94A3B8; margin-bottom:8px;">
+            <b>🪟 Windows 用户</b>
+          </p>
+          <div style="background:#0D1117; border:1px solid #1C2A3D; border-radius:12px; padding:16px;">
+            <p style="font-size:12px; color:#94A3B8; line-height:1.8;">
+              下载 .exe 安装程序 → 双击运行 → 按照安装向导操作 → 完成后桌面会出现 PokerGTO Trainer 图标。<br>
+              如果 Windows Defender 提示未知应用，点击「<b style="color:#FBBF24;">更多信息</b>」→「<b style="color:#34D399;">仍要运行</b>」即可。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Activate -->
+    <div style="max-width: 720px; margin: 0 auto 32px;">
+      <div style="display:flex; gap:16px; align-items:start;">
+        <div style="width:44px; height:44px; border-radius:12px; background: linear-gradient(135deg, #F59E0B, #D97706); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:900; color:white; flex-shrink:0;">3</div>
+        <div style="flex:1;">
+          <h3 style="font-size:18px; font-weight:700; color:#EDF1F7; margin-bottom:4px;">激活付费功能</h3>
+          <p style="font-size:14px; color:#94A3B8; margin-bottom:16px;">
+            打开 App 后默认可免费使用基础训练功能。要解锁全部 26 个模块：
+          </p>
+          <div style="background:#0D1117; border:1px solid #1C2A3D; border-radius:14px; padding:20px;">
+            <div style="display:flex; flex-direction:column; gap:12px;">
+              <div style="display:flex; gap:10px; align-items:center;">
+                <span style="font-size:12px; font-weight:700; color:#64748B; min-width:20px;">A</span>
+                <span style="font-size:13px; color:#EDF1F7;">点击左侧菜单「<b style="color:#60A5FA;">账户</b>」→ 找到「<b>激活卡密</b>」输入框</span>
+              </div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <span style="font-size:12px; font-weight:700; color:#64748B; min-width:20px;">B</span>
+                <span style="font-size:13px; color:#EDF1F7;">输入购买后收到的 19 位激活码（格式：<code style="background:#1A1A1A; padding:2px 8px; border-radius:4px; font-size:12px; color:#FBBF24;">PGTO-XXXX-XXXX-XXXX</code>）</span>
+              </div>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <span style="font-size:12px; font-weight:700; color:#64748B; min-width:20px;">C</span>
+                <span style="font-size:13px; color:#EDF1F7;">点击「<b style="color:#34D399;">激活</b>」→ 看到「激活成功」→ 所有功能即刻解锁 🎉</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:14px; padding:12px 16px; background:rgba(16,185,129,0.05); border:1px solid rgba(16,185,129,0.15); border-radius:10px; display:flex; gap:10px; align-items:start;">
+            <span style="font-size:16px;">💡</span>
+            <p style="font-size:12px; color:#94A3B8; line-height:1.6;">
+              <b style="color:#34D399;">先免费体验再买！</b><br>
+              不激活也能使用策略浏览器、基础训练、手牌对比等免费功能。<br>
+              觉得有用再买卡密，支持 <b>微信 / 支付宝</b> 支付，激活码 <b>永久有效</b>。
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Video Demo Placeholder -->
+    <div style="max-width: 720px; margin: 40px auto 0; text-align:center; padding:28px; background:#0D1117; border:1px solid #1C2A3D; border-radius:16px;">
+      <div style="font-size:32px; margin-bottom:12px;">🎬</div>
+      <h3 style="font-size:16px; font-weight:700; color:#EDF1F7; margin-bottom:6px;">视频教程即将上线</h3>
+      <p style="font-size:13px; color:#64748B; margin-bottom:16px;">完整的安装到激活视频教程正在制作中，完成后会放在这里。</p>
+      <p style="font-size:12px; color:#475569;">到时候会在微信群第一时间通知，加客服微信 <b style="color:#60A5FA;">Mamba4life__0824</b> 提前进群</p>
     </div>
   </div>
 </div>
@@ -649,27 +800,19 @@
 <div class="container" id="faq">
   <div class="section">
     <h2>❓ 常见问题</h2>
-    <p class="subtitle">关于产品和定价，你想知道的都在这里</p>
+    <p class="subtitle">买之前想了解的，都在这里</p>
     <div style="max-width:800px; margin:0 auto; display:flex; flex-direction:column; gap:12px;">
       <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
         <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">和 GTO Wizard 比有什么区别？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">功能覆盖 GTO Wizard 核心能力：网页版 ¥29.9/月提供 CFR 求解、牌桌模拟、范围矩阵、GTO 训练、EV 反馈，价格仅为 GTO Wizard（¥499/月）的 1/16。桌面终身版 ¥666.66 增加 AI 教练（DeepSeek V4）、离线模式、高精度本地引擎、Node Locking 等深度分析功能，一次买断。全中文界面。如果你需要全英文国际顶级品牌，选 GTO Wizard；如果你想要高性价比的中文 GTO 训练工具，选我们。</p>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">网页版免费提供基础 GTO 训练功能，对标 GTO Wizard 入门体验。桌面专业版功能覆盖 GTO Wizard 约 90%（翻前范围、CFR 求解、训练模式、EV 反馈），价格仅 1/3。全中文界面，桌面端 100% 本地运行、离线可用，并提供终身买断选项，没有订阅压力。</p>
       </details>
       <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
         <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">网页版和桌面版有什么区别？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;"><b>🌐 网页版（¥29.9/月）：</b>浏览器直接使用，含 CFR 求解（浏览器 Web Worker 引擎）、牌桌模拟（AI 对局训练）、翻前范围矩阵、GTO 训练模式、EV 反馈、范围编辑器、Range Battle、胜率训练、Bluff Catcher。7 天免费试用，无需绑卡。<br><br><b>🖥️ 桌面版（¥666.66 终身，即将上线）：</b>在网页版全部功能基础上，增加 🧠 AI 教练（DeepSeek V4 实时解说）、📡 离线使用、⚡ 高精度本地 CFR 引擎（比网页版更快更准）、🔒 Node Locking、🔄 转牌/河牌深度分析、👥 多人底池分析（3-6人）、📂 手牌历史文件导入 + PDF 导出。一次付费永久使用，所有大版本免费更新。</p>
-      </details>
-      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
-        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">有免费试用吗？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">有！网页版提供 7 天免费试用，无需绑卡。试用期间所有功能全部开放，没有任何限制。到期后如果选择不续费，基础功能（范围矩阵查询、EV 反馈）仍可继续免费使用。</p>
-      </details>
-      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
-        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">桌面版什么时候上线？已经订阅网页版的有优惠吗？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">桌面版预计 2026 年 9 月上线。已经订阅网页版的用户，<b style="color:#FBBF24;">已付订阅费可全额抵扣桌面终身版</b>。例如你已付 3 个月 ¥89.7，购买桌面版只需补 ¥666.66 - ¥89.7 = ¥576.96。相当于先用网页版练手，桌面版出来无缝升级，不花冤枉钱。</p>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;"><b>🌐 网页版（免费）：</b>浏览器直接开打，无需下载安装。提供基础 GTO 训练、翻前范围矩阵、EV 反馈、AI 实战对局。适合入门学习和日常练习。<br><br><b>⚡ 桌面专业版（付费）：</b>在网页版基础上增加了 CFR 求解器、AI Coach 智能解说、Node Locking、Range Battle、Cash vs MTT 对比、对手剥削顾问等 26 个完整模块。100% 本地运行，离线可用。适合专业玩家和深度训练。</p>
       </details>
       <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
         <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">不付费能用什么？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">不付费的情况下，可以使用基础功能：翻前范围矩阵查询、基础 EV 反馈。免费试用 7 天后如果决定不订阅，这些基础功能仍然保留。要使用 CFR 求解器、牌桌模拟、GTO 训练模式等完整功能，需要订阅网页版（¥29.9/月）或等待桌面终身版上线。</p>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">网页版永久免费，点开即玩，无需注册！包含基础 GTO 训练、范围矩阵查询、EV 反馈和 AI 实战对局。觉得不够用？升级桌面专业版解锁 CFR 求解器 + 全部 26 个模块。</p>
       </details>
       <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
         <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">macOS 提示「无法验证开发者」，安全吗？</summary>
@@ -677,11 +820,15 @@
       </details>
       <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
         <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">支持哪些系统？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">网页版所有设备可用（电脑、平板、手机）。桌面版支持 macOS（Apple Silicon，M 系列芯片）和 Windows 10/11 x64，Linux 版打包中。</p>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">macOS（Apple Silicon，M 系列芯片）和 Windows 10/11 x64 均有安装包，Linux 版打包中。所有版本功能一致，离线可用。</p>
       </details>
       <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
-        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">怎么付款？不满意可以退吗？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">微信/支付宝扫码付款，加客服微信获取激活链接或卡密。网页版：7 天试用期内不满意全额退款。桌面终身版：购买后 7 天内不满意全额退款。国际用户可通过 Stripe 信用卡支付。</p>
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">怎么付款和激活？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">微信/支付宝扫码付款 → 截图凭证 → 加客服微信（Mamba4life_0824）→ 收到 19 位卡密 → 在 App 内「账户 → 激活卡密」输入，立即解锁。国际用户可在 App 内通过 Stripe 用信用卡支付。</p>
+      </details>
+      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
+        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">卡密是永久的吗？</summary>
+        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">终身版卡密永久有效，含所有大版本免费更新；入门版/专业版为订阅制（月付/年付），到期后基础功能仍可免费使用。</p>
       </details>
     </div>
   </div>
@@ -690,9 +837,9 @@
 <!-- Tech -->
 <div class="container" style="text-align:center;padding-bottom:16px;">
   <p style="color:#475569;font-size:13px;">
-    🌐 网页版 ¥29.9/月：CFR 求解 · 牌桌模拟 · 范围矩阵 · GTO 训练 · EV 反馈 · 7 天免费试用<br>
-    🖥️ 桌面终身版 ¥666.66：AI 教练 · 离线可用 · 高精度引擎 · Node Locking · 即将上线<br>
-    macOS / Windows / Linux · 微信/支付宝/Stripe
+    🌐 网页版：浏览器直接开打 · 基础 GTO 训练 + AI 对局<br>
+    🛠 桌面专业版：Electron · React 19 · TypeScript · CFR Solver · 26 模块 · 离线可用<br>
+    macOS / Windows / Linux
   </p>
 </div>
 
@@ -706,7 +853,7 @@
 
 <div class="footer">
   PokerGTO Trainer · &copy; 2026 · poker-gto-trainer<br>
-  <span style="color:#475569;">🌐 网页版 ¥29.9/月（CFR + 牌桌模拟 + GTO训练）· 🖥️ 桌面版 ¥666.66 终身（含 AI 教练 + 离线，即将上线）· 微信/支付宝 · Stripe</span><br>
+  <span style="color:#475569;">🌐 网页版免费 · ⚡ 桌面专业版付费 · 支持微信/支付宝 · Stripe · 卡密激活</span><br>
   <a href="/poker-gto-trainer/privacy.html" style="color:#475569;font-size:12px;">隐私政策</a> &middot;
   <a href="/poker-gto-trainer/terms.html" style="color:#475569;font-size:12px;">服务条款</a>
 </div>
