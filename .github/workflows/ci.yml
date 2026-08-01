@@ -19,6 +19,8 @@ jobs:
       - run: npm ci
       - name: Run tests
         run: npx vitest run --config vitest.config.ts
+        env:
+          VITE_LICENSE_SECRET: ${{ secrets.VITELICENSESECRET }}
       - name: Typecheck
         run: npx tsc --noEmit
       - name: Build
