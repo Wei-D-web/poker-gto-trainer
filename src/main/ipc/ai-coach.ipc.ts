@@ -1,136 +1,155 @@
 import { ipcMain } from 'electron'
-import { execSync } from 'child_process'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import type { CoachSendRequest, CoachSendResponse } from '../../shared/types/ai-coach'
 
-const AGENT_ID = 'poker-bro'
-const MODEL_ID = 'deepseek/deepseek-v4-pro'
+const DEEPSEEK_API_URL = process.env.DEEPSEEK_API_URL || 'https://api.deepseek.com/chat/completions'
+const DEEPSEEK_MODEL = process.env.DEEPSEEK_MODEL || 'deepseek-chat'
 
 /**
- * Load .env file from project root and return key-value pairs.
- * Simple parser — avoids adding dotenv dependency.
+ * 系统提示词 — 扑克 GTO 教练人设（替代 OpenClaw poker-bro agent 的 persona）
  */
-function loadEnvFile(): Record<string, string> {
+const SYSTEM_PROMPT = `你是 PokerGTO Trainer 内置的 AI 策略教练「巴哥」，一位精通 GTO（博弈论最优策略）的德州扑克专家。
+
+你的职责：
+- 用中文（简体）解释 GTO 策略，语言通俗但有专业深度
+- 分析玩家可能拿到的范围、赔率、坚果优势、位置优势
+- 给出可执行的建议（跟注/加注/弃牌），并说明 GTO 理由和剥削性偏离（exploit）时机
+- 回答关于翻前范围、翻后打法、ICM、牌桌动态的问题
+- 引用具体数字（底池赔率百分比、范围占比）时确保计算准确
+
+风格：
+- 简洁直接，每次回答不超过 300 字（除非用户要求详细分析）
+- 用扑克术语时给出中文解释
+- 不确定时明确说明「这是近似 GTO 估计」，不要编造精确数字`
+
+/**
+ * 从项目根目录 .env 读取 DEEPSEEK_API_KEY。
+ * 桌面版打包后 .env 随应用分发（extraResources/data），key 由用户配置。
+ */
+function loadDeepSeekKey(): string {
   try {
     const envPath = join(__dirname, '..', '..', '..', '.env')
     const content = readFileSync(envPath, 'utf-8')
-    const vars: Record<string, string> = {}
-
-    for (const line of content.split('\n')) {
-      const trimmed = line.trim()
-      if (!trimmed || trimmed.startsWith('#')) continue
-      const eqIdx = trimmed.indexOf('=')
-      if (eqIdx === -1) continue
-      const key = trimmed.slice(0, eqIdx).trim()
-      const value = trimmed.slice(eqIdx + 1).trim()
-      if (key && value) vars[key] = value
-    }
-
-    return vars
+    const match = content.match(/^DEEPSEEK_API_KEY=(.+)$/m)
+    if (match) return match[1].trim().replace(/^["']|["']$/g, '')
   } catch {
-    return {}
+    /* .env 不存在则回退 process.env */
   }
+  return process.env.DEEPSEEK_API_KEY || ''
 }
 
 /**
- * Call OpenClaw agent via CLI.
- * Uses execSync — agent response typically takes 3-10 seconds.
- * Forces deepseek-v4-pro model via --model flag.
+ * 直连 DeepSeek Chat Completions API（OpenAI 兼容格式）。
+ * 移除 OpenClaw CLI 依赖 — 买家只需联网，无需安装任何本地工具。
  */
-function callOpenClawAgent(message: string): CoachSendResponse {
+async function callDeepSeek(
+  messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }>,
+): Promise<CoachSendResponse> {
   const startTime = Date.now()
-  const envVars = loadEnvFile()
+  const apiKey = loadDeepSeekKey()
+
+  if (!apiKey) {
+    return {
+      text: '',
+      sessionId: '',
+      durationMs: 0,
+      error: '未配置 DEEPSEEK_API_KEY，请在应用目录 .env 中设置',
+    }
+  }
+
+  // 60 秒超时保护（deepseek-chat 通常 5-20 秒返回）
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 60000)
 
   try {
-    // Escape special characters for shell safety
-    const escaped = message
-      .replace(/\\/g, '\\\\')
-      .replace(/"/g, '\\"')
-      .replace(/\$/g, '\\$')
-      .replace(/`/g, '\\`')
-
-    const cmd = `openclaw agent --agent ${AGENT_ID} --model ${MODEL_ID} --message "${escaped}" --thinking off --json`
-
-    const stdout = execSync(cmd, {
-      timeout: 120000, // 2 min timeout for pro model (slower but smarter)
-      maxBuffer: 1024 * 1024, // 1MB output buffer
-      encoding: 'utf-8',
-      env: {
-        ...process.env,
-        // Pass DeepSeek API key from .env to OpenClaw
-        DEEPSEEK_API_KEY: envVars.DEEPSEEK_API_KEY || process.env.DEEPSEEK_API_KEY || '',
-        OPENCLAW_NO_COLOR: '1',
+    const res = await fetch(DEEPSEEK_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
       },
+      body: JSON.stringify({
+        model: DEEPSEEK_MODEL,
+        messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+        temperature: 0.7,
+        max_tokens: 1024,
+        stream: false,
+      }),
+      signal: controller.signal,
     })
 
-    // Parse JSON response. The CLI outputs JSON with some log lines mixed in.
-    const jsonMatch = stdout.match(/\{[\s\S]*"payloads"[\s\S]*\}/)
-    if (!jsonMatch) {
+    if (!res.ok) {
+      const body = await res.text().catch(() => '')
       return {
         text: '',
         sessionId: '',
         durationMs: Date.now() - startTime,
-        error: `Failed to parse agent response. Raw output: ${stdout.slice(0, 500)}`,
+        error: `DeepSeek API 返回 ${res.status}: ${body.slice(0, 300)}`,
       }
     }
 
-    const result = JSON.parse(jsonMatch[0])
-    const payload = result.payloads?.[0]
+    const data = await res.json()
+    const text: string = data?.choices?.[0]?.message?.content || '(无响应)'
+    const usage = data?.usage
 
     return {
-      text: payload?.text || '(no response)',
-      sessionId: result.meta?.agentMeta?.sessionId || '',
-      usage: result.meta?.agentMeta?.usage,
+      text,
+      sessionId: `deepseek-${Date.now()}`,
+      usage: usage
+        ? {
+            input: usage.prompt_tokens ?? 0,
+            output: usage.completion_tokens ?? 0,
+            total: (usage.prompt_tokens ?? 0) + (usage.completion_tokens ?? 0),
+          }
+        : undefined,
       durationMs: Date.now() - startTime,
     }
   } catch (error: any) {
-    const stderr = error.stderr || ''
-    const stdout = error.stdout || ''
     return {
       text: '',
       sessionId: '',
       durationMs: Date.now() - startTime,
-      error: `Agent call failed: ${error.message}. stderr: ${stderr.slice(0, 300)}. stdout: ${stdout.slice(0, 300)}`,
+      error: `DeepSeek 调用失败: ${error.name === 'AbortError' ? '请求超时（60s）' : error.message}`,
     }
+  } finally {
+    clearTimeout(timer)
   }
 }
 
 export function registerAiCoachIpc(): void {
   ipcMain.handle(
     'ai-coach:send',
-    (_event, params: CoachSendRequest): CoachSendResponse => {
+    (_event, params: CoachSendRequest): Promise<CoachSendResponse> => {
       const { message } = params
 
       if (!message || message.trim().length === 0) {
-        return {
+        return Promise.resolve({
           text: '',
           sessionId: '',
           durationMs: 0,
           error: 'Message is required',
+        })
+      }
+
+      // 拼接对话历史（保留最近 6 轮），映射为 API messages
+      const history: Array<{ role: 'user' | 'assistant'; content: string }> = []
+      if (params.history && params.history.length > 0) {
+        for (const m of params.history.slice(-12)) {
+          if (m.role === 'user' || m.role === 'assistant') {
+            history.push({ role: m.role, content: m.content })
+          }
         }
       }
+      history.push({ role: 'user', content: message })
 
-      // Prepend conversation history for context
-      let fullMessage = message
-      if (params.history && params.history.length > 0) {
-        const context = params.history
-          .slice(-6) // Last 3 exchanges (6 messages)
-          .map((m) => `[${m.role === 'user' ? '吴总' : '巴哥'}]: ${m.content}`)
-          .join('\n')
-        fullMessage = `对话历史:\n${context}\n\n---\n吴总: ${message}`
-      }
-
-      return callOpenClawAgent(fullMessage)
+      return callDeepSeek(history)
     }
   )
 
   ipcMain.handle('ai-coach:health', () => {
-    try {
-      execSync('openclaw agents list', { timeout: 5000, encoding: 'utf-8' })
-      return { ok: true, agentId: AGENT_ID }
-    } catch {
-      return { ok: false, agentId: AGENT_ID }
-    }
+    // 健康检查：仅确认 API key 已配置（不发起付费请求）
+    const ok = Boolean(loadDeepSeekKey())
+    return { ok, agentId: DEEPSEEK_MODEL }
   })
 }
