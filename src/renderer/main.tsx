@@ -7,10 +7,8 @@ import './styles/globals.css'
 const root = document.getElementById('root')
 if (root) {
   ReactDOM.createRoot(root).render(
-    <React.StrictMode>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
-    </React.StrictMode>
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   )
 }

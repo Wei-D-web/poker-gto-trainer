@@ -281,6 +281,26 @@ body {
 }
 
 /* ============================================================
+   Battle / Poker Table Animations
+   ============================================================ */
+
+@keyframes card-deal {
+  0% { transform: translateY(-20px) scale(0.8); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.animate-card-deal {
+  animation: card-deal 0.3s var(--ease-out) both;
+}
+
+@keyframes slide-up {
+  0% { transform: translateY(8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+.animate-slide-up {
+  animation: slide-up 0.25s var(--ease-out) both;
+}
+
+/* ============================================================
    Tooltip
    ============================================================ */
 

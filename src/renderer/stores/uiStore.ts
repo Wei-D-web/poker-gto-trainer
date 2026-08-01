@@ -22,7 +22,7 @@ export const useUIStore = create<UIStore>((set) => ({
   theme: 'dark',
   sidebarCollapsed: false,
   splitRatio: 0.55,
-  activeRoute: 'analyzer',
+  activeRoute: 'explore',
   showEquity: true,
   showEV: true,
 
