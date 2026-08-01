@@ -26,171 +26,809 @@
 <meta name="twitter:title" content="PokerGTO Trainer — 专业 GTO 扑克训练，¥29.9/月 网页版 · ¥666 终身桌面版">
 <meta name="twitter:description" content="网页版 ¥29.9/月：CFR 求解 + 牌桌模拟 + GTO 训练，7 天免费试用。桌面终身版 ¥666.66 含 AI 教练 + 离线，即将上线。">
 <meta name="twitter:image" content="https://wei-d-web.github.io/poker-gto-trainer/og-image.png">
+
+<!-- Google Fonts: Orbitron for gaming headings -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif; background: #05080C; color: #EDF1F7; line-height:1.6; }
-  #bgCanvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; width: 100%; height: 100%; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+/* ═══════════════════════════════════════════
+   PokerGTO Trainer — Design System v4
+   Dark gaming theme · Green CTA · Purple accent
+   ═══════════════════════════════════════════ */
 
-  @keyframes glowPulse { 0%,100% { box-shadow: 0 4px 24px rgba(16,185,129,0.3); } 50% { box-shadow: 0 4px 40px rgba(16,185,129,0.55), 0 0 80px rgba(16,185,129,0.1); } }
-  @keyframes matrixBreathe { 0%,100% { opacity: 0.5; transform: translate(-50%,-50%) scale(1); } 50% { opacity: 0.8; transform: translate(-50%,-50%) scale(1.05); } }
-  @keyframes fadeInUp { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-  @keyframes comingSoonPulse { 0%,100% { box-shadow: 0 0 20px rgba(245,158,11,0.3); } 50% { box-shadow: 0 0 40px rgba(245,158,11,0.6), 0 0 80px rgba(245,158,11,0.15); } }
+:root {
+  /* Brand */
+  --color-brand: #10B981;
+  --color-brand-dim: #059669;
+  --color-brand-glow: rgba(16,185,129,0.35);
+  --color-accent: #7C3AED;
+  --color-accent-glow: rgba(124,58,237,0.25);
+  --color-gold: #F59E0B;
+  --color-gold-dim: #D97706;
+  --color-gold-glow: rgba(245,158,11,0.35);
 
-  /* ── Top Sticky Nav ── */
-  .nav { position: sticky; top: 0; z-index: 101; background: rgba(5,8,12,0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid rgba(21,34,51,0.5); }
-  .nav-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; }
-  .nav-logo { font-size: 18px; font-weight: 800; text-decoration: none; background: linear-gradient(135deg, #60A5FA, #A78BFA); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.02em; flex-shrink: 0; }
-  .nav-links { display: flex; gap: 28px; align-items: center; }
-  .nav-links a { color: #94A3B8; text-decoration: none; font-size: 14px; font-weight: 500; transition: color 0.2s; }
-  .nav-links a:hover { color: #EDF1F7; }
-  .btn-nav { padding: 8px 20px; border-radius: 10px; font-size: 13px; font-weight: 700; background: linear-gradient(135deg, #10B981, #059669); color: white; text-decoration: none; transition: all 0.2s; }
-  .btn-nav:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(16,185,129,0.4); }
-  .nav-toggle { display: none; background: none; border: none; color: #94A3B8; font-size: 24px; cursor: pointer; padding: 4px; line-height: 1; }
+  /* Surfaces */
+  --bg-root: #080C14;
+  --bg-surface: #0B1020;
+  --bg-card: #0D1326;
+  --bg-card-hover: #111B33;
+  --bg-elevated: rgba(11,16,32,0.92);
 
-  /* ── Hero ── */
-  .hero { padding: 80px 0 60px; }
-  .hero-grid { display: flex; align-items: center; gap: 60px; }
-  .hero-text { flex: 1; min-width: 0; }
-  .hero-visual { flex: 0 0 420px; }
-  .hero .badge { display: inline-block; padding: 6px 16px; border-radius: 20px; background: rgba(16,185,129,0.1); color: #34D399; font-size: 13px; font-weight: 600; margin-bottom: 24px; border: 1px solid rgba(16,185,129,0.2); }
-  .hero h1 { font-size: 56px; font-weight: 900; letter-spacing: -0.02em; margin-bottom: 16px; background: linear-gradient(135deg, #60A5FA, #A78BFA, #34D399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .hero p { font-size: 18px; color: #94A3B8; max-width: 600px; margin-bottom: 32px; }
-  .hero .cta-group { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-  .hero .price-hint { font-size: 13px; color: #64748B; margin-top: 12px; }
+  /* Text */
+  --text-primary: #EDF1F7;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --text-inverse: #0A0A0A;
 
-  /* ── Buttons ── */
-  .btn { padding: 14px 32px; border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
-  .btn-primary { background: linear-gradient(135deg, #10B981, #059669); color: white; box-shadow: 0 4px 24px rgba(16,185,129,0.3); border: none; animation: glowPulse 3s ease-in-out infinite; }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(16,185,129,0.5); animation: none; }
-  .btn-secondary { background: linear-gradient(135deg, #2563EB, #7C3AED); color: white; box-shadow: 0 4px 24px rgba(37,99,235,0.2); border: none; }
-  .btn-secondary:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(37,99,235,0.3); }
-  .btn-gold { background: linear-gradient(135deg, #F59E0B, #D97706); color: #0A0A0A; box-shadow: 0 4px 24px rgba(245,158,11,0.3); border: none; animation: comingSoonPulse 2.5s ease-in-out infinite; }
-  .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 36px rgba(245,158,11,0.5); animation: none; }
-  .btn-outline { background: transparent; color: #94A3B8; border: 1px solid #1C2A3D; }
-  .btn-outline:hover { border-color: #3B82F6; color: #EDF1F7; }
+  /* Borders */
+  --border-default: rgba(30,41,59,0.6);
+  --border-hover: rgba(59,130,246,0.3);
+  --border-brand: rgba(16,185,129,0.3);
+  --border-gold: rgba(245,158,11,0.3);
 
-  /* ── Range Matrix Visual ── */
-  .range-matrix-wrap { position: relative; }
-  .range-matrix { display: grid; grid-template-columns: repeat(13, 1fr); gap: 2px; aspect-ratio: 1; background: #0A0F18; border: 1px solid #1C2A3D; border-radius: 16px; padding: 12px; box-shadow: 0 20px 60px rgba(16,185,129,0.08), 0 0 120px rgba(37,99,235,0.05); }
-  .range-cell { aspect-ratio: 1; border-radius: 3px; font-size: 7px; font-weight: 700; display: flex; align-items: center; justify-content: center; color: transparent; transition: all 0.15s; }
-  .range-cell:hover { transform: scale(1.3); z-index: 1; color: rgba(255,255,255,0.8); }
-  .range-cell.premium  { background: #DC2626; }
-  .range-cell.strong   { background: #EA580C; }
-  .range-cell.playable { background: #16A34A; }
-  .range-cell.speculative { background: #2563EB; }
-  .range-cell.marginal { background: #4B5563; }
-  .range-cell.fold     { background: #1F2937; }
-  .range-axis { display: flex; justify-content: space-around; margin-top: 8px; }
-  .range-axis span { font-size: 9px; color: #64748B; font-weight: 600; letter-spacing: 0.05em; }
-  .matrix-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 80%; height: 80%; background: radial-gradient(ellipse, rgba(16,185,129,0.06) 0%, transparent 70%); pointer-events: none; border-radius: 50%; animation: matrixBreathe 4s ease-in-out infinite; }
+  /* Radii */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
 
-  /* Sticky Bottom CTA */
-  .sticky-cta { position: fixed; bottom: 0; left: 0; right: 0; z-index: 100; background: rgba(5,8,12,0.95); backdrop-filter: blur(20px); border-top: 1px solid #152233; padding: 14px 24px; transform: translateY(100%); transition: transform 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 12px; }
-  .sticky-cta.visible { transform: translateY(0); }
-  .sticky-cta .btn { padding: 10px 24px; font-size: 14px; }
-  .sticky-cta .hint { font-size: 12px; color: #64748B; margin-right: 8px; }
+  /* Shadows */
+  --shadow-card: 0 4px 24px rgba(0,0,0,0.3);
+  --shadow-card-hover: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.08);
+  --shadow-brand: 0 4px 24px var(--color-brand-glow);
+  --shadow-gold: 0 4px 24px var(--color-gold-glow);
 
-  /* Feature Preview Screenshots */
-  .preview-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-width: 900px; margin: 0 auto; }
-  .preview-card { background: #090D14; border: 1px solid #152233; border-radius: 16px; overflow: hidden; transition: all 0.2s; }
-  .preview-card:hover { border-color: #2A3B52; transform: translateY(-2px); }
-  .preview-card img { width: 100%; height: auto; display: block; border-bottom: 1px solid #152233; }
-  .preview-card .caption { padding: 12px 16px; font-size: 13px; color: #94A3B8; font-weight: 600; }
+  /* Typography */
+  --font-display: 'Orbitron', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+  --font-mono: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
 
-  /* Stats bar */
-  .stats-bar { display: flex; justify-content: center; gap: 48px; padding: 32px 0; border-top: 1px solid #152233; border-bottom: 1px solid #152233; margin-bottom: 80px; }
-  .stat { text-align: center; }
-  .stat .num { font-size: 32px; font-weight: 900; background: linear-gradient(135deg, #EDF1F7 0%, #A78BFA 50%, #60A5FA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .stat .label { font-size: 13px; color: #64748B; margin-top: 4px; }
+  /* Spacing scale */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
 
-  /* Section */
-  .section { padding: 60px 0; }
-  .section h2 { font-size: 32px; font-weight: 800; text-align: center; margin-bottom: 12px; }
-  .section .subtitle { text-align: center; color: #94A3B8; margin-bottom: 48px; font-size: 16px; }
+  /* Transitions */
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --transition-fast: 150ms var(--ease-out);
+  --transition-base: 250ms var(--ease-out);
+  --transition-slow: 400ms var(--ease-out);
+}
 
-  /* ── Module grid ── */
-  .module-category { margin-bottom: 36px; }
-  .module-category:last-child { margin-bottom: 0; }
-  .module-cat-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(21,34,51,0.5); }
-  .module-cat-header .cat-icon { font-size: 18px; }
-  .module-cat-header .cat-title { font-size: 15px; font-weight: 700; color: #94A3B8; letter-spacing: -0.01em; }
-  .module-cat-header .cat-count { font-size: 11px; color: #475569; font-weight: 500; }
-  .module-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  .module-card { background: linear-gradient(180deg, rgba(13,17,23,0.8) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(21,34,51,0.6); border-radius: 16px; padding: 20px; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
-  .module-card:hover { border-color: rgba(59,130,246,0.25); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.08); }
-  .module-card .icon { font-size: 24px; margin-bottom: 8px; }
-  .module-card h4 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
-  .module-card p { font-size: 12px; color: #64748B; }
-  .new-badge { display: inline-block; padding: 2px 8px; border-radius: 8px; background: rgba(16,185,129,0.1); color: #34D399; font-size: 10px; font-weight: 700; margin-left: 6px; }
+/* ── Reset ── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg-root);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-  /* Pricing */
-  .pricing-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 720px; margin: 0 auto; }
-  .pricing-card { background: linear-gradient(180deg, rgba(13,17,23,0.8) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(21,34,51,0.6); border-radius: 20px; padding: 32px; text-align: center; position: relative; transition: all 0.3s; }
-  .pricing-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
-  .pricing-card.popular { border-color: rgba(16,185,129,0.5); background: linear-gradient(180deg, rgba(6,78,59,0.12) 0%, rgba(9,13,20,0.9) 100%); box-shadow: 0 0 60px rgba(16,185,129,0.12), 0 0 120px rgba(16,185,129,0.04); }
-  .pricing-card.popular::before { content: '推荐'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #10B981; color: white; padding: 4px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; }
-  .pricing-card.coming-soon { border-color: rgba(245,158,11,0.4); background: linear-gradient(180deg, rgba(146,64,14,0.08) 0%, rgba(9,13,20,0.9) 100%); }
-  .pricing-card.coming-soon::after { content: '即将上线 🚀'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #F59E0B; color: #0A0A0A; padding: 4px 16px; border-radius: 10px; font-size: 12px; font-weight: 700; }
-  .pricing-card h3 { font-size: 18px; margin-bottom: 4px; }
-  .pricing-card .subtitle-text { color: #94A3B8; font-size: 13px; margin-bottom: 16px; }
-  .pricing-card .price { font-size: 44px; font-weight: 900; margin: 16px 0; }
-  .pricing-card .price span { font-size: 16px; font-weight: 500; color: #64748B; }
-  .pricing-card ul { list-style: none; text-align: left; margin: 24px 0; }
-  .pricing-card li { font-size: 13px; padding: 6px 0; color: #94A3B8; }
-  .pricing-card li::before { content: '✓'; color: #34D399; margin-right: 8px; font-weight: 700; }
-  .pricing-card li.highlight::before { content: '⭐'; }
+/* ── Background Canvas ── */
+#bgCanvas {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none; width: 100%; height: 100%;
+}
 
-  /* Desktop Teaser */
-  .desktop-teaser { background: linear-gradient(135deg, rgba(245,158,11,0.06) 0%, rgba(217,119,6,0.03) 100%); border: 1px solid rgba(245,158,11,0.2); border-radius: 20px; padding: 40px 32px; max-width: 720px; margin: 40px auto 0; text-align: center; }
-  .desktop-teaser h3 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
-  .desktop-teaser .benefits { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin: 20px 0; }
-  .desktop-teaser .benefit-item { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #94A3B8; }
-  .desktop-teaser .benefit-item .icon { font-size: 18px; }
-  .desktop-teaser .notify-box { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
-  .desktop-teaser .notify-box input { padding: 12px 18px; border-radius: 12px; border: 1px solid #1C2A3D; background: #090D14; color: #EDF1F7; font-size: 14px; min-width: 260px; outline: none; transition: border-color 0.2s; }
-  .desktop-teaser .notify-box input:focus { border-color: #F59E0B; }
-  .desktop-teaser .notify-box input::placeholder { color: #475569; }
+/* ── Layout ── */
+.container {
+  max-width: 1200px; margin: 0 auto;
+  padding: 0 var(--space-lg); position: relative; z-index: 1;
+}
 
-  /* Footer */
-  .footer { text-align: center; padding: 40px 0 80px; color: #475569; font-size: 13px; border-top: 1px solid #152233; margin-top: 60px; }
+/* ── Animations ── */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 4px 24px var(--color-brand-glow); }
+  50% { box-shadow: 0 4px 48px rgba(16,185,129,0.55), 0 0 80px rgba(16,185,129,0.1); }
+}
+@keyframes goldPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(245,158,11,0.25); }
+  50% { box-shadow: 0 0 44px rgba(245,158,11,0.5), 0 0 80px rgba(245,158,11,0.12); }
+}
+@keyframes matrixBreathe {
+  0%, 100% { opacity: 0.5; transform: translate(-50%,-50%) scale(1); }
+  50% { opacity: 0.75; transform: translate(-50%,-50%) scale(1.06); }
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
 
-  /* ── Scroll Animation ── */
-  .animate { opacity: 0; transform: translateY(28px); transition: opacity 0.7s cubic-bezier(0.4,0,0.2,1), transform 0.7s cubic-bezier(0.4,0,0.2,1); }
-  .animate.visible { opacity: 1; transform: translateY(0); }
-  .animate-delay-1 { transition-delay: 0.08s; }
-  .animate-delay-2 { transition-delay: 0.16s; }
-  .animate-delay-3 { transition-delay: 0.24s; }
-  .animate-delay-4 { transition-delay: 0.32s; }
+/* ── Scroll Reveal ── */
+.animate {
+  opacity: 0; transform: translateY(28px);
+  transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+}
+.animate.visible { opacity: 1; transform: translateY(0); }
+.animate-delay-1 { transition-delay: 0.06s; }
+.animate-delay-2 { transition-delay: 0.14s; }
+.animate-delay-3 { transition-delay: 0.22s; }
+.animate-delay-4 { transition-delay: 0.30s; }
 
-  @media (max-width: 900px) {
-    /* Nav mobile */
-    .nav-links { display: none; }
-    .nav-toggle { display: block; }
-    .nav-links.open { display: flex; flex-direction: column; position: absolute; top: 60px; left: 0; right: 0; background: rgba(5,8,12,0.98); backdrop-filter: blur(16px); padding: 20px 24px; gap: 16px; border-bottom: 1px solid #152233; }
-    /* Hero mobile */
-    .hero { padding: 40px 0 40px; }
-    .hero-grid { flex-direction: column-reverse; gap: 32px; }
-    .hero-text { text-align: center; }
-    .hero-visual { flex: 0 0 auto; width: 100%; max-width: 340px; margin: 0 auto; }
-    .hero h1 { font-size: 36px; }
-    .hero p { font-size: 15px; margin-left: auto; margin-right: auto; }
-    .hero .badge { font-size: 12px; }
-    .hero .cta-group { justify-content: center; }
-    .range-matrix { padding: 8px; border-radius: 12px; }
-    .range-cell { font-size: 5px; border-radius: 2px; }
-    /* Grids */
-    .module-category { margin-bottom: 28px; }
-    .module-grid { grid-template-columns: repeat(2, 1fr); }
-    .pricing-grid { grid-template-columns: 1fr; }
-    .preview-grid { grid-template-columns: 1fr; }
-    .hero h1 { font-size: 36px; }
-    .stats-bar { gap: 24px; flex-wrap: wrap; }
-    .sticky-cta { flex-direction: column; gap: 8px; text-align: center; }
-    .desktop-teaser .benefits { flex-direction: column; align-items: center; }
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
+  html { scroll-behavior: auto; }
+}
+
+/* ═══════════ Nav ═══════════ */
+.nav {
+  position: sticky; top: 0; z-index: 101;
+  background: rgba(8,12,20,0.9);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border-default);
+}
+.nav-inner {
+  max-width: 1200px; margin: 0 auto;
+  padding: 0 var(--space-lg);
+  display: flex; align-items: center; justify-content: space-between;
+  height: 60px;
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 700;
+  text-decoration: none;
+  background: linear-gradient(135deg, #60A5FA, #A78BFA);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: 0.04em; flex-shrink: 0;
+}
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a {
+  color: var(--text-secondary); text-decoration: none;
+  font-size: 13px; font-weight: 500; transition: color var(--transition-fast);
+}
+.nav-links a:hover { color: var(--text-primary); }
+.btn-nav {
+  padding: 8px 20px; border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 700;
+  background: linear-gradient(135deg, var(--color-brand), var(--color-brand-dim));
+  color: white; text-decoration: none;
+  transition: all var(--transition-fast);
+}
+.btn-nav:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--color-brand-glow);
+}
+.nav-toggle {
+  display: none; background: none; border: none;
+  color: var(--text-secondary); font-size: 22px;
+  cursor: pointer; padding: 4px; line-height: 1;
+  width: 44px; height: 44px; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm);
+}
+.nav-toggle:hover { color: var(--text-primary); background: rgba(255,255,255,0.04); }
+
+/* ═══════════ Buttons ═══════════ */
+.btn {
+  padding: 14px 32px; border-radius: var(--radius-md);
+  font-size: 15px; font-weight: 700; cursor: pointer;
+  transition: all var(--transition-base);
+  text-decoration: none; display: inline-block;
+  border: none; font-family: var(--font-body);
+  position: relative; overflow: hidden;
+}
+.btn:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-brand), var(--color-brand-dim));
+  color: white;
+  box-shadow: var(--shadow-brand);
+  animation: glowPulse 3s ease-in-out infinite;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 36px rgba(16,185,129,0.5);
+  animation: none;
+}
+.btn-secondary {
+  background: linear-gradient(135deg, #2563EB, var(--color-accent));
+  color: white;
+  box-shadow: 0 4px 24px var(--color-accent-glow);
+}
+.btn-secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(124,58,237,0.35);
+}
+.btn-gold {
+  background: linear-gradient(135deg, var(--color-gold), var(--color-gold-dim));
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-gold);
+  animation: goldPulse 2.5s ease-in-out infinite;
+}
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 36px rgba(245,158,11,0.5);
+  animation: none;
+}
+.btn-outline {
+  background: transparent; color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+}
+.btn-outline:hover {
+  border-color: #3B82F6; color: var(--text-primary);
+  background: rgba(59,130,246,0.04);
+}
+
+/* ═══════════ Section Headers ═══════════ */
+.section {
+  padding: var(--space-4xl) 0;
+}
+.section-header {
+  text-align: center; margin-bottom: var(--space-3xl);
+}
+.section-header h2 {
+  font-family: var(--font-display);
+  font-size: 28px; font-weight: 800;
+  letter-spacing: 0.02em; margin-bottom: var(--space-sm);
+}
+.section-header .subtitle {
+  color: var(--text-secondary); font-size: 16px;
+  max-width: 560px; margin: 0 auto;
+}
+
+/* ═══════════ Card Base ═══════════ */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  transition: all var(--transition-base);
+}
+.card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* ═══════════ Hero ═══════════ */
+.hero {
+  padding: 80px 0 60px;
+}
+.hero-grid {
+  display: flex; align-items: center; gap: 60px;
+}
+.hero-text { flex: 1; min-width: 0; }
+.hero-visual { flex: 0 0 420px; }
+
+.hero .badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 18px; border-radius: 20px;
+  background: rgba(16,185,129,0.1); color: #34D399;
+  font-size: 13px; font-weight: 600; margin-bottom: var(--space-lg);
+  border: 1px solid rgba(16,185,129,0.2);
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: 52px; font-weight: 900;
+  letter-spacing: 0.04em; margin-bottom: var(--space-md);
+  background: linear-gradient(135deg, #60A5FA 0%, #A78BFA 40%, #34D399 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  line-height: 1.15;
+}
+.hero p {
+  font-size: 17px; color: var(--text-secondary);
+  max-width: 600px; margin-bottom: var(--space-xl);
+  line-height: 1.7;
+}
+.hero .cta-group {
+  display: flex; gap: 12px; flex-wrap: wrap; align-items: center;
+}
+.hero .price-hint {
+  font-size: 13px; color: var(--text-muted); margin-top: 12px;
+}
+
+/* Desktop teaser inline badge */
+.desktop-inline-badge {
+  display: inline-block; margin-top: 10px;
+  padding: 7px 16px;
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+}
+
+/* ═══════════ Range Matrix ─══════════ */
+.range-matrix-wrap { position: relative; }
+.range-matrix {
+  display: grid; grid-template-columns: repeat(13, 1fr);
+  gap: 2px; aspect-ratio: 1;
+  background: #0A0F18;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  box-shadow: 0 20px 60px rgba(16,185,129,0.06), 0 0 120px rgba(37,99,235,0.04);
+}
+.range-cell {
+  aspect-ratio: 1; border-radius: 3px;
+  font-size: 7px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  color: transparent; transition: all var(--transition-fast);
+  cursor: default;
+}
+.range-cell:hover {
+  transform: scale(1.35); z-index: 2;
+  color: rgba(255,255,255,0.85);
+}
+.range-cell.premium     { background: #DC2626; }
+.range-cell.strong      { background: #EA580C; }
+.range-cell.playable    { background: #16A34A; }
+.range-cell.speculative { background: #2563EB; }
+.range-cell.marginal    { background: #4B5563; }
+.range-cell.fold        { background: #1F2937; }
+
+.range-axis {
+  display: flex; justify-content: space-around; margin-top: 8px;
+}
+.range-axis span {
+  font-size: 9px; color: var(--text-muted);
+  font-weight: 600; letter-spacing: 0.05em;
+}
+.matrix-glow {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 80%; height: 80%;
+  background: radial-gradient(ellipse, rgba(16,185,129,0.05) 0%, transparent 70%);
+  pointer-events: none; border-radius: 50%;
+  animation: matrixBreathe 4s ease-in-out infinite;
+}
+
+/* ═══════════ Stats Bar ═══════════ */
+.stats-bar {
+  display: flex; justify-content: center; gap: var(--space-3xl);
+  padding: var(--space-xl) 0;
+  border-top: 1px solid var(--border-default);
+  border-bottom: 1px solid var(--border-default);
+  margin-bottom: var(--space-4xl);
+}
+.stat { text-align: center; }
+.stat .num {
+  font-family: var(--font-display);
+  font-size: 30px; font-weight: 900;
+  background: linear-gradient(135deg, #EDF1F7 0%, #A78BFA 50%, #60A5FA 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: 0.02em;
+}
+.stat .label {
+  font-size: 13px; color: var(--text-muted); margin-top: var(--space-xs);
+}
+
+/* ═══════════ Compare Cards ═══════════ */
+.compare-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg);
+  max-width: 900px; margin: 0 auto;
+}
+.compare-card {
+  border-radius: var(--radius-lg); padding: 36px 32px;
+  position: relative; transition: all var(--transition-base);
+}
+.compare-card:hover { transform: translateY(-2px); }
+.compare-card.web {
+  background: linear-gradient(180deg, rgba(16,185,129,0.05) 0%, var(--bg-card) 100%);
+  border: 1px solid var(--border-brand);
+}
+.compare-card.desktop {
+  background: linear-gradient(180deg, rgba(245,158,11,0.05) 0%, var(--bg-card) 100%);
+  border: 1px solid var(--border-gold);
+}
+.compare-card .tag {
+  display: inline-block; padding: 4px 14px; border-radius: var(--radius-sm);
+  font-size: 12px; font-weight: 700; margin-bottom: var(--space-md);
+}
+.compare-card.web .tag { background: rgba(16,185,129,0.12); color: #34D399; }
+.compare-card.desktop .tag { background: rgba(245,158,11,0.12); color: #FBBF24; }
+.compare-card h3 {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 700; margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+.compare-card .subtitle-text { font-size: 13px; color: var(--text-secondary); margin-bottom: var(--space-md); }
+.compare-card .price-tag { font-family: var(--font-display); font-size: 28px; font-weight: 900; margin-bottom: 20px; letter-spacing: 0.02em; }
+.compare-card.web .price-tag { color: #34D399; }
+.compare-card.desktop .price-tag { color: #FBBF24; }
+.compare-card .price-tag span { font-family: var(--font-body); font-size: 14px; font-weight: 500; color: var(--text-muted); }
+.compare-card ul { list-style: none; margin-bottom: var(--space-lg); }
+.compare-card li {
+  font-size: 13px; padding: 7px 0; color: var(--text-secondary);
+  display: flex; align-items: center; gap: 8px;
+}
+.compare-card li .check { color: #34D399; flex-shrink: 0; font-weight: 700; }
+.compare-card li .star { flex-shrink: 0; }
+.compare-card .btn { width: 100%; text-align: center; }
+.compare-card .coming-badge {
+  display: inline-block; padding: 3px 10px; border-radius: 6px;
+  background: rgba(245,158,11,0.12); color: #FBBF24;
+  font-size: 11px; font-weight: 700; margin-left: 8px;
+  vertical-align: middle;
+}
+
+/* ═══════════ Preview Screenshots ═══════════ */
+.preview-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-md); max-width: 900px; margin: 0 auto;
+}
+.preview-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg); overflow: hidden;
+  transition: all var(--transition-base);
+}
+.preview-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-card-hover);
+}
+.preview-card img {
+  width: 100%; height: auto; display: block;
+  border-bottom: 1px solid var(--border-default);
+}
+.preview-card .caption {
+  padding: 12px 16px; font-size: 13px;
+  color: var(--text-secondary); font-weight: 600;
+}
+
+/* ═══════════ Feature Modules ═══════════ */
+.module-category { margin-bottom: 36px; }
+.module-category:last-child { margin-bottom: 0; }
+.module-cat-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: var(--space-md); padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-default);
+}
+.module-cat-header .cat-icon { font-size: 16px; }
+.module-cat-header .cat-title {
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 700;
+  color: var(--text-secondary);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.module-cat-header .cat-count {
+  font-size: 11px; color: var(--text-muted); font-weight: 500;
+}
+.module-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
+}
+.module-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  transition: all var(--transition-base);
+  cursor: default;
+}
+.module-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(59,130,246,0.06);
+}
+.module-card .icon { font-size: 22px; margin-bottom: 8px; }
+.module-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+.module-card p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+.new-badge {
+  display: inline-block; padding: 2px 7px; border-radius: 6px;
+  background: rgba(16,185,129,0.1); color: #34D399;
+  font-size: 10px; font-weight: 700;
+}
+.desktop-badge {
+  display: inline-block; padding: 2px 7px; border-radius: 6px;
+  background: rgba(245,158,11,0.12); color: #FBBF24;
+  font-size: 10px; font-weight: 700;
+}
+
+/* ═══════════ Pricing ═══════════ */
+.pricing-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 20px; max-width: 760px; margin: 0 auto;
+}
+.pricing-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg); padding: var(--space-xl);
+  text-align: center; position: relative;
+  transition: all var(--transition-base);
+}
+.pricing-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-card-hover); }
+.pricing-card.popular {
+  border-color: var(--border-brand);
+  background: linear-gradient(180deg, rgba(6,78,59,0.1) 0%, var(--bg-card) 100%);
+  box-shadow: 0 0 60px rgba(16,185,129,0.1), 0 0 120px rgba(16,185,129,0.03);
+}
+.pricing-card.popular::before {
+  content: '推荐'; position: absolute; top: -13px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-brand); color: white;
+  padding: 5px 18px; border-radius: var(--radius-sm);
+  font-size: 12px; font-weight: 700;
+}
+.pricing-card.coming-soon {
+  border-color: var(--border-gold);
+  background: linear-gradient(180deg, rgba(146,64,14,0.06) 0%, var(--bg-card) 100%);
+}
+.pricing-card.coming-soon::after {
+  content: '即将上线'; position: absolute; top: -13px; left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-gold); color: #0A0A0A;
+  padding: 5px 18px; border-radius: var(--radius-sm);
+  font-size: 12px; font-weight: 700;
+}
+.pricing-card h3 {
+  font-family: var(--font-display);
+  font-size: 18px; margin-bottom: 4px; letter-spacing: 0.02em;
+}
+.pricing-card .subtitle-text { color: var(--text-secondary); font-size: 13px; margin-bottom: var(--space-md); }
+.pricing-card .price {
+  font-family: var(--font-display);
+  font-size: 42px; font-weight: 900; margin: var(--space-md) 0;
+  letter-spacing: 0.02em;
+}
+.pricing-card .price span {
+  font-family: var(--font-body);
+  font-size: 15px; font-weight: 500; color: var(--text-muted);
+}
+.pricing-card ul { list-style: none; text-align: left; margin: var(--space-lg) 0; }
+.pricing-card li {
+  font-size: 13px; padding: 6px 0; color: var(--text-secondary);
+  display: flex; align-items: center; gap: 8px;
+}
+.pricing-card li .check { color: #34D399; flex-shrink: 0; font-weight: 700; }
+
+/* ═══════════ Desktop Teaser ═══════════ */
+.desktop-teaser {
+  background: linear-gradient(135deg, rgba(245,158,11,0.05) 0%, rgba(217,119,6,0.02) 100%);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius-lg); padding: 44px 36px;
+  max-width: 720px; margin: 44px auto 0; text-align: center;
+}
+.desktop-teaser h3 {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 800; margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+.desktop-teaser .benefits {
+  display: flex; gap: var(--space-lg); justify-content: center;
+  flex-wrap: wrap; margin: 20px 0;
+}
+.desktop-teaser .benefit-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 14px; color: var(--text-secondary);
+}
+.desktop-teaser .benefit-item .icon { font-size: 17px; }
+.desktop-teaser .notify-box {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px;
+}
+.desktop-teaser .notify-box input {
+  padding: 12px 18px; border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface); color: var(--text-primary);
+  font-size: 14px; min-width: 260px; outline: none;
+  transition: border-color var(--transition-fast);
+  font-family: var(--font-body);
+}
+.desktop-teaser .notify-box input:focus {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 3px rgba(245,158,11,0.1);
+}
+.desktop-teaser .notify-box input::placeholder { color: var(--text-muted); }
+
+/* ═══════════ Payment Section ═══════════ */
+.payment-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-lg); max-width: 900px; margin: 0 auto;
+}
+.payment-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg); padding: var(--space-xl);
+  text-align: center; position: relative;
+}
+.payment-card.web-plan { border: 1px solid var(--border-brand); }
+.payment-card.desktop-plan { border: 1px solid var(--border-gold); }
+.payment-card .top-badge {
+  position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+  padding: 5px 18px; border-radius: var(--radius-sm);
+  font-size: 12px; font-weight: 700;
+}
+.payment-card .top-badge.recommend { background: var(--color-brand); color: white; }
+.payment-card .top-badge.upcoming { background: var(--color-gold); color: #0A0A0A; }
+.payment-card h3 {font-size: 19px; margin-bottom: 12px; }
+.payment-card .price-large {
+  font-family: var(--font-display);
+  font-size: 38px; font-weight: 900; margin-bottom: 4px;
+}
+.payment-card .price-hint { color: var(--text-muted); font-size: 13px; margin-bottom: 20px; }
+.payment-card .qr-box {
+  background: #111; border-radius: var(--radius-md);
+  padding: 20px; margin-bottom: var(--space-md);
+}
+.payment-card .steps {
+  text-align: left; font-size: 13px; color: var(--text-secondary);
+  line-height: 2.2;
+}
+.payment-card .action-box {
+  margin-top: var(--space-md); padding: 14px;
+  border-radius: var(--radius-md);
+}
+.payment-card .action-box.green {
+  background: rgba(52,211,153,0.07);
+  border: 1px solid rgba(52,211,153,0.2);
+}
+.payment-card .action-box.gold {
+  background: rgba(245,158,11,0.07);
+  border: 1px solid rgba(245,158,11,0.18);
+}
+
+/* ═══════════ Community ═══════════ */
+.community-block {
+  text-align: center; margin-top: 60px;
+  padding: 44px 28px;
+  background: linear-gradient(135deg, #0F172A, #1A1040);
+  border: 1px solid #1E293B;
+  border-radius: var(--radius-lg);
+  max-width: 600px; margin-left: auto; margin-right: auto;
+}
+.community-block .label {
+  font-family: var(--font-display);
+  font-size: 13px; color: #A78BFA; font-weight: 700;
+  margin-bottom: 8px; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.community-block .title {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 800; color: var(--text-primary);
+  margin-bottom: 8px; letter-spacing: 0.02em;
+}
+.community-block .desc {
+  font-size: 14px; color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+  max-width: 400px; margin-left: auto; margin-right: auto;
+}
+
+/* ═══════════ FAQ ═══════════ */
+.faq-list {
+  max-width: 800px; margin: 0 auto;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.faq-list details {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md); padding: 16px 20px;
+  transition: border-color var(--transition-fast);
+}
+.faq-list details:hover { border-color: rgba(59,130,246,0.15); }
+.faq-list details[open] {
+  border-color: rgba(59,130,246,0.25);
+  background: var(--bg-card-hover);
+}
+.faq-list summary {
+  cursor: pointer; font-weight: 700; font-size: 15px;
+  color: var(--text-primary); user-select: none;
+  padding: 2px 0;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.faq-list summary::-webkit-details-marker { display: none; }
+.faq-list summary::after {
+  content: '+'; font-size: 18px; color: var(--text-muted);
+  transition: transform var(--transition-fast);
+  font-weight: 300;
+}
+.faq-list details[open] summary::after {
+  content: '−'; transform: rotate(180deg);
+}
+.faq-list .answer {
+  margin-top: 10px; font-size: 14px;
+  color: var(--text-secondary); line-height: 1.7;
+}
+
+/* ═══════════ Sticky Bottom CTA ═══════════ */
+.sticky-cta {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(8,12,20,0.96);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-default);
+  padding: 14px var(--space-lg);
+  transform: translateY(100%);
+  transition: transform 0.3s var(--ease-out);
+  display: flex; justify-content: center; align-items: center; gap: 12px;
+}
+.sticky-cta.visible { transform: translateY(0); }
+.sticky-cta .btn { padding: 10px 24px; font-size: 14px; }
+.sticky-cta .hint { font-size: 12px; color: var(--text-muted); margin-right: 8px; }
+
+/* ═══════════ Footer ═══════════ */
+.footer {
+  text-align: center; padding: 44px 0 100px;
+  color: var(--text-muted); font-size: 13px;
+  border-top: 1px solid var(--border-default); margin-top: 60px;
+}
+.footer a {
+  color: var(--text-muted); font-size: 12px;
+  text-decoration: none; transition: color var(--transition-fast);
+}
+.footer a:hover { color: var(--text-secondary); }
+
+/* ═══════════ Focus ring (global) ═══════════ */
+a:focus-visible, button:focus-visible, input:focus-visible, details summary:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ═══════════ Responsive ═══════════ */
+@media (max-width: 1024px) {
+  .hero h1 { font-size: 40px; }
+  .hero-grid { gap: 40px; }
+  .hero-visual { flex: 0 0 340px; }
+  .module-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 900px) {
+  /* Nav */
+  .nav-links { display: none; }
+  .nav-toggle { display: flex; }
+  .nav-links.open {
+    display: flex; flex-direction: column;
+    position: absolute; top: 60px; left: 0; right: 0;
+    background: rgba(8,12,20,0.98);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    padding: 20px var(--space-lg); gap: var(--space-md);
+    border-bottom: 1px solid var(--border-default);
+  }
+  /* Hero */
+  .hero { padding: 44px 0 40px; }
+  .hero-grid { flex-direction: column-reverse; gap: 32px; }
+  .hero-text { text-align: center; }
+  .hero-visual { flex: 0 0 auto; width: 100%; max-width: 340px; margin: 0 auto; }
+  .hero h1 { font-size: 36px; }
+  .hero p { font-size: 15px; margin-left: auto; margin-right: auto; }
+  .hero .cta-group { justify-content: center; }
+  .range-matrix { padding: 8px; border-radius: var(--radius-sm); }
+  .range-cell { font-size: 5px; border-radius: 2px; }
+  /* Grids */
+  .compare-grid, .pricing-grid { grid-template-columns: 1fr; }
+  .preview-grid { grid-template-columns: 1fr; }
+  .module-grid { grid-template-columns: repeat(2, 1fr); }
+  .stats-bar { gap: var(--space-lg); flex-wrap: wrap; }
+  .sticky-cta { flex-direction: column; gap: 8px; text-align: center; }
+  .desktop-teaser .benefits { flex-direction: column; align-items: center; }
+  .section { padding: var(--space-3xl) 0; }
+  .section-header h2 { font-size: 24px; }
+}
+
+@media (max-width: 480px) {
+  .hero h1 { font-size: 28px; }
+  .hero-visual { max-width: 280px; }
+  .module-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .module-card { padding: 14px; }
+  .module-card h4 { font-size: 12px; }
+  .module-card p { font-size: 11px; }
+  .btn { padding: 12px 24px; font-size: 14px; width: 100%; text-align: center; }
+  .hero .cta-group { flex-direction: column; width: 100%; }
+  .hero .cta-group .btn { width: 100%; text-align: center; }
+  .stats-bar { gap: var(--space-md); }
+  .stat .num { font-size: 24px; }
+  .compare-card { padding: 24px 20px; }
+  .pricing-card { padding: 24px 20px; }
+  .desktop-teaser { padding: 28px 20px; }
+  .payment-card { padding: 24px 20px; }
+}
 </style>
 
 <!-- JSON-LD Structured Data -->
@@ -234,29 +872,27 @@
 
 <canvas id="bgCanvas"></canvas>
 
-<!-- ═══════ Top Sticky Nav ═══════ -->
+<!-- ═══════ Nav ═══════ -->
 <nav class="nav" id="navbar">
   <div class="nav-inner">
-    <a href="#hero" class="nav-logo">PokerGTO</a>
-    <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
+    <a href="#hero" class="nav-logo">POKERGTO</a>
+    <button class="nav-toggle" id="navToggle" aria-label="菜单" aria-expanded="false">☰</button>
     <div class="nav-links" id="navLinks">
       <a href="#features">功能</a>
-      <a href="#preview">界面预览</a>
-      <a href="#compare">网页 vs 桌面</a>
+      <a href="#preview">预览</a>
+      <a href="#compare">版本对比</a>
       <a href="#pricing">定价</a>
-      <a href="#desktop-teaser">桌面版预告</a>
-      <a href="#community">社群</a>
       <a href="#faq">常见问题</a>
-      <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn-nav">🚀 免费试用</a>
+      <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn-nav">免费试用</a>
     </div>
   </div>
 </nav>
 
-<!-- Sticky Bottom CTA -->
+<!-- ═══════ Sticky Bottom CTA ═══════ -->
 <div class="sticky-cta" id="stickyCta">
-  <span class="hint">🔥 7 天免费试用 · ¥29.9/月 · 随时取消</span>
-  <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn btn-primary">🚀 开始免费试用 — 网页版</a>
-  <a href="#desktop-teaser" class="btn btn-outline" style="border-color:#F59E0B;color:#F59E0B;">🖥️ 桌面终身版 · 即将上线</a>
+  <span class="hint">7 天免费试用 · ¥29.9/月 · 随时取消</span>
+  <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn btn-primary">开始免费试用 — 网页版</a>
+  <a href="#desktop-teaser" class="btn btn-outline" style="border-color:var(--color-gold);color:var(--color-gold);">桌面终身版 · 即将上线</a>
 </div>
 
 <!-- ═══════ Hero ═══════ -->
@@ -264,19 +900,21 @@
   <div class="container">
     <div class="hero-grid">
       <div class="hero-text">
-        <div class="badge">🃏 专业 GTO 训练 · ¥29.9/月 · 7 天免费试用</div>
+        <div class="badge">
+          <span style="font-size:16px;">🃏</span> 专业 GTO 训练 · ¥29.9/月 · 7 天免费试用
+        </div>
         <h1>PokerGTO Trainer</h1>
         <p>
           网页版 <b style="color:#34D399;">¥29.9/月</b>，核心功能全部开放。<br>
           CFR 求解 · 牌桌模拟 · 范围矩阵 · GTO 训练 · EV 反馈 — <b style="color:#EDF1F7;">实用功能都给全。</b><br>
-          <span style="display:inline-block;margin-top:8px;padding:6px 14px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;font-size:14px;">
-            🖥️ <b style="color:#FBBF24;">桌面终身版 ¥666.66</b> — AI 教练 · 离线可用 · 高精度引擎 · 即将上线
+          <span class="desktop-inline-badge">
+            <b style="color:#FBBF24;">桌面终身版 ¥666.66</b> — AI 教练 · 离线可用 · 高精度引擎 · 即将上线
           </span>
         </p>
         <div class="cta-group">
-          <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn btn-primary">🚀 免费试用 7 天</a>
-          <a href="#compare" class="btn btn-outline">⚡ 网页 vs 桌面对比</a>
-          <a href="#desktop-teaser" class="btn btn-gold" style="font-size:14px;padding:14px 24px;">🖥️ 桌面版上线通知我</a>
+          <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn btn-primary">免费试用 7 天</a>
+          <a href="#compare" class="btn btn-outline">网页 vs 桌面对比</a>
+          <a href="#desktop-teaser" class="btn btn-gold" style="font-size:14px;padding:14px 24px;">桌面版上线通知</a>
         </div>
         <div class="price-hint">无需绑卡 · 试用期满 ¥29.9/月 或 ¥199/年（省 45%）· 随时取消</div>
       </div>
@@ -291,7 +929,7 @@
   </div>
 </section>
 
-<!-- Stats -->
+<!-- ═══════ Stats ═══════ -->
 <div class="stats-bar animate">
   <div class="stat"><div class="num">26</div><div class="label">专业模块</div></div>
   <div class="stat"><div class="num">¥29.9</div><div class="label">月费 · 全功能</div></div>
@@ -302,112 +940,98 @@
 <!-- ═══════ Compare: Web vs Desktop ═══════ -->
 <div class="container" id="compare">
   <div class="section">
-    <h2>🌐 网页版 vs 🖥️ 桌面终身版</h2>
-    <p class="subtitle">网页版按月订阅，核心功能全给。桌面版一次买断，解锁 AI 教练 + 高精度引擎 + 离线。</p>
-    <style>
-      .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 900px; margin: 0 auto; }
-      .compare-card { border-radius: 20px; padding: 36px 32px; position: relative; }
-      .compare-card.web { background: linear-gradient(180deg, rgba(16,185,129,0.06) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(16,185,129,0.25); }
-      .compare-card.desktop { background: linear-gradient(180deg, rgba(245,158,11,0.06) 0%, rgba(9,13,20,0.9) 100%); border: 1px solid rgba(245,158,11,0.3); }
-      .compare-card .tag { display: inline-block; padding: 4px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
-      .compare-card.web .tag { background: rgba(16,185,129,0.15); color: #34D399; }
-      .compare-card.desktop .tag { background: rgba(245,158,11,0.15); color: #FBBF24; }
-      .compare-card h3 { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
-      .compare-card .subtitle-text { font-size: 13px; color: #94A3B8; margin-bottom: 16px; }
-      .compare-card .price-tag { font-size: 28px; font-weight: 900; margin-bottom: 20px; }
-      .compare-card.web .price-tag { color: #34D399; }
-      .compare-card.desktop .price-tag { color: #FBBF24; }
-      .compare-card .price-tag span { font-size: 14px; font-weight: 500; color: #64748B; }
-      .compare-card ul { list-style: none; margin-bottom: 24px; }
-      .compare-card li { font-size: 13px; padding: 7px 0; color: #94A3B8; }
-      .compare-card li.yes::before { content: '✅'; margin-right: 8px; }
-      .compare-card li.plus::before { content: '⭐'; margin-right: 8px; }
-      .compare-card .btn { width: 100%; text-align: center; }
-      .compare-card .coming-badge { display: inline-block; padding: 4px 12px; border-radius: 8px; background: rgba(245,158,11,0.12); color: #FBBF24; font-size: 11px; font-weight: 700; margin-left: 8px; }
-      @media (max-width: 768px) {
-        .compare-grid { grid-template-columns: 1fr; }
-      }
-    </style>
+    <div class="section-header">
+      <h2>网页版 vs 桌面终身版</h2>
+      <p class="subtitle">网页版按月订阅，核心功能全给。桌面版一次买断，解锁 AI 教练 + 高精度引擎 + 离线。</p>
+    </div>
     <div class="compare-grid">
       <!-- Web -->
       <div class="compare-card web animate animate-delay-1">
-        <div class="tag">🌐 推荐入门</div>
+        <div class="tag">推荐入门</div>
         <h3>网页版</h3>
         <p class="subtitle-text">浏览器直接使用 · 核心功能全开放 · 按月订阅</p>
         <div class="price-tag">¥29.9<span>/月</span></div>
         <ul>
-          <li class="yes">CFR 求解器（浏览器引擎）</li>
-          <li class="yes">牌桌模拟 — AI 对局训练</li>
-          <li class="yes">翻前范围矩阵 + 策略浏览器</li>
-          <li class="yes">GTO 训练模式 · EV 即时反馈</li>
-          <li class="yes">范围编辑器 · Range Battle</li>
-          <li class="yes">胜率训练 · Bluff Catcher</li>
-          <li class="yes">Cash vs MTT 策略对比</li>
-          <li class="yes">随时随地 · 手机平板电脑都能用</li>
-          <li class="yes" style="color:#64748B;font-size:12px;">⚠️ CFR 精度低于桌面版（浏览器限制）</li>
+          <li><span class="check">✓</span> CFR 求解器（浏览器引擎）</li>
+          <li><span class="check">✓</span> 牌桌模拟 — AI 对局训练</li>
+          <li><span class="check">✓</span> 翻前范围矩阵 + 策略浏览器</li>
+          <li><span class="check">✓</span> GTO 训练模式 · EV 即时反馈</li>
+          <li><span class="check">✓</span> 范围编辑器 · Range Battle</li>
+          <li><span class="check">✓</span> 胜率训练 · Bluff Catcher</li>
+          <li><span class="check">✓</span> Cash vs MTT 策略对比</li>
+          <li><span class="check">✓</span> 随时随地 · 手机平板电脑都能用</li>
+          <li style="color:var(--text-muted);font-size:12px;padding-top:4px;">⚠ CFR 精度低于桌面版（浏览器限制）</li>
         </ul>
-        <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn btn-primary">🚀 免费试用 7 天</a>
+        <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn btn-primary">免费试用 7 天</a>
       </div>
       <!-- Desktop -->
       <div class="compare-card desktop animate animate-delay-2">
-        <div class="tag">🖥️ 重度用户首选</div>
+        <div class="tag">重度用户首选</div>
         <h3>桌面终身版 <span class="coming-badge">即将上线</span></h3>
         <p class="subtitle-text">网页版全部 + AI 教练 + 离线 + 高精度引擎 · 一次买断</p>
         <div class="price-tag">¥666.66<span> 终身</span></div>
         <ul>
-          <li class="yes">网页版全部功能</li>
-          <li class="plus">🧠 AI 教练 — DeepSeek V4 实时解说</li>
-          <li class="plus">📡 离线使用 — 无需网络</li>
-          <li class="plus">⚡ 高精度本地 CFR 引擎 — 比网页版更快更准</li>
-          <li class="plus">🔒 Node Locking — 锁定手牌重新求解</li>
-          <li class="plus">🔄 转牌/河牌深度分析</li>
-          <li class="plus">👥 多人底池分析（3-6人）</li>
-          <li class="plus">📂 手牌历史文件导入 + PDF 导出</li>
-          <li class="plus">💾 本地数据存储 · 隐私安全</li>
-          <li class="plus">🔄 所有大版本免费更新</li>
+          <li><span class="check">✓</span> 网页版全部功能</li>
+          <li><span class="star">⭐</span> AI 教练 — DeepSeek V4 实时解说</li>
+          <li><span class="star">⭐</span> 离线使用 — 无需网络</li>
+          <li><span class="star">⭐</span> 高精度本地 CFR 引擎 — 比网页版更快更准</li>
+          <li><span class="star">⭐</span> Node Locking — 锁定手牌重新求解</li>
+          <li><span class="star">⭐</span> 转牌/河牌深度分析</li>
+          <li><span class="star">⭐</span> 多人底池分析（3-6人）</li>
+          <li><span class="star">⭐</span> 手牌历史文件导入 + PDF 导出</li>
+          <li><span class="star">⭐</span> 本地数据存储 · 隐私安全</li>
+          <li><span class="star">⭐</span> 所有大版本免费更新</li>
         </ul>
-        <a href="#desktop-teaser" class="btn btn-gold">🔔 上线通知我</a>
+        <a href="#desktop-teaser" class="btn btn-gold">上线通知我</a>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Feature Preview Screenshots -->
+<!-- ═══════ Preview Screenshots ═══════ -->
 <div class="container" id="preview">
   <div class="section">
-    <h2>👀 看看里面长什么样</h2>
-    <p class="subtitle">网页版核心功能，这些你都能用</p>
+    <div class="section-header">
+      <h2>看看里面长什么样</h2>
+      <p class="subtitle">网页版核心功能，这些你都能用</p>
+    </div>
     <div class="preview-grid">
       <div class="preview-card animate animate-delay-1">
         <img src="/poker-gto-trainer/demo-screenshots/01-strategy-explorer.webp" alt="策略浏览器 - 翻前范围矩阵" width="1400" height="840" loading="lazy" onerror="this.parentElement.style.display='none'">
-        <div class="caption">🌐 策略浏览器 — 13×13 范围矩阵 · CFR 求解</div>
+        <div class="caption">策略浏览器 — 13×13 范围矩阵 · CFR 求解</div>
       </div>
       <div class="preview-card animate animate-delay-2">
         <img src="/poker-gto-trainer/demo-screenshots/04-training-quiz.webp" alt="GTO训练模式" width="1400" height="840" loading="lazy" onerror="this.parentElement.style.display='none'">
-        <div class="caption">🎯 训练模式 — 随机出题 · EV 即时反馈</div>
+        <div class="caption">训练模式 — 随机出题 · EV 即时反馈</div>
       </div>
       <div class="preview-card animate animate-delay-3">
         <img src="/poker-gto-trainer/demo-screenshots/07-range-battle.webp" alt="Range Battle 范围对战" width="1400" height="840" loading="lazy" onerror="this.parentElement.style.display='none'">
-        <div class="caption">⚔️ Range Battle — 范围对战 · 胜率分布图</div>
+        <div class="caption">Range Battle — 范围对战 · 胜率分布图</div>
       </div>
       <div class="preview-card animate animate-delay-4">
         <img src="/poker-gto-trainer/demo-screenshots/03-range-editor.webp" alt="范围编辑器" width="1400" height="840" loading="lazy" onerror="this.parentElement.style.display='none'">
-        <div class="caption">✏️ 范围编辑器 — 构建自定义手牌范围</div>
+        <div class="caption">范围编辑器 — 构建自定义手牌范围</div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Features -->
+<!-- ═══════ Features ═══════ -->
 <div class="container" id="features">
   <div class="section">
-    <h2>全部功能模块</h2>
-    <p class="subtitle">网页版含核心训练模块。标注 ⚡ 的为桌面版独占（需本地高精度引擎）。</p>
+    <div class="section-header">
+      <h2>全部功能模块</h2>
+      <p class="subtitle">网页版含核心训练模块。标注「桌面」的为桌面版独占（需本地高精度引擎）。</p>
+    </div>
     <div class="module-grid">
 
-      <!-- 🎓 学习与训练 -->
+      <!-- 学习与训练 -->
       <div class="module-category" style="grid-column: 1 / -1;">
-        <div class="module-cat-header animate"><span class="cat-icon">🎓</span><span class="cat-title">学习与训练</span><span class="cat-count">6 个模块</span></div>
+        <div class="module-cat-header animate">
+          <span class="cat-icon">🎓</span>
+          <span class="cat-title">学习与训练</span>
+          <span class="cat-count">6 模块</span>
+        </div>
         <div class="module-grid">
           <div class="module-card"><div class="icon">🔥</div><h4>Daily Drills<span class="new-badge">New</span></h4><p>每日GTO挑战 + 连击追踪</p></div>
           <div class="module-card"><div class="icon">🎮</div><h4>实战模拟</h4><p>对抗GTO AI，真实牌桌体验</p></div>
@@ -418,34 +1042,46 @@
         </div>
       </div>
 
-      <!-- ⚔️ 实战与分析 -->
+      <!-- 实战与分析 -->
       <div class="module-category" style="grid-column: 1 / -1;">
-        <div class="module-cat-header animate"><span class="cat-icon">⚔️</span><span class="cat-title">实战与分析</span><span class="cat-count">6 个模块</span></div>
+        <div class="module-cat-header animate">
+          <span class="cat-icon">⚔️</span>
+          <span class="cat-title">实战与分析</span>
+          <span class="cat-count">6 模块</span>
+        </div>
         <div class="module-grid">
           <div class="module-card"><div class="icon">🔍</div><h4>手牌分析器</h4><p>逐条决策GTO偏差分析</p></div>
           <div class="module-card"><div class="icon">⚔️</div><h4>Range Battle<span class="new-badge">New</span></h4><p>范围对战 · 胜率分布图</p></div>
-          <div class="module-card"><div class="icon">🔒</div><h4>Node Locking<span class="new-badge" style="background:rgba(245,158,11,0.15);color:#FBBF24;">桌面</span></h4><p>锁定手牌 · 观察策略调整</p></div>
-          <div class="module-card"><div class="icon">🔄</div><h4>转牌河牌<span class="new-badge" style="background:rgba(245,158,11,0.15);color:#FBBF24;">桌面</span></h4><p>危险牌/空白牌检测</p></div>
-          <div class="module-card"><div class="icon">👥</div><h4>多人底池<span class="new-badge" style="background:rgba(245,158,11,0.15);color:#FBBF24;">桌面</span></h4><p>3-6人启发式分析</p></div>
+          <div class="module-card"><div class="icon">🔒</div><h4>Node Locking<span class="desktop-badge">桌面</span></h4><p>锁定手牌 · 观察策略调整</p></div>
+          <div class="module-card"><div class="icon">🔄</div><h4>转牌河牌<span class="desktop-badge">桌面</span></h4><p>危险牌/空白牌检测</p></div>
+          <div class="module-card"><div class="icon">👥</div><h4>多人底池<span class="desktop-badge">桌面</span></h4><p>3-6人启发式分析</p></div>
           <div class="module-card"><div class="icon">🔬</div><h4>Strategy Lab<span class="new-badge">New</span></h4><p>完整翻后策略分解</p></div>
         </div>
       </div>
 
-      <!-- 📊 数据与报告 -->
+      <!-- 数据与报告 -->
       <div class="module-category" style="grid-column: 1 / -1;">
-        <div class="module-cat-header animate"><span class="cat-icon">📊</span><span class="cat-title">数据与报告</span><span class="cat-count">5 个模块</span></div>
+        <div class="module-cat-header animate">
+          <span class="cat-icon">📊</span>
+          <span class="cat-title">数据与报告</span>
+          <span class="cat-count">5 模块</span>
+        </div>
         <div class="module-grid">
           <div class="module-card"><div class="icon">📊</div><h4>数据分析<span class="new-badge">New</span></h4><p>批量手牌聚合Dashboard</p></div>
-          <div class="module-card"><div class="icon">📄</div><h4>PDF报告<span class="new-badge" style="background:rgba(245,158,11,0.15);color:#FBBF24;">桌面</span></h4><p>一键导出分析报告</p></div>
+          <div class="module-card"><div class="icon">📄</div><h4>PDF报告<span class="desktop-badge">桌面</span></h4><p>一键导出分析报告</p></div>
           <div class="module-card"><div class="icon">📤</div><h4>多格式导出<span class="new-badge">New</span></h4><p>JSON/CSV/Range数据</p></div>
           <div class="module-card"><div class="icon">📈</div><h4>进度追踪<span class="new-badge">New</span></h4><p>30天EV趋势图表</p></div>
           <div class="module-card"><div class="icon">📜</div><h4>手牌历史</h4><p>批量导入 · 导出PDF</p></div>
         </div>
       </div>
 
-      <!-- 🛠 工具与配置 -->
+      <!-- 工具与配置 -->
       <div class="module-category" style="grid-column: 1 / -1;">
-        <div class="module-cat-header animate"><span class="cat-icon">🛠</span><span class="cat-title">工具与配置</span><span class="cat-count">5 个模块</span></div>
+        <div class="module-cat-header animate">
+          <span class="cat-icon">🛠</span>
+          <span class="cat-title">工具与配置</span>
+          <span class="cat-count">5 模块</span>
+        </div>
         <div class="module-grid">
           <div class="module-card"><div class="icon">🔧</div><h4>工具箱<span class="new-badge">New</span></h4><p>Pot Odds/Replayer/参考</p></div>
           <div class="module-card"><div class="icon">✏️</div><h4>范围编辑器</h4><p>构建自定义手牌范围</p></div>
@@ -455,12 +1091,16 @@
         </div>
       </div>
 
-      <!-- 🎯 高级功能 -->
+      <!-- 高级功能 -->
       <div class="module-category" style="grid-column: 1 / -1;">
-        <div class="module-cat-header animate"><span class="cat-icon">🎯</span><span class="cat-title">高级功能</span><span class="cat-count">4 个模块</span></div>
+        <div class="module-cat-header animate">
+          <span class="cat-icon">🎯</span>
+          <span class="cat-title">高级功能</span>
+          <span class="cat-count">4 模块</span>
+        </div>
         <div class="module-grid">
-          <div class="module-card"><div class="icon">🔄</div><h4>Cash vs MTT<span class="new-badge">NEW</span></h4><p>现金局vs锦标赛策略差异</p></div>
-          <div class="module-card"><div class="icon">🎯</div><h4>对手剥削顾问<span class="new-badge">NEW</span></h4><p>7种对手类型针对性偏移</p></div>
+          <div class="module-card"><div class="icon">🔄</div><h4>Cash vs MTT<span class="new-badge">New</span></h4><p>现金局vs锦标赛策略差异</p></div>
+          <div class="module-card"><div class="icon">🎯</div><h4>对手剥削顾问<span class="new-badge">New</span></h4><p>7种对手类型针对性偏移</p></div>
           <div class="module-card"><div class="icon">⚙️</div><h4>设置/双语</h4><p>中英文切换 · 快捷键</p></div>
           <div class="module-card"><div class="icon">📖</div><h4>使用说明</h4><p>应用内完整指南</p></div>
         </div>
@@ -473,57 +1113,59 @@
 <!-- ═══════ Pricing ═══════ -->
 <div class="container" id="pricing">
   <div class="section">
-    <h2>简单定价</h2>
-    <p class="subtitle">网页版核心功能全给，桌面版解锁 AI 教练 + 高精度引擎。7 天免费试用，不满意全额退。</p>
+    <div class="section-header">
+      <h2>简单定价</h2>
+      <p class="subtitle">网页版核心功能全给，桌面版解锁 AI 教练 + 高精度引擎。7 天免费试用，不满意全额退。</p>
+    </div>
     <div class="pricing-grid">
 
-      <!-- Web Monthly -->
+      <!-- Web -->
       <div class="pricing-card popular animate animate-delay-1">
-        <h3>🌐 网页版 · 核心功能全开</h3>
+        <h3>网页版 · 核心功能全开</h3>
         <p class="subtitle-text">浏览器即用 · CFR 求解 + 牌桌模拟 + GTO 训练 · 7 天免费试用</p>
         <div class="price" style="color:#34D399;">¥29.9<span>/月</span></div>
-        <p style="color:#64748B;font-size:13px;margin-top:-12px;">或 ¥199/年（省 ¥160 · 相当于 ¥16.6/月）</p>
+        <p style="color:var(--text-muted);font-size:13px;margin-top:-12px;">或 ¥199/年（省 ¥160 · 相当于 ¥16.6/月）</p>
         <ul>
-          <li>CFR 求解器（浏览器引擎）</li>
-          <li>牌桌模拟 — AI 对局训练</li>
-          <li>翻前范围矩阵 + 策略浏览器</li>
-          <li>GTO 训练模式 · EV 即时反馈</li>
-          <li>范围编辑器 · Range Battle</li>
-          <li>胜率训练 · Bluff Catcher</li>
-          <li>Cash vs MTT 策略对比</li>
-          <li>手机平板电脑都能用</li>
-          <li>7 天免费试用 · 无需绑卡</li>
-          <li>随时取消 · 不满意全额退</li>
+          <li><span class="check">✓</span> CFR 求解器（浏览器引擎）</li>
+          <li><span class="check">✓</span> 牌桌模拟 — AI 对局训练</li>
+          <li><span class="check">✓</span> 翻前范围矩阵 + 策略浏览器</li>
+          <li><span class="check">✓</span> GTO 训练模式 · EV 即时反馈</li>
+          <li><span class="check">✓</span> 范围编辑器 · Range Battle</li>
+          <li><span class="check">✓</span> 胜率训练 · Bluff Catcher</li>
+          <li><span class="check">✓</span> Cash vs MTT 策略对比</li>
+          <li><span class="check">✓</span> 手机平板电脑都能用</li>
+          <li><span class="check">✓</span> 7 天免费试用 · 无需绑卡</li>
+          <li><span class="check">✓</span> 随时取消 · 不满意全额退</li>
         </ul>
-        <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;text-align:center;">🚀 免费试用 7 天</a>
+        <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;text-align:center;">免费试用 7 天</a>
       </div>
 
-      <!-- Desktop Lifetime -->
+      <!-- Desktop -->
       <div class="pricing-card coming-soon animate animate-delay-2">
-        <h3>🖥️ 桌面版 · 终身买断</h3>
+        <h3>桌面版 · 终身买断</h3>
         <p class="subtitle-text">网页版全部 + AI 教练 + 离线 + 高精度引擎 · 一次付费永久使用</p>
         <div class="price" style="color:#FBBF24;">¥666.66<span> 终身</span></div>
-        <p style="color:#64748B;font-size:13px;margin-top:-12px;">≈ GTO Wizard 1.3 个月的价格 · 用 23 个月回本</p>
+        <p style="color:var(--text-muted);font-size:13px;margin-top:-12px;">≈ GTO Wizard 1.3 个月的价格 · 用 23 个月回本</p>
         <ul>
-          <li>网页版全部功能</li>
-          <li class="highlight">🧠 AI 教练 — DeepSeek V4 实时解说</li>
-          <li class="highlight">📡 离线使用 · 无需网络</li>
-          <li class="highlight">⚡ 高精度本地 CFR 引擎</li>
-          <li class="highlight">🔒 Node Locking · 转牌河牌 · 多人底池</li>
-          <li class="highlight">📂 手牌历史导入 · PDF 导出</li>
-          <li class="highlight">💾 本地数据存储 · 隐私安全</li>
-          <li class="highlight">🔄 所有大版本免费更新</li>
+          <li><span class="check">✓</span> 网页版全部功能</li>
+          <li><span class="check" style="color:#FBBF24;">⭐</span> AI 教练 — DeepSeek V4 实时解说</li>
+          <li><span class="check" style="color:#FBBF24;">⭐</span> 离线使用 · 无需网络</li>
+          <li><span class="check" style="color:#FBBF24;">⭐</span> 高精度本地 CFR 引擎</li>
+          <li><span class="check" style="color:#FBBF24;">⭐</span> Node Locking · 转牌河牌 · 多人底池</li>
+          <li><span class="check" style="color:#FBBF24;">⭐</span> 手牌历史导入 · PDF 导出</li>
+          <li><span class="check" style="color:#FBBF24;">⭐</span> 本地数据存储 · 隐私安全</li>
+          <li><span class="check" style="color:#FBBF24;">⭐</span> 所有大版本免费更新</li>
         </ul>
-        <a href="#desktop-teaser" class="btn btn-gold" style="width:100%;text-align:center;">🔔 上线通知我</a>
+        <a href="#desktop-teaser" class="btn btn-gold" style="width:100%;text-align:center;">上线通知我</a>
       </div>
 
     </div>
 
-    <!-- Desktop Teaser Section -->
+    <!-- Desktop Teaser -->
     <div class="desktop-teaser animate" id="desktop-teaser">
-      <div style="font-size:40px;margin-bottom:12px;">🖥️</div>
+      <div style="font-size:36px;margin-bottom:10px;">🖥️</div>
       <h3>桌面终身版 — 即将上线</h3>
-      <p style="color:#94A3B8;font-size:15px;max-width:560px;margin:0 auto 0;">
+      <p style="color:var(--text-secondary);font-size:15px;max-width:560px;margin:0 auto;">
         ¥666.66 终身买断。含 <b style="color:#FBBF24;">AI 教练</b>（DeepSeek V4）+ <b style="color:#FBBF24;">离线使用</b> + <b style="color:#FBBF24;">高精度本地 CFR 引擎</b> + Node Locking + 转牌河牌 + 多人底池。<br>
         现在订阅网页版，桌面版上线时<span style="color:#FBBF24;font-weight:700;">已付订阅费可抵扣桌面版</span>。
       </p>
@@ -535,12 +1177,12 @@
         <div class="benefit-item"><span class="icon">💾</span> 本地数据</div>
         <div class="benefit-item"><span class="icon">🔄</span> 永久更新</div>
       </div>
-      <p style="color:#64748B;font-size:14px;margin-bottom:12px;">留下联系方式，上线第一时间通知 + 早鸟优惠</p>
+      <p style="color:var(--text-muted);font-size:14px;margin-bottom:12px;">留下联系方式，上线第一时间通知 + 早鸟优惠</p>
       <div class="notify-box">
-        <input type="email" placeholder="输入邮箱地址" id="notifyEmail">
-        <button class="btn btn-gold" style="font-size:14px;padding:12px 24px;" onclick="document.getElementById('notifyEmail').value ? alert('✅ 已记录！桌面版上线时我们会第一时间通知你。') : alert('请输入邮箱地址')">🔔 通知我</button>
+        <input type="email" placeholder="输入邮箱地址" id="notifyEmail" aria-label="邮件通知邮箱">
+        <button class="btn btn-gold" style="font-size:14px;padding:12px 24px;" onclick="document.getElementById('notifyEmail').value ? alert('✅ 已记录！桌面版上线时我们会第一时间通知你。') : alert('请输入邮箱地址')">通知我</button>
       </div>
-      <p style="color:#475569;font-size:12px;margin-top:8px;">不加微信也能收到通知 · 也可以直接加客服微信 <b style="color:#94A3B8;">Mamba4life__0824</b> 提前锁定早鸟价</p>
+      <p style="color:var(--text-muted);font-size:12px;margin-top:8px;">不加微信也能收到通知 · 也可以直接加客服微信 <b style="color:var(--text-secondary);">Mamba4life__0824</b> 提前锁定早鸟价</p>
     </div>
 
   </div>
@@ -549,26 +1191,28 @@
 <!-- ═══════ Payment ═══════ -->
 <div class="container" style="padding-bottom:60px;">
   <div class="section">
-    <h2>🇨🇳 微信/支付宝订阅</h2>
-    <p class="subtitle">网页版 ¥29.9/月（CFR 求解 + 牌桌模拟 + GTO 训练）· 桌面终身版 ¥666.66（含 AI 教练 + 离线，即将上线）</p>
+    <div class="section-header">
+      <h2>微信/支付宝订阅</h2>
+      <p class="subtitle">网页版 ¥29.9/月（CFR 求解 + 牌桌模拟 + GTO 训练）· 桌面终身版 ¥666.66（含 AI 教练 + 离线，即将上线）</p>
+    </div>
 
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; max-width: 900px; margin: 0 auto;">
+    <div class="payment-grid">
 
-      <!-- Web Subscription -->
-      <div style="background:#090D14; border:1px solid #10B98133; border-radius:20px; padding:32px; text-align:center; position:relative;">
-        <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#10B981; color:white; padding:4px 16px; border-radius:10px; font-size:12px; font-weight:700;">推荐</div>
-        <h3 style="font-size:20px; margin-bottom:12px;">🌐 网页版 · 核心功能全开</h3>
-        <div style="font-size:36px; font-weight:900; color:#34D399; margin-bottom:4px;">¥29.9</div>
-        <div style="color:#64748B; font-size:13px; margin-bottom:8px;">/ 月 · 7 天免费试用</div>
-        <div style="color:#94A3B8; font-size:13px; margin-bottom:20px;">年付 ¥199/年 (省 ¥160 · 相当于 ¥16.6/月)</div>
+      <!-- Web -->
+      <div class="payment-card web-plan">
+        <div class="top-badge recommend">推荐</div>
+        <h3>网页版 · 核心功能全开</h3>
+        <div class="price-large" style="color:#34D399;">¥29.9</div>
+        <div class="price-hint">/ 月 · 7 天免费试用</div>
+        <div style="color:var(--text-secondary);font-size:13px;margin-bottom:20px;">年付 ¥199/年 (省 ¥160 · 相当于 ¥16.6/月)</div>
 
-        <div style="background:#111; border-radius:12px; padding:20px; margin-bottom:16px;">
-          <p style="font-size:13px; color:#94A3B8; margin-bottom:12px;">📱 微信/支付宝扫码订阅，自助开通</p>
-          <img src="/poker-gto-trainer/payment/wechat-pay-qr.png" alt="微信支付" style="width:180px; height:180px; border-radius:12px; margin:0 auto 8px; display:block; object-fit:contain; background:white; padding:8px;" onerror="this.style.display='none'" onload="this.style.display='block'">
-          <p style="font-size:11px; color:#64748B;">客服微信: <b>Mamba4life__0824</b></p>
+        <div class="qr-box">
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">微信/支付宝扫码订阅，自助开通</p>
+          <img src="/poker-gto-trainer/payment/wechat-pay-qr.png" alt="微信支付二维码" style="width:180px;height:180px;border-radius:12px;margin:0 auto 8px;display:block;object-fit:contain;background:white;padding:8px;" onerror="this.style.display='none'" onload="this.style.display='block'">
+          <p style="font-size:11px;color:var(--text-muted);">客服微信: <b>Mamba4life__0824</b></p>
         </div>
 
-        <div style="text-align:left; font-size:13px; color:#94A3B8; line-height:2;">
+        <div class="steps">
           <b>开通流程：</b><br>
           1️⃣ 扫码支付 ¥29.9（首月）<br>
           2️⃣ 截图支付凭证<br>
@@ -576,30 +1220,30 @@
           4️⃣ 收到激活链接 → 立即使用<br>
           5️⃣ 7 天试用期内不满意全额退
         </div>
-        <div style="margin-top:16px; padding:14px; background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.2); border-radius:12px;">
-          <p style="font-size:12px; color:#34D399; font-weight:600; margin-bottom:6px;">✅ 已订阅？直接开始训练</p>
-          <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" style="display:block; padding:10px 0; background:#34D399; color:#0A0A0A; border-radius:10px; font-size:13px; font-weight:700; text-decoration:none; text-align:center;">打开网页版 🚀</a>
+        <div class="action-box green">
+          <p style="font-size:12px;color:#34D399;font-weight:600;margin-bottom:6px;">✅ 已订阅？直接开始训练</p>
+          <a href="https://eoi55ae5bfevy.ok.kimi.link" target="_blank" rel="noopener" style="display:block;padding:10px 0;background:#34D399;color:#0A0A0A;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;text-align:center;">打开网页版</a>
         </div>
       </div>
 
-      <!-- Desktop Lifetime -->
-      <div style="background:#090D14; border:1px solid #F59E0B33; border-radius:20px; padding:32px; text-align:center; position:relative;">
-        <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#F59E0B; color:black; padding:4px 16px; border-radius:10px; font-size:12px; font-weight:700;">即将上线</div>
-        <h3 style="font-size:20px; margin-bottom:12px;">🖥️ 桌面版 · 终身买断</h3>
-        <div style="font-size:36px; font-weight:900; color:#F59E0B; margin-bottom:4px;">¥666.66</div>
-        <div style="color:#64748B; font-size:13px; margin-bottom:8px;">一次付费 · 永久使用 · 含所有大版本更新</div>
-        <div style="color:#94A3B8; font-size:13px; margin-bottom:20px;">含 AI 教练 + 离线 + 高精度引擎 + Node Locking · 预计 2026 年 9 月上线</div>
+      <!-- Desktop -->
+      <div class="payment-card desktop-plan">
+        <div class="top-badge upcoming">即将上线</div>
+        <h3>桌面版 · 终身买断</h3>
+        <div class="price-large" style="color:#F59E0B;">¥666.66</div>
+        <div class="price-hint">一次付费 · 永久使用 · 含所有大版本更新</div>
+        <div style="color:var(--text-secondary);font-size:13px;margin-bottom:20px;">含 AI 教练 + 离线 + 高精度引擎 + Node Locking · 预计 2026 年 9 月上线</div>
 
-        <div style="background:#111; border-radius:12px; padding:20px; margin-bottom:16px;">
-          <p style="font-size:13px; color:#94A3B8; margin-bottom:12px;">📱 提前锁定早鸟价，上线优先通知</p>
-          <div style="display:flex; gap:12px; justify-content:center;">
-            <img src="/poker-gto-trainer/payment/wechat-pay-qr.png" alt="微信支付" style="width:140px; height:140px; border-radius:12px; object-fit:contain; background:white; padding:6px;" onerror="this.style.display='none'" onload="this.style.display='block'">
-            <img src="/poker-gto-trainer/payment/alipay-qr.png" alt="支付宝" style="width:140px; height:140px; border-radius:12px; object-fit:contain; background:white; padding:6px;" onerror="this.style.display='none'" onload="this.style.display='block'">
+        <div class="qr-box">
+          <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">提前锁定早鸟价，上线优先通知</p>
+          <div style="display:flex;gap:12px;justify-content:center;">
+            <img src="/poker-gto-trainer/payment/wechat-pay-qr.png" alt="微信支付二维码" style="width:140px;height:140px;border-radius:12px;object-fit:contain;background:white;padding:6px;" onerror="this.style.display='none'" onload="this.style.display='block'">
+            <img src="/poker-gto-trainer/payment/alipay-qr.png" alt="支付宝二维码" style="width:140px;height:140px;border-radius:12px;object-fit:contain;background:white;padding:6px;" onerror="this.style.display='none'" onload="this.style.display='block'">
           </div>
-          <p style="font-size:11px; color:#64748B; margin-top:8px;">客服: Mamba4life__0824</p>
+          <p style="font-size:11px;color:var(--text-muted);margin-top:8px;">客服: Mamba4life__0824</p>
         </div>
 
-        <div style="text-align:left; font-size:13px; color:#94A3B8; line-height:2;">
+        <div class="steps">
           <b>桌面版特权：</b><br>
           ✅ 网页版全部功能 · 永久有效<br>
           ✅ 离线使用 · 无需网络<br>
@@ -607,38 +1251,38 @@
           ✅ 所有大版本免费更新<br>
           ✅ 优先功能请求通道
         </div>
-        <div style="margin-top:16px; padding:14px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.2); border-radius:12px;">
-          <p style="font-size:12px; color:#FBBF24; font-weight:600; margin-bottom:6px;">🔔 桌面版上线通知</p>
-          <p style="font-size:11px; color:#64748B; margin-bottom:10px;">留下联系方式或加客服微信，上线第一时间通知 + 早鸟价</p>
-          <a href="#desktop-teaser" style="display:block; padding:10px 0; background:#F59E0B; color:#0A0A0A; border-radius:10px; font-size:13px; font-weight:700; text-decoration:none; text-align:center;">📩 预约早鸟价</a>
+        <div class="action-box gold">
+          <p style="font-size:12px;color:#FBBF24;font-weight:600;margin-bottom:6px;">桌面版上线通知</p>
+          <p style="font-size:11px;color:var(--text-muted);margin-bottom:10px;">留下联系方式或加客服微信，上线第一时间通知 + 早鸟价</p>
+          <a href="#desktop-teaser" style="display:block;padding:10px 0;background:#F59E0B;color:#0A0A0A;border-radius:10px;font-size:13px;font-weight:700;text-decoration:none;text-align:center;">预约早鸟价</a>
         </div>
       </div>
 
     </div>
 
     <!-- Community -->
-    <div id="community" class="animate" style="text-align:center; margin-top:60px; padding:40px 24px; background: linear-gradient(135deg, #0F172A, #1A1040); border: 1px solid #1E293B; border-radius:20px; max-width:600px; margin-left:auto; margin-right:auto;">
-      <p style="font-size:14px; color:#A78BFA; font-weight:700; margin-bottom:8px; letter-spacing:0.05em;">🧠 加入社群</p>
-      <p style="font-size:24px; font-weight:900; color:#EDF1F7; margin-bottom:8px;">PokerGTO 学习交流群</p>
-      <p style="font-size:14px; color:#94A3B8; margin-bottom:24px; max-width:400px; margin-left:auto; margin-right:auto;">
+    <div class="community-block animate" id="community">
+      <p class="label">加入社群</p>
+      <p class="title">PokerGTO 学习交流群</p>
+      <p class="desc">
         免费手牌分析 · GTO 策略讨论 · 软件内测资格 · 桌面版早鸟优惠
       </p>
-      <div style="display:inline-block; background:white; padding:8px; border-radius:12px; box-shadow:0 4px 24px rgba(167,139,250,0.15);">
-        <img src="/poker-gto-trainer/payment/wechat-group-qr.png" alt="微信群二维码" style="width:160px; height:160px; display:block; border-radius:8px;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div style="width:160px; height:160px; background:#1A1A1A; border:1px dashed #333; border-radius:8px; display:none; align-items:center; justify-content:center; color:#64748B; font-size:12px; text-align:center; line-height:1.6; flex-direction:column; gap:8px;">
+      <div style="display:inline-block;background:white;padding:8px;border-radius:12px;box-shadow:0 4px 24px rgba(167,139,250,0.15);">
+        <img src="/poker-gto-trainer/payment/wechat-group-qr.png" alt="微信群二维码" style="width:160px;height:160px;display:block;border-radius:8px;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div style="width:160px;height:160px;background:#1A1A1A;border:1px dashed #333;border-radius:8px;display:none;align-items:center;justify-content:center;color:var(--text-muted);font-size:12px;text-align:center;line-height:1.6;flex-direction:column;gap:8px;">
           <span style="font-size:28px;">📱</span>
           <span>群二维码<br>即将更新</span>
         </div>
       </div>
-      <p style="font-size:12px; color:#64748B; margin-top:12px;">扫码加入 · 或加客服微信 <b style="color:#94A3B8;">Mamba4life__0824</b> 手动拉群</p>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:12px;">扫码加入 · 或加客服微信 <b style="color:var(--text-secondary);">Mamba4life__0824</b> 手动拉群</p>
     </div>
 
-    <!-- Stripe International -->
-    <div style="text-align:center; margin-top:24px; padding:20px; background:#111; border:1px solid #222; border-radius:16px; max-width:600px; margin-left:auto; margin-right:auto;">
-      <p style="font-size:14px; color:#94A3B8; margin-bottom:4px;">
-        🌍 国际用户支持信用卡支付 (Visa/Mastercard)
+    <!-- Stripe -->
+    <div style="text-align:center;margin-top:24px;padding:20px;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-md);max-width:600px;margin-left:auto;margin-right:auto;">
+      <p style="font-size:14px;color:var(--text-secondary);margin-bottom:4px;">
+        国际用户支持信用卡支付 (Visa/Mastercard)
       </p>
-      <p style="font-size:12px; color:#64748B;">
+      <p style="font-size:12px;color:var(--text-muted);">
         网页版 ¥29.9/月或 $4.99/月，Stripe 安全支付
       </p>
     </div>
@@ -648,88 +1292,96 @@
 <!-- ═══════ FAQ ═══════ -->
 <div class="container" id="faq">
   <div class="section">
-    <h2>❓ 常见问题</h2>
-    <p class="subtitle">关于产品和定价，你想知道的都在这里</p>
-    <div style="max-width:800px; margin:0 auto; display:flex; flex-direction:column; gap:12px;">
-      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
-        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">和 GTO Wizard 比有什么区别？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">功能覆盖 GTO Wizard 核心能力：网页版 ¥29.9/月提供 CFR 求解、牌桌模拟、范围矩阵、GTO 训练、EV 反馈，价格仅为 GTO Wizard（¥499/月）的 1/16。桌面终身版 ¥666.66 增加 AI 教练（DeepSeek V4）、离线模式、高精度本地引擎、Node Locking 等深度分析功能，一次买断。全中文界面。如果你需要全英文国际顶级品牌，选 GTO Wizard；如果你想要高性价比的中文 GTO 训练工具，选我们。</p>
+    <div class="section-header">
+      <h2>常见问题</h2>
+      <p class="subtitle">关于产品和定价，你想知道的都在这里</p>
+    </div>
+    <div class="faq-list">
+      <details>
+        <summary>和 GTO Wizard 比有什么区别？</summary>
+        <div class="answer">功能覆盖 GTO Wizard 核心能力：网页版 ¥29.9/月提供 CFR 求解、牌桌模拟、范围矩阵、GTO 训练、EV 反馈，价格仅为 GTO Wizard（¥499/月）的 1/16。桌面终身版 ¥666.66 增加 AI 教练（DeepSeek V4）、离线模式、高精度本地引擎、Node Locking 等深度分析功能，一次买断。全中文界面。如果你需要全英文国际顶级品牌，选 GTO Wizard；如果你想要高性价比的中文 GTO 训练工具，选我们。</div>
       </details>
-      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
-        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">网页版和桌面版有什么区别？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;"><b>🌐 网页版（¥29.9/月）：</b>浏览器直接使用，含 CFR 求解（浏览器 Web Worker 引擎）、牌桌模拟（AI 对局训练）、翻前范围矩阵、GTO 训练模式、EV 反馈、范围编辑器、Range Battle、胜率训练、Bluff Catcher。7 天免费试用，无需绑卡。<br><br><b>🖥️ 桌面版（¥666.66 终身，即将上线）：</b>在网页版全部功能基础上，增加 🧠 AI 教练（DeepSeek V4 实时解说）、📡 离线使用、⚡ 高精度本地 CFR 引擎（比网页版更快更准）、🔒 Node Locking、🔄 转牌/河牌深度分析、👥 多人底池分析（3-6人）、📂 手牌历史文件导入 + PDF 导出。一次付费永久使用，所有大版本免费更新。</p>
+      <details>
+        <summary>网页版和桌面版有什么区别？</summary>
+        <div class="answer"><b>网页版（¥29.9/月）：</b>浏览器直接使用，含 CFR 求解（浏览器 Web Worker 引擎）、牌桌模拟（AI 对局训练）、翻前范围矩阵、GTO 训练模式、EV 反馈、范围编辑器、Range Battle、胜率训练、Bluff Catcher。7 天免费试用，无需绑卡。<br><br><b>桌面版（¥666.66 终身，即将上线）：</b>在网页版全部功能基础上，增加 AI 教练（DeepSeek V4 实时解说）、离线使用、高精度本地 CFR 引擎（比网页版更快更准）、Node Locking、转牌/河牌深度分析、多人底池分析（3-6人）、手牌历史文件导入 + PDF 导出。一次付费永久使用，所有大版本免费更新。</div>
       </details>
-      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
-        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">有免费试用吗？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">有！网页版提供 7 天免费试用，无需绑卡。试用期间所有功能全部开放，没有任何限制。到期后如果选择不续费，基础功能（范围矩阵查询、EV 反馈）仍可继续免费使用。</p>
+      <details>
+        <summary>有免费试用吗？</summary>
+        <div class="answer">有！网页版提供 7 天免费试用，无需绑卡。试用期间所有功能全部开放，没有任何限制。到期后如果选择不续费，基础功能（范围矩阵查询、EV 反馈）仍可继续免费使用。</div>
       </details>
-      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
-        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">桌面版什么时候上线？已经订阅网页版的有优惠吗？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">桌面版预计 2026 年 9 月上线。已经订阅网页版的用户，<b style="color:#FBBF24;">已付订阅费可全额抵扣桌面终身版</b>。例如你已付 3 个月 ¥89.7，购买桌面版只需补 ¥666.66 - ¥89.7 = ¥576.96。相当于先用网页版练手，桌面版出来无缝升级，不花冤枉钱。</p>
+      <details>
+        <summary>桌面版什么时候上线？已经订阅网页版的有优惠吗？</summary>
+        <div class="answer">桌面版预计 2026 年 9 月上线。已经订阅网页版的用户，<b style="color:#FBBF24;">已付订阅费可全额抵扣桌面终身版</b>。例如你已付 3 个月 ¥89.7，购买桌面版只需补 ¥666.66 - ¥89.7 = ¥576.96。相当于先用网页版练手，桌面版出来无缝升级，不花冤枉钱。</div>
       </details>
-      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
-        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">不付费能用什么？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">不付费的情况下，可以使用基础功能：翻前范围矩阵查询、基础 EV 反馈。免费试用 7 天后如果决定不订阅，这些基础功能仍然保留。要使用 CFR 求解器、牌桌模拟、GTO 训练模式等完整功能，需要订阅网页版（¥29.9/月）或等待桌面终身版上线。</p>
+      <details>
+        <summary>不付费能用什么？</summary>
+        <div class="answer">不付费的情况下，可以使用基础功能：翻前范围矩阵查询、基础 EV 反馈。免费试用 7 天后如果决定不订阅，这些基础功能仍然保留。要使用 CFR 求解器、牌桌模拟、GTO 训练模式等完整功能，需要订阅网页版（¥29.9/月）或等待桌面终身版上线。</div>
       </details>
-      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
-        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">macOS 提示「无法验证开发者」，安全吗？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">安全。这只是因为我们还没购买 Apple 官方签名（$99/年）。打开 系统设置 → 隐私与安全性 → 找到「PokerGTO Trainer 已被阻止」→ 点「仍要打开」即可，只需操作一次。软件 100% 本地运行，不联网、不收集数据。</p>
+      <details>
+        <summary>macOS 提示「无法验证开发者」，安全吗？</summary>
+        <div class="answer">安全。这只是因为我们还没购买 Apple 官方签名（$99/年）。打开 系统设置 → 隐私与安全性 → 找到「PokerGTO Trainer 已被阻止」→ 点「仍要打开」即可，只需操作一次。软件 100% 本地运行，不联网、不收集数据。</div>
       </details>
-      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
-        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">支持哪些系统？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">网页版所有设备可用（电脑、平板、手机）。桌面版支持 macOS（Apple Silicon，M 系列芯片）和 Windows 10/11 x64，Linux 版打包中。</p>
+      <details>
+        <summary>支持哪些系统？</summary>
+        <div class="answer">网页版所有设备可用（电脑、平板、手机）。桌面版支持 macOS（Apple Silicon，M 系列芯片）和 Windows 10/11 x64，Linux 版打包中。</div>
       </details>
-      <details style="background:#090D14; border:1px solid #152233; border-radius:12px; padding:16px 20px;">
-        <summary style="cursor:pointer; font-weight:700; font-size:15px; color:#EDF1F7;">怎么付款？不满意可以退吗？</summary>
-        <p style="margin-top:10px; font-size:14px; color:#94A3B8; line-height:1.7;">微信/支付宝扫码付款，加客服微信获取激活链接或卡密。网页版：7 天试用期内不满意全额退款。桌面终身版：购买后 7 天内不满意全额退款。国际用户可通过 Stripe 信用卡支付。</p>
+      <details>
+        <summary>怎么付款？不满意可以退吗？</summary>
+        <div class="answer">微信/支付宝扫码付款，加客服微信获取激活链接或卡密。网页版：7 天试用期内不满意全额退款。桌面终身版：购买后 7 天内不满意全额退款。国际用户可通过 Stripe 信用卡支付。</div>
       </details>
     </div>
   </div>
 </div>
 
-<!-- Tech -->
+<!-- ═══════ Tech Footer ═══════ -->
 <div class="container" style="text-align:center;padding-bottom:16px;">
-  <p style="color:#475569;font-size:13px;">
-    🌐 网页版 ¥29.9/月：CFR 求解 · 牌桌模拟 · 范围矩阵 · GTO 训练 · EV 反馈 · 7 天免费试用<br>
-    🖥️ 桌面终身版 ¥666.66：AI 教练 · 离线可用 · 高精度引擎 · Node Locking · 即将上线<br>
+  <p style="color:var(--text-muted);font-size:13px;line-height:1.8;">
+    网页版 ¥29.9/月：CFR 求解 · 牌桌模拟 · 范围矩阵 · GTO 训练 · EV 反馈 · 7 天免费试用<br>
+    桌面终身版 ¥666.66：AI 教练 · 离线可用 · 高精度引擎 · Node Locking · 即将上线<br>
     macOS / Windows / Linux · 微信/支付宝/Stripe
   </p>
 </div>
 
-<!-- Kimi 备用入口 -->
-<div class="container" style="text-align:center;padding-bottom:40px;">
-  <p style="color:#475569;font-size:11px;">
-    原 Kimi 部署（额度用尽，备用）：
-    <a href="https://eoi55ae5bfevy.ok.kimi.link/" target="_blank" rel="noopener" style="color:#556278;text-decoration:underline;text-underline-offset:2px;">eoi55ae5bfevy.ok.kimi.link</a>
-  </p>
-</div>
-
 <div class="footer">
-  PokerGTO Trainer · &copy; 2026 · poker-gto-trainer<br>
-  <span style="color:#475569;">🌐 网页版 ¥29.9/月（CFR + 牌桌模拟 + GTO训练）· 🖥️ 桌面版 ¥666.66 终身（含 AI 教练 + 离线，即将上线）· 微信/支付宝 · Stripe</span><br>
-  <a href="/poker-gto-trainer/privacy.html" style="color:#475569;font-size:12px;">隐私政策</a> &middot;
-  <a href="/poker-gto-trainer/terms.html" style="color:#475569;font-size:12px;">服务条款</a>
+  PokerGTO Trainer · &copy; 2026<br>
+  <span style="color:var(--text-muted);">网页版 ¥29.9/月（CFR + 牌桌模拟 + GTO训练）· 桌面版 ¥666.66 终身（含 AI 教练 + 离线，即将上线）· 微信/支付宝 · Stripe</span><br>
+  <a href="/poker-gto-trainer/privacy.html">隐私政策</a> &middot;
+  <a href="/poker-gto-trainer/terms.html">服务条款</a>
 </div>
 
 <script>
-// ── Mobile Nav Toggle ──
+// ═══════════════════════════════════════════════
+// Mobile Nav Toggle
+// ═══════════════════════════════════════════════
 (function(){
-  var t = document.getElementById('navToggle');
-  var l = document.getElementById('navLinks');
-  if (!t || !l) return;
-  t.addEventListener('click', function(){
-    l.classList.toggle('open');
-    t.textContent = l.classList.contains('open') ? '✕' : '☰';
+  var toggle = document.getElementById('navToggle');
+  var links = document.getElementById('navLinks');
+  if (!toggle || !links) return;
+  toggle.addEventListener('click', function(){
+    var isOpen = links.classList.toggle('open');
+    toggle.textContent = isOpen ? '✕' : '☰';
+    toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   });
-  l.querySelectorAll('a').forEach(function(a){
+  links.querySelectorAll('a').forEach(function(a){
     a.addEventListener('click', function(){
-      l.classList.remove('open');
-      t.textContent = '☰';
+      links.classList.remove('open');
+      toggle.textContent = '☰';
+      toggle.setAttribute('aria-expanded', 'false');
     });
+  });
+  // Close on outside click
+  document.addEventListener('click', function(e){
+    if (!toggle.contains(e.target) && !links.contains(e.target)) {
+      links.classList.remove('open');
+      toggle.textContent = '☰';
+      toggle.setAttribute('aria-expanded', 'false');
+    }
   });
 })();
 
-// ── Build Range Matrix ──
+// ═══════════════════════════════════════════════
+// Range Matrix Builder
+// ═══════════════════════════════════════════════
 (function(){
   var ranks = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
   var m = document.getElementById('rangeMatrix');
@@ -757,16 +1409,19 @@
         else if (hi2 <= 3 && lo2 <= 9) cls = 'marginal';
         else cls = 'fold';
       }
-      html += '<div class="range-cell ' + cls + '">' + hand + '</div>';
+      html += '<div class="range-cell ' + cls + '" title="' + hand + '">' + hand + '</div>';
     }
   }
   m.innerHTML = html;
 })();
 
-// ── Sticky CTA bar ──
+// ═══════════════════════════════════════════════
+// Sticky Bottom CTA
+// ═══════════════════════════════════════════════
 (function() {
   var sticky = document.getElementById('stickyCta');
   var hero = document.getElementById('hero');
+  if (!sticky || !hero) return;
   var heroBottom = hero.offsetTop + hero.offsetHeight;
   var ticking = false;
 
@@ -786,9 +1441,16 @@
       ticking = true;
     }
   }, { passive: true });
+
+  // Recalculate on resize
+  window.addEventListener('resize', function() {
+    heroBottom = hero.offsetTop + hero.offsetHeight;
+  });
 })();
 
-// ── Scroll Animations ──
+// ═══════════════════════════════════════════════
+// Scroll Reveal (Intersection Observer)
+// ═══════════════════════════════════════════════
 (function(){
   var observer = new IntersectionObserver(function(entries){
     entries.forEach(function(entry){
@@ -803,35 +1465,21 @@
     observer.observe(el);
   });
 })();
-
-// ── OS Detection — highlight recommended download ──
-(function() {
-  var ua = navigator.userAgent || '';
-  var detected = 'mac'; // default
-  if (/Win/.test(ua)) detected = 'win';
-  else if (/Linux/.test(ua) && !/Android/.test(ua)) detected = 'linux';
-
-  var cards = document.querySelectorAll('.download-card[data-os]');
-  cards.forEach(function(card) {
-    if (card.getAttribute('data-os') === detected) {
-      card.classList.add('recommended');
-    }
-  });
-})();
 </script>
 
 <script>
-// ═══════════════════════════════════════════════════
+// ═══════════════════════════════════════════════
 // Casino Vault — Curated Poker Background
 // Cards · Chips · Lamp · Parallax · Particles
-// ═══════════════════════════════════════════════════
+// (Preserved from original — this is the soul of the page)
+// ═══════════════════════════════════════════════
 (function(){
   var canvas = document.getElementById('bgCanvas');
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
 
   var W, H, dpr;
-  var mx = 0, my = 0, tmx = 0, tmy = 0; // parallax mouse -1..1
+  var mx = 0, my = 0, tmx = 0, tmy = 0;
 
   function resize() {
     W = window.innerWidth; H = window.innerHeight;
@@ -854,11 +1502,9 @@
     };
   }
 
-  // Utils
   function lerp(a,b,t) { return a+(b-a)*t; }
   function rand(a,b) { return Math.random()*(b-a)+a; }
 
-  // Rhythm
   var bass=0, mid=0, beat=0, beatOn=false, rtm=0;
   function rhythm() {
     rtm++;
@@ -870,7 +1516,7 @@
     }
   }
 
-  // ── Card Back Pre-render (gold diamond pattern on deep blue) ──
+  // Card Back Pre-render
   var cardBackCache = {};
   function getCardBack(w) {
     var kw = Math.floor(w);
@@ -880,16 +1526,11 @@
     c.width = w*s; c.height = h*s;
     var cx = c.getContext('2d'); cx.scale(s,s);
     var r = w*0.1, m = w*0.07, G = '#B8942E';
-
-    // Body
     cx.fillStyle = '#0D1B3E'; cx.beginPath(); cx.roundRect(0,0,w,h,r); cx.fill();
-    // Gold border
     cx.strokeStyle = G; cx.lineWidth = 2.5;
     cx.beginPath(); cx.roundRect(1.5,1.5,w-3,h-3,r-0.5); cx.stroke();
-    // White inner line
     cx.strokeStyle = 'rgba(255,255,255,0.5)'; cx.lineWidth = 0.8;
     cx.beginPath(); cx.roundRect(m,m,w-m*2,h-m*2,r*0.6); cx.stroke();
-    // Diamond grid
     cx.strokeStyle = 'rgba(184,148,46,0.35)'; cx.lineWidth = 0.7;
     var ds = w*0.16, ox = w*0.13, oy = h*0.13;
     for (var dx=ox; dx<w-ox+ds; dx+=ds*2.3) {
@@ -899,23 +1540,20 @@
         cx.lineTo(dx, dy+ds); cx.lineTo(dx-ds, dy); cx.closePath(); cx.stroke();
       }
     }
-    // Center crest — large diamond
     cx.strokeStyle = 'rgba(184,148,46,0.55)'; cx.lineWidth = 1.3;
     var cs = w*0.24, cw2 = w/2, ch2 = h/2;
     cx.beginPath();
     cx.moveTo(cw2, ch2-cs); cx.lineTo(cw2+cs, ch2);
     cx.lineTo(cw2, ch2+cs); cx.lineTo(cw2-cs, ch2); cx.closePath(); cx.stroke();
-    // Center inner diamond
     cx.strokeStyle = 'rgba(184,148,46,0.25)'; cx.lineWidth = 0.6;
     var cs2 = cs*0.45;
     cx.beginPath();
     cx.moveTo(cw2, ch2-cs2); cx.lineTo(cw2+cs2, ch2);
     cx.lineTo(cw2, ch2+cs2); cx.lineTo(cw2-cs2, ch2); cx.closePath(); cx.stroke();
-
     cardBackCache[kw] = c; return c;
   }
 
-  // ── Card Face Pre-render ──
+  // Card Face Pre-render
   var RANKS = ['A','K','Q','J','10','9','8','7','6','5','4','3','2'];
   var SUITS = ['♠','♥','♦','♣'];
   var faceCache = {};
@@ -928,14 +1566,12 @@
     var c = document.createElement('canvas');
     c.width=w*s; c.height=h*s;
     var cx=c.getContext('2d'); cx.scale(s,s);
-
     cx.shadowColor='rgba(0,0,0,0.35)'; cx.shadowBlur=w*0.07; cx.shadowOffsetX=1; cx.shadowOffsetY=2;
     cx.fillStyle='#F5F1EB'; cx.beginPath(); cx.roundRect(0,0,w,h,r); cx.fill();
     cx.shadowColor='transparent'; cx.shadowBlur=0; cx.shadowOffsetX=0; cx.shadowOffsetY=0;
     cx.strokeStyle='rgba(0,0,0,0.22)'; cx.lineWidth=0.7; cx.beginPath(); cx.roundRect(0,0,w,h,r); cx.stroke();
     var ins=w*0.06;
     cx.strokeStyle='rgba(0,0,0,0.07)'; cx.lineWidth=0.5; cx.beginPath(); cx.roundRect(ins,ins,w-ins*2,h-ins*2,r*0.7); cx.stroke();
-
     var fs=w*0.24;
     cx.font='bold '+fs+'px -apple-system,"SF Pro Display",sans-serif';
     cx.fillStyle=color; cx.textAlign='left'; cx.textBaseline='top';
@@ -952,7 +1588,7 @@
     faceCache[key]=c; return c;
   }
 
-  // ── Cards (12, mix face-up / face-down) ──
+  // Cards
   var cards=[], NUM=12;
   function makeCard() {
     var fu = Math.random() > 0.3;
@@ -965,14 +1601,13 @@
       w: rand(58, 95), rot: rand(-0.35,0.35), tr: rand(-0.25,0.25),
       alpha: rand(0.14, 0.30), layer: rand(0,1),
       phase: rand(0,Math.PI*2), wobble: rand(0.3,1.0),
-      dealT: 1, // 0→1 dealing
+      dealT: 1,
     };
   }
   function initCards() { cards=[]; for(var i=0;i<NUM;i++) cards.push(makeCard()); }
   initCards();
 
-  // Deal animation — send one card from top-center
-  var dealTimer=0, dealInterval=240; // ~4s at 60fps
+  var dealTimer=0, dealInterval=240;
   function triggerDeal() {
     var ci = Math.floor(Math.random()*NUM);
     var c = cards[ci];
@@ -988,7 +1623,6 @@
     if (c.faceUp) { c.rank = RANKS[Math.floor(Math.random()*13)]; c.suit = SUITS[Math.floor(Math.random()*4)]; }
   }
 
-  // Fan spread — every 20s
   var fanTimer=0, fanActive=false, fanStart=0, FAN_DURATION=180;
   function triggerFan() {
     fanActive=true; fanStart=0;
@@ -1001,7 +1635,7 @@
     }
   }
 
-  // ── Chip Stacks ──
+  // Chip Stacks
   var chipColors = [
     ['#F5F5F5','#DC2626','#3B82F6','#1F2937'],
     ['#DC2626','#3B82F6','#F5F5F5','#10B981'],
@@ -1013,19 +1647,15 @@
     for (var i=0; i<count; i++) {
       var cy = y - i*4.5;
       var col = colors[i%colors.length];
-      // shadow
       ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.beginPath();
       ctx.roundRect(x-cw/2+2, cy-ch/2+2, cw, ch, ch/2); ctx.fill();
-      // body
       ctx.fillStyle=col; ctx.beginPath();
       ctx.roundRect(x-cw/2, cy-ch/2, cw, ch, ch/2); ctx.fill();
-      // highlight
       var grd = ctx.createLinearGradient(0, cy-ch/2, 0, cy+ch/2);
       grd.addColorStop(0,'rgba(255,255,255,0.35)'); grd.addColorStop(0.4,'rgba(255,255,255,0.05)');
       grd.addColorStop(1,'rgba(0,0,0,0.25)');
       ctx.fillStyle=grd; ctx.beginPath();
       ctx.roundRect(x-cw/2, cy-ch/2, cw, ch, ch/2); ctx.fill();
-      // edge spots
       for (var s=0; s<3; s++) {
         ctx.fillStyle='rgba(255,255,255,0.45)';
         ctx.fillRect(x-cw/2+5+s*10, cy-ch/2+1, 4, 1.5);
@@ -1034,7 +1664,7 @@
     ctx.globalAlpha=1;
   }
 
-  // ── Particles (50, no lines) ──
+  // Particles
   var particles=[], NP=50;
   function createP() {
     var cols=[[59,130,246],[139,92,246],[16,185,129]];
@@ -1046,7 +1676,7 @@
   function initP() { particles=[]; for(var i=0;i<NP;i++) particles.push(createP()); }
   initP();
 
-  // ── Glow Orbs (3) ──
+  // Glow Orbs
   var orbs=[], NO=3;
   function createO(i) {
     return { x:rand(W*0.15,W*0.85), y:rand(H*0.15,H*0.85),
@@ -1056,7 +1686,6 @@
   function initO() { orbs=[]; for(var i=0;i<NO;i++) { var o=createO(i); o.bx=o.x; o.by=o.y; o.r=o.baseR; orbs.push(o); } }
   initO();
 
-  // ── Felt dots ──
   function drawFelt() {
     var sp=4, a=0.02;
     ctx.fillStyle='rgba(255,255,255,'+a+')';
@@ -1064,7 +1693,6 @@
       if ((Math.floor(x/sp)+Math.floor(y/sp))%3===0) ctx.fillRect(x,y,0.7,0.7);
   }
 
-  // ── Lamp Cone ──
   function drawLamp() {
     var flicker = 1 + Math.sin(performance.now()*0.0007)*0.08 + Math.sin(performance.now()*0.0015)*0.05;
     var alpha = (0.045 + beat*0.03) * flicker;
@@ -1075,14 +1703,13 @@
     ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
   }
 
-  // ── Vignette ──
   function drawVignette() {
     var grad = ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.48, W/2, H/2, Math.max(W,H)*0.76);
     grad.addColorStop(0,'rgba(0,0,0,0)'); grad.addColorStop(1,'rgba(0,0,0,0.55)');
     ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
   }
 
-  // ═══════════════ RENDER ═══════════════
+  // Main render loop
   var lt=performance.now();
 
   function render(time) {
@@ -1090,23 +1717,19 @@
     var dt = (time-lt)/16.667; if (dt>3) dt=3; lt=time;
     if (W!==window.innerWidth||H!==window.innerHeight) resize();
 
-    // Mouse parallax smooth
     tmx += (mx-tmx)*0.04; tmy += (my-tmy)*0.04;
 
     rhythm(); beat*=0.85;
     var sm = 1 + mid*2 + beat*0.9;
 
-    // Schedulers
     dealTimer++; fanTimer++;
     if (!fanActive && dealTimer > dealInterval) { dealTimer=0; dealInterval=rand(200,300); triggerDeal(); }
     if (!fanActive && fanTimer > 1200) { fanTimer=0; triggerFan(); }
     if (fanActive) { fanStart++; if (fanStart > FAN_DURATION) { fanActive=false; fanTimer=0; } }
 
-    // ── Clear ──
-    ctx.clearRect(0,0,W,H); ctx.fillStyle='#05080C'; ctx.fillRect(0,0,W,H);
+    ctx.clearRect(0,0,W,H); ctx.fillStyle='#080C14'; ctx.fillRect(0,0,W,H);
     drawFelt();
 
-    // ── Orbs ──
     var oc=[[59,130,246],[139,92,246],[16,185,129]];
     for (var oi=0; oi<orbs.length; oi++) {
       var orb=orbs[oi];
@@ -1122,46 +1745,38 @@
       ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
     }
 
-    // ── Lamp Cone ──
     drawLamp();
 
-    // ── Cards ──
     for (var ci=0; ci<cards.length; ci++) {
       var card=cards[ci];
-      // Dealing progress
       if (card.dealT < 1) {
         card.dealT = Math.min(1, card.dealT + 0.018*dt);
-        var t = card.dealT, et = 1-Math.pow(1-t,3); // ease-out cubic
+        var t = card.dealT, et = 1-Math.pow(1-t,3);
         card.x = lerp(card.x, card.tx, et*0.1 + (t>0.9?0.15:0));
         card.y = lerp(card.y, card.ty, et*0.1 + (t>0.9?0.15:0));
         if (t > 0.98) { card.x=card.tx; card.y=card.ty; card.rot=card.tr; card.dealT=1; }
       }
-      // Gentle float
       var px = tmx*card.layer*50, py = tmy*card.layer*35;
       card.x = lerp(card.x, card.tx+px+Math.sin(time*0.0004+card.phase)*card.wobble, 0.003*dt);
       card.y = lerp(card.y, card.ty+py+Math.cos(time*0.0005+card.phase)*card.wobble, 0.003*dt);
       card.rot = lerp(card.rot, card.tr, 0.02*dt);
-      // Wrap
       if (card.x<-200) card.x=W+200; if (card.x>W+200) card.x=-200;
       if (card.y<-200) card.y=H+200; if (card.y>H+200) card.y=-200;
 
       var h=card.w*1.4, ca=card.alpha+beat*0.04;
       ctx.save(); ctx.globalAlpha=ca; ctx.translate(card.x, card.y); ctx.rotate(card.rot);
 
-      // Glow behind card
       var cg=oc[ci%3];
       var glow=ctx.createRadialGradient(0,0,card.w*0.2,0,0,card.w*0.85);
       glow.addColorStop(0,'rgba('+cg[0]+','+cg[1]+','+cg[2]+',0.2)');
       glow.addColorStop(1,'rgba(0,0,0,0)');
       ctx.fillStyle=glow; ctx.fillRect(-card.w*0.8,-h*0.8,card.w*1.6,h*1.6);
 
-      // Draw card
       var img = card.faceUp ? getCardFace(card.rank, card.suit, card.w) : getCardBack(card.w);
       ctx.drawImage(img, -card.w/2, -h/2, card.w, h);
       ctx.restore();
     }
 
-    // ── Particles ──
     for (var pi=0; pi<particles.length; pi++) {
       var p=particles[pi]; p.life++;
       if (p.life>p.maxL) {
@@ -1179,7 +1794,6 @@
       if (p.sz>1.5) { ctx.beginPath(); ctx.arc(p.x,p.y,p.sz*3.2,0,Math.PI*2); ctx.fillStyle='rgba('+p.color[0]+','+p.color[1]+','+p.color[2]+','+(pa*0.1)+')'; ctx.fill(); }
     }
 
-    // ── Chip Stacks ──
     var chipAlpha = 0.3 + beat*0.08 + bass*0.1;
     var chipX = [W*0.08, W*0.91, W*0.5];
     var chipY = [H*0.82, H*0.88, H*0.92];
@@ -1190,7 +1804,6 @@
       drawChipStack(cx2, cy2, chipColors[chi], chipH[chi], chipAlpha);
     }
 
-    // ── Beat flash ──
     if (beatOn && beat>0.45) {
       var fa=beat*0.018;
       var fg=ctx.createRadialGradient(W/2, H/2, Math.min(W,H)*0.06, W/2, H/2, Math.max(W,H)*0.78);
@@ -1198,10 +1811,8 @@
       ctx.fillStyle=fg; ctx.fillRect(0,0,W,H);
     }
 
-    // ── Vignette ──
     drawVignette();
 
-    // ── Watermark ──
     var la=0.08+beat*0.03;
     ctx.fillStyle='rgba(59,130,246,'+la+')';
     ctx.font='500 11px -apple-system,BlinkMacSystemFont,"SF Pro Display",sans-serif'; ctx.textAlign='left';
@@ -1209,13 +1820,11 @@
     ctx.fillStyle='rgba(148,163,184,'+(la*0.5)+')'; ctx.fillText('TRAINER',24,H-14);
   }
 
-  // ── Mouse parallax ──
   document.addEventListener('mousemove', function(e) {
     mx = (e.clientX/W - 0.5)*2;
     my = (e.clientY/H - 0.5)*2;
   });
 
-  // ── Resize reposition ──
   var rt;
   window.addEventListener('resize', function() {
     clearTimeout(rt);

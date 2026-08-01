@@ -1,0 +1,14 @@
+node_modules/
+out/
+dist/app/
+src/
+resources/
+tests/
+mcp-server/
+packages/
+jarvis-platform/
+supabase/
+.git/
+.venv/
+*.dmg
+*.exe
