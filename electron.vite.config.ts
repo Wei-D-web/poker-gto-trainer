@@ -10,6 +10,9 @@ export default defineConfig({
     })],
     build: {
       outDir: 'out/main',
+      rollupOptions: {
+        input: resolve('src/main/index.ts'),
+      },
     },
   },
   preload: {
