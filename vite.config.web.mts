@@ -14,6 +14,7 @@ const __dirname = dirname(__filename)
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   root: resolve(__dirname, 'web'),
+  envDir: resolve(__dirname), // 从项目根读 .env（root 是 web/，默认找不到根目录的 env）
   base: '/poker-gto-trainer/app/',
   build: {
     outDir: resolve(__dirname, 'dist/web'),
